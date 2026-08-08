@@ -1,5 +1,3 @@
-import { HomePage } from "@/features/home";
-
 export default function Page() {
-  return <HomePage />;
+  return <>Hi mom</>;
 }

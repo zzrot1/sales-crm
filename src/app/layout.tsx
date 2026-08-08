@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { QueryProvider } from "@/providers/query-provider";
+import { AppProviders } from "@/providers/app-providers";
 
 export const metadata: Metadata = {
   title: "Sales CRM",
@@ -11,7 +11,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en">
       <body>
-        <QueryProvider>{children}</QueryProvider>
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   );

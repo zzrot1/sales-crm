@@ -1,38 +1,25 @@
 import ky, { type Options, type SearchParamsOption } from "ky";
 
-import {
-  getAccessToken,
-  handleUnauthorizedResponse,
-} from "@/features/auth/lib/api-auth";
+import { getBackendUrl } from "@/common/config";
+import { routes } from "@/common/routes";
 
-type ApiFetchOptions = {
-  method?: string;
+type ApiFetchOptions = Omit<RequestInit, "body"> & {
   params?: Record<string, unknown>;
   data?: unknown;
-  body?: BodyInit | Record<string, unknown> | null;
-  headers?: Options["headers"];
-  signal?: AbortSignal;
+  body?: BodyInit | null;
 };
 
 export type ErrorType<ErrorData = unknown> = ErrorData;
 export type BodyType<BodyData = unknown> = BodyData;
 
 const api = ky.create({
-  prefix: process.env.NEXT_PUBLIC_BACKEND_URL,
+  prefix: getBackendUrl(),
+  credentials: "include",
   hooks: {
-    beforeRequest: [
-      async ({ request }) => {
-        const token = await getAccessToken();
-
-        if (token) {
-          request.headers.set("Authorization", `Bearer ${token}`);
-        }
-      },
-    ],
     afterResponse: [
-      async ({ response }) => {
+      ({ response }) => {
         if (response.status === 401) {
-          await handleUnauthorizedResponse();
+          redirectToLogin();
         }
       },
     ],
@@ -52,10 +39,18 @@ export async function apiFetch<TResponse>(
   });
 
   if (response.status === 204) {
-    return undefined as TResponse;
+    return {
+      data: undefined,
+      status: response.status,
+      headers: response.headers,
+    } as TResponse;
   }
 
-  return response.json<TResponse>();
+  return {
+    data: await response.json(),
+    status: response.status,
+    headers: response.headers,
+  } as TResponse;
 }
 
 function getSearchParams(
@@ -100,4 +95,14 @@ function getBodyOptions(options: ApiFetchOptions): Pick<Options, "body" | "json"
   }
 
   return { json: body };
+}
+
+function redirectToLogin() {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const loginUrl = new URL(routes.login.path, window.location.origin);
+  loginUrl.searchParams.set("reason", routes.login.reasons.unauthorized);
+  window.location.href = loginUrl.toString();
 }

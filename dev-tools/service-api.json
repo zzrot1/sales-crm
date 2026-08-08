@@ -1,0 +1,353 @@
+{
+  "openapi": "3.0.0",
+  "components": {
+    "examples": {},
+    "headers": {},
+    "parameters": {},
+    "requestBodies": {},
+    "responses": {},
+    "schemas": {
+      "UserDto": {
+        "properties": {
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "googleId": { "type": "string", "nullable": true },
+          "isEmailVerified": { "type": "boolean" },
+          "role": { "type": "string", "enum": ["USER", "ADMIN"] },
+          "name": { "type": "string", "nullable": true },
+          "email": { "type": "string" },
+          "id": { "type": "number", "format": "double" }
+        },
+        "required": [
+          "updatedAt",
+          "createdAt",
+          "googleId",
+          "isEmailVerified",
+          "role",
+          "name",
+          "email",
+          "id"
+        ],
+        "type": "object"
+      },
+      "CreateUserRequest": {
+        "properties": {
+          "role": { "type": "string", "enum": ["USER", "ADMIN"] },
+          "name": { "type": "string" },
+          "email": { "type": "string" }
+        },
+        "required": ["email"],
+        "type": "object"
+      },
+      "PagedUsersResponse": {
+        "properties": {
+          "totalPages": { "type": "number", "format": "double" },
+          "limit": { "type": "number", "format": "double" },
+          "page": { "type": "number", "format": "double" },
+          "total": { "type": "number", "format": "double" },
+          "data": {
+            "items": { "$ref": "#/components/schemas/UserDto" },
+            "type": "array"
+          }
+        },
+        "required": ["totalPages", "limit", "page", "total", "data"],
+        "type": "object"
+      },
+      "UpdateUserRequest": {
+        "properties": {
+          "isEmailVerified": { "type": "boolean" },
+          "role": { "type": "string", "enum": ["USER", "ADMIN"] },
+          "name": { "type": "string", "nullable": true },
+          "email": { "type": "string" }
+        },
+        "type": "object"
+      },
+      "AuthUserDto": {
+        "properties": {
+          "googleId": { "type": "string", "nullable": true },
+          "isEmailVerified": { "type": "boolean" },
+          "role": { "type": "string", "enum": ["USER", "ADMIN"] },
+          "name": { "type": "string", "nullable": true },
+          "email": { "type": "string" },
+          "id": { "type": "number", "format": "double" }
+        },
+        "required": [
+          "googleId",
+          "isEmailVerified",
+          "role",
+          "name",
+          "email",
+          "id"
+        ],
+        "type": "object"
+      },
+      "AuthToken": {
+        "properties": {
+          "expires": { "type": "string", "format": "date-time" },
+          "token": { "type": "string" }
+        },
+        "required": ["expires", "token"],
+        "type": "object"
+      },
+      "AuthTokensResponse": {
+        "properties": {
+          "refresh": { "$ref": "#/components/schemas/AuthToken" },
+          "access": { "$ref": "#/components/schemas/AuthToken" }
+        },
+        "required": ["refresh", "access"],
+        "type": "object"
+      },
+      "AuthResponse": {
+        "properties": {
+          "tokens": { "$ref": "#/components/schemas/AuthTokensResponse" },
+          "user": { "$ref": "#/components/schemas/AuthUserDto" }
+        },
+        "required": ["tokens", "user"],
+        "type": "object"
+      },
+      "RefreshRequest": {
+        "properties": { "refreshToken": { "type": "string" } },
+        "required": ["refreshToken"],
+        "type": "object"
+      },
+      "LogoutRequest": {
+        "properties": { "refreshToken": { "type": "string" } },
+        "required": ["refreshToken"],
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "info": {
+    "title": "express-auth-postgresql",
+    "version": "1.0.0",
+    "license": { "name": "ISC" },
+    "contact": { "name": "Mihu Ioan" }
+  },
+  "paths": {
+    "/users": {
+      "post": {
+        "operationId": "CreateUser",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserDto" }
+              }
+            }
+          }
+        },
+        "tags": ["Users"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateUserRequest" }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "GetUsers",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PagedUsersResponse" }
+              }
+            }
+          }
+        },
+        "tags": ["Users"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "_page",
+            "required": false,
+            "schema": { "format": "double", "type": "number" }
+          },
+          {
+            "in": "query",
+            "name": "_limit",
+            "required": false,
+            "schema": { "format": "double", "type": "number" }
+          },
+          {
+            "in": "query",
+            "name": "_sortBy",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["createdAt", "email", "role"]
+            }
+          },
+          {
+            "in": "query",
+            "name": "_sortOrder",
+            "required": false,
+            "schema": { "type": "string", "enum": ["asc", "desc"] }
+          }
+        ]
+      }
+    },
+    "/users/{userId}": {
+      "get": {
+        "operationId": "GetUser",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserDto" }
+              }
+            }
+          }
+        },
+        "tags": ["Users"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": { "format": "double", "type": "number" }
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "UpdateUser",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserDto" }
+              }
+            }
+          }
+        },
+        "tags": ["Users"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": { "format": "double", "type": "number" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateUserRequest" }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "DeleteUser",
+        "responses": { "204": { "description": "No content" } },
+        "tags": ["Users"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": { "format": "double", "type": "number" }
+          }
+        ]
+      }
+    },
+    "/auth/google": {
+      "get": {
+        "operationId": "Google",
+        "responses": { "204": { "description": "No content" } },
+        "tags": ["Auth"],
+        "security": [],
+        "parameters": []
+      }
+    },
+    "/auth/google/callback": {
+      "get": {
+        "operationId": "GoogleCallback",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AuthResponse" }
+              }
+            }
+          }
+        },
+        "tags": ["Auth"],
+        "security": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "_code",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ]
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "operationId": "Refresh",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AuthTokensResponse" }
+              }
+            }
+          }
+        },
+        "tags": ["Auth"],
+        "security": [],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RefreshRequest" }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "operationId": "Logout",
+        "responses": { "204": { "description": "No content" } },
+        "tags": ["Auth"],
+        "security": [],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LogoutRequest" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "servers": [{ "url": "/v1" }]
+}
