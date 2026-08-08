@@ -1,0 +1,244 @@
+.dashboard {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.statsGrid {
+  display: grid;
+  gap: 1rem;
+}
+
+.statCard,
+.chartCard,
+.tableCard {
+  border: 1px solid #2f2f2f;
+  background: #171717;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.statCard {
+  min-height: 11.5rem;
+  border-radius: 0.85rem;
+  padding: 1.55rem;
+}
+
+.statHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: #b8c0cc;
+  font-size: 0.9rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border: 1px solid #303030;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.22rem 0.55rem;
+}
+
+.statValue {
+  margin-top: 0.7rem;
+  color: #fff;
+  font-size: clamp(2rem, 3vw, 2.4rem);
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+}
+
+.statTrend {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 1.75rem;
+  color: #fff;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.statDetail {
+  margin-top: 0.5rem;
+  color: #a8b0bd;
+  font-size: 0.92rem;
+}
+
+.chartCard {
+  border-radius: 0.9rem;
+  padding: 1.5rem;
+}
+
+.chartTop,
+.toolbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.sectionTitle {
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.sectionHint {
+  margin-top: 0.5rem;
+  color: #aab2bf;
+  font-size: 0.92rem;
+}
+
+.segmented {
+  display: inline-flex;
+  overflow: hidden;
+  border: 1px solid #333;
+  border-radius: 0.5rem;
+  background: #111;
+}
+
+.segmented button,
+.pill,
+.action {
+  border: 0;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+}
+
+.segmented button {
+  background: transparent;
+  border-right: 1px solid #303030;
+  padding: 0.7rem 1rem;
+}
+
+.segmented button:last-child {
+  border-right: 0;
+}
+
+.segmented .activeSegment {
+  background: #3a3a3a;
+}
+
+.chart {
+  position: relative;
+  height: 16rem;
+  margin-top: 3rem;
+  border-top: 1px solid #242424;
+  background:
+    linear-gradient(#222 1px, transparent 1px) 0 33% / 100% 33%,
+    linear-gradient(#222 1px, transparent 1px) 0 66% / 100% 33%;
+}
+
+.chart svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.chartLabels {
+  position: absolute;
+  inset: auto 0 -1.65rem;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  color: #6f7784;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.toolbar {
+  align-items: center;
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.pill,
+.action {
+  border: 1px solid #333;
+  border-radius: 0.5rem;
+  background: #1b1b1b;
+  padding: 0.48rem 0.72rem;
+  font-size: 0.88rem;
+}
+
+.pillActive {
+  background: #343434;
+  box-shadow: inset 0 0 0 1px #707070;
+}
+
+.counter {
+  display: inline-grid;
+  min-width: 1.2rem;
+  height: 1.2rem;
+  place-items: center;
+  margin-left: 0.28rem;
+  border-radius: 999px;
+  background: #555;
+  color: #fff;
+  font-size: 0.75rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.55rem;
+}
+
+.tableCard {
+  overflow: hidden;
+  border-radius: 0.75rem;
+}
+
+.tableHead,
+.tableRow {
+  display: grid;
+  grid-template-columns: 1.8fr 1.1fr 1fr 1fr 1fr 1fr;
+  gap: 1rem;
+  align-items: center;
+}
+
+.tableHead {
+  background: #262626;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 800;
+  padding: 0.8rem 1.5rem;
+}
+
+.tableRow {
+  color: #c7ced8;
+  border-top: 1px solid #292929;
+  padding: 0.85rem 1.5rem;
+  font-size: 0.88rem;
+}
+
+@media (min-width: 64rem) {
+  .statsGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 52rem) {
+  .chartTop,
+  .toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .tableCard {
+    overflow-x: auto;
+  }
+
+  .tableHead,
+  .tableRow {
+    min-width: 46rem;
+  }
+}

@@ -7,9 +7,9 @@ export enum RouteAccessType {
 }
 
 export const routes = {
-  home: {
+  dashboard: {
     name: "Dashboard",
-    path: "/",
+    path: "/dashboard",
     access: {
       type: RouteAccessType.Authenticated,
       roles: [AuthUserDtoRole.USER, AuthUserDtoRole.ADMIN],
