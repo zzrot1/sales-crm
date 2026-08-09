@@ -1,4 +1,11 @@
-import { ArrowDownRight, ArrowUpRight, Columns3, Plus } from "lucide-react";
+import {
+  ArrowDownRight,
+  ArrowUpRight,
+  ChevronDown,
+  Columns3,
+  Plus,
+} from "lucide-react";
+import { SectionsDataTable } from "./sections-data-table";
 import styles from "./index.module.css";
 
 const stats = [
@@ -126,7 +133,7 @@ export function DashboardPage() {
         </div>
         <div className={styles.actions}>
           <button className={styles.action} type="button">
-            <Columns3 size={14} /> Customize Columns
+            <Columns3 size={14} /> Customize Columns <ChevronDown size={14} />
           </button>
           <button className={styles.action} type="button">
             <Plus size={14} /> Add Section
@@ -134,26 +141,7 @@ export function DashboardPage() {
         </div>
       </section>
 
-      <section className={styles.tableCard}>
-        <div className={styles.tableHead}>
-          <span>Header</span>
-          <span>Section Type</span>
-          <span>Status</span>
-          <span>Target</span>
-          <span>Limit</span>
-          <span>Reviewer</span>
-        </div>
-        {["Revenue briefing", "Customer health", "Pipeline risk"].map((row, index) => (
-          <div className={styles.tableRow} key={row}>
-            <span>{row}</span>
-            <span>{index === 0 ? "Financial" : "Operations"}</span>
-            <span>{index === 2 ? "Review" : "Ready"}</span>
-            <span>Q3</span>
-            <span>{index + 3} days</span>
-            <span>Sales Ops</span>
-          </div>
-        ))}
-      </section>
+      <SectionsDataTable />
     </div>
   );
 }

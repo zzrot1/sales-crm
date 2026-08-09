@@ -15,6 +15,7 @@ export type BodyType<BodyData = unknown> = BodyData;
 const api = ky.create({
   prefix: getBackendUrl(),
   credentials: "include",
+  timeout: 60000,
   hooks: {
     afterResponse: [
       ({ response }) => {
@@ -106,3 +107,5 @@ function redirectToLogin() {
   loginUrl.searchParams.set("reason", routes.login.reasons.unauthorized);
   window.location.href = loginUrl.toString();
 }
+
+

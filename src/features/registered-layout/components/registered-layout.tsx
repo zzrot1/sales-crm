@@ -1,17 +1,15 @@
 "use client";
 
 import {
-  BarChart3,
-  Circle,
-  Database,
+  Building2,
+  ClipboardList,
+  Columns3,
   FileBarChart,
-  FileText,
-  Folder,
   LayoutDashboard,
   LogOut,
-  MoreHorizontal,
   PlusCircle,
-  UsersRound,
+  Settings,
+  Upload,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -22,26 +20,19 @@ import styles from "./index.module.css";
 
 const navGroups = [
   {
-    label: "Home",
+    label: "Aplicatie",
     items: [
       {
         name: routes.dashboard.name,
         href: routes.dashboard.path,
         icon: LayoutDashboard,
       },
-      { name: "Lifecycle", href: "/lifecycle", icon: Circle },
-      { name: "Analytics", href: "/analytics", icon: BarChart3 },
-      { name: "Projects", href: "/projects", icon: Folder },
-      { name: "Team", href: "/team", icon: UsersRound },
-    ],
-  },
-  {
-    label: "Documents",
-    items: [
-      { name: "Data Library", href: "/data-library", icon: Database },
-      { name: "Reports", href: "/reports", icon: FileBarChart },
-      { name: "Word Assistant", href: "/word-assistant", icon: FileText },
-      { name: "More", href: "/more", icon: MoreHorizontal },
+      { name: routes.companies.name, href: routes.companies.path, icon: Building2 },
+      { name: routes.deals.name, href: routes.deals.path, icon: Columns3 },
+      { name: routes.tasks.name, href: routes.tasks.path, icon: ClipboardList },
+      { name: routes.import.name, href: routes.import.path, icon: Upload },
+      { name: routes.reports.name, href: routes.reports.path, icon: FileBarChart },
+      { name: routes.settings.name, href: routes.settings.path, icon: Settings },
     ],
   },
 ];
@@ -52,6 +43,11 @@ type RegisteredLayoutProps = {
 
 export function RegisteredLayout({ children }: RegisteredLayoutProps) {
   const pathname = usePathname();
+  const activeItem = navGroups
+    .flatMap((group) => group.items)
+    .find((item) => pathname === item.href || pathname.startsWith(`${item.href}/`));
+  const quickCreateLabel =
+    activeItem?.href === routes.companies.path ? "Company" : "Quick Create";
 
   return (
     <div className={styles.shell}>
@@ -68,9 +64,7 @@ export function RegisteredLayout({ children }: RegisteredLayoutProps) {
               {group.items.map((item) => {
                 const Icon = item.icon;
                 const isActive =
-                  pathname === item.href ||
-                  (pathname === routes.dashboard.path &&
-                    item.name === "Analytics");
+                  pathname === item.href || pathname.startsWith(`${item.href}/`);
 
                 return (
                   <Link
@@ -93,7 +87,7 @@ export function RegisteredLayout({ children }: RegisteredLayoutProps) {
         <div className={styles.footer}>
           <div className={styles.workspace}>
             <span className={styles.workspaceAvatar}>AC</span>
-            <div>
+            <div className={styles.workspaceDetails}>
               <p className={styles.workspaceName}>Acme Inc.</p>
               <p className={styles.workspaceHint}>Workspace</p>
             </div>
@@ -110,10 +104,12 @@ export function RegisteredLayout({ children }: RegisteredLayoutProps) {
 
       <div className={styles.content}>
         <header className={styles.header}>
-          <h1 className={styles.pageTitle}>Documents</h1>
+          <h1 className={styles.pageTitle}>
+            {activeItem?.name ?? routes.dashboard.name}
+          </h1>
           <button className={styles.quickCreate} type="button">
             <PlusCircle size={15} />
-            Quick Create
+            {quickCreateLabel}
           </button>
         </header>
 

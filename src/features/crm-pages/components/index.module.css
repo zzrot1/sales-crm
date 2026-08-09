@@ -1,0 +1,784 @@
+.page {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  border: 1px solid #2f2f2f;
+  border-radius: 0.75rem;
+  background: #171717;
+  padding: 1.35rem;
+}
+
+.eyebrow {
+  color: #97a0ad;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.title {
+  margin-top: 0.4rem;
+  color: #fff;
+  font-size: 1.45rem;
+  font-weight: 850;
+}
+
+.description {
+  max-width: 42rem;
+  margin-top: 0.55rem;
+  color: #b8c0cc;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 2.4rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background: #f5f5f5;
+  color: #0d0d0d;
+  padding: 0 0.85rem;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.secondaryButton,
+.ghostButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 2.35rem;
+  border: 1px solid #343434;
+  border-radius: 0.5rem;
+  background: #101010;
+  color: #fff;
+  padding: 0 0.8rem;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.ghostButton {
+  background: transparent;
+  color: #c9d1dd;
+}
+
+.grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.twoColumns {
+  grid-template-columns: minmax(0, 1.25fr) minmax(18rem, 0.75fr);
+}
+
+.card,
+.tableCard,
+.column {
+  border: 1px solid #2f2f2f;
+  border-radius: 0.75rem;
+  background: #171717;
+}
+
+.card {
+  padding: 1.15rem;
+}
+
+.cardTitle {
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 850;
+}
+
+.muted {
+  color: #9ea7b5;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.statGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.statValue {
+  margin-top: 0.55rem;
+  color: #fff;
+  font-size: 1.8rem;
+  font-weight: 850;
+}
+
+.tableCard {
+  overflow: hidden;
+}
+
+.page > .tableCard {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 6.5rem);
+  min-height: 28rem;
+}
+
+.tableHead,
+.tableRow {
+  display: grid;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.85rem 1rem;
+}
+
+.tableHead {
+  background: #242424;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 850;
+}
+
+.tableRow {
+  border-top: 1px solid #292929;
+  color: #c7ced8;
+  font-size: 0.88rem;
+}
+
+.companiesTable {
+  grid-template-columns: 1.3fr 1fr 0.9fr 0.9fr;
+}
+
+.tasksTable {
+  grid-template-columns: 1.6fr 0.9fr 0.9fr 0.8fr;
+}
+
+.reportsTable {
+  grid-template-columns: 1.3fr 0.9fr 0.8fr 0.8fr;
+}
+
+.importTable {
+  grid-template-columns: 1.15fr 1fr 1.2fr 0.8fr 0.8fr;
+}
+
+.status {
+  display: inline-flex;
+  width: fit-content;
+  border: 1px solid #3a3a3a;
+  border-radius: 999px;
+  color: #fff;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.detailsList {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
+.detailItem {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid #292929;
+  padding-bottom: 0.75rem;
+  color: #c7ced8;
+  font-size: 0.88rem;
+}
+
+.detailItem:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.kanban {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(13rem, 1fr));
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+.column {
+  display: grid;
+  align-content: start;
+  gap: 0.75rem;
+  min-height: 21rem;
+  padding: 0.85rem;
+}
+
+.columnHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 850;
+}
+
+.dealCard {
+  display: grid;
+  gap: 0.45rem;
+  border: 1px solid #303030;
+  border-radius: 0.5rem;
+  background: #101010;
+  padding: 0.85rem;
+}
+
+.dealName {
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 850;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.filter {
+  border: 1px solid #333;
+  border-radius: 999px;
+  background: #1b1b1b;
+  color: #fff;
+  padding: 0.45rem 0.75rem;
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.activeFilter {
+  background: #f5f5f5;
+  color: #111;
+}
+
+.uploadBox {
+  display: grid;
+  place-items: center;
+  min-height: 11rem;
+  border: 1px dashed #505050;
+  border-radius: 0.75rem;
+  background: #101010;
+  color: #c7ced8;
+  text-align: center;
+}
+
+.dropzone {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-height: 9.25rem;
+  border: 1px dashed #454545;
+  border-radius: 0.75rem;
+  background: #111;
+  padding: 1.25rem;
+  cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.dropzone:hover,
+.dropzoneActive {
+  border-color: #d7dde8;
+  background: #171717;
+  box-shadow: inset 0 0 0 1px #3a3a3a;
+}
+
+.fileInput {
+  display: none;
+}
+
+.dropIcon {
+  display: grid;
+  flex: 0 0 auto;
+  width: 3rem;
+  height: 3rem;
+  place-items: center;
+  border: 1px solid #343434;
+  border-radius: 0.65rem;
+  background: #0b0b0b;
+  color: #e8edf5;
+}
+
+.dropCopy {
+  min-width: 0;
+  flex: 1;
+}
+
+.dropCopy h2 {
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 850;
+}
+
+.dropCopy p {
+  margin-top: 0.35rem;
+  color: #aab6c8;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.importSummary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border: 1px solid #2f2f2f;
+  border-radius: 0.75rem;
+  background: #171717;
+  padding: 0.9rem 1rem;
+}
+
+.fileMeta,
+.importActions,
+.importError {
+  display: flex;
+  align-items: center;
+}
+
+.fileMeta {
+  gap: 0.7rem;
+  min-width: 0;
+}
+
+.fileMeta svg {
+  flex: 0 0 auto;
+  color: #cbd5e1;
+}
+
+.fileMeta .cardTitle,
+.fileMeta .muted {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.importActions {
+  gap: 0.6rem;
+}
+
+.importError {
+  gap: 0.45rem;
+  color: #ffb4a8;
+  font-size: 0.9rem;
+  font-weight: 750;
+}
+
+.button svg,
+.ghostButton svg {
+  flex: 0 0 auto;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.field label {
+  color: #aab2bf;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.field input {
+  min-height: 2.45rem;
+  border: 1px solid #333;
+  border-radius: 0.5rem;
+  background: #101010;
+  color: #fff;
+  padding: 0 0.75rem;
+  font: inherit;
+}
+
+@media (max-width: 72rem) {
+  .twoColumns,
+  .statGrid,
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .dropzone,
+  .importSummary {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .secondaryButton,
+  .importActions {
+    width: 100%;
+  }
+
+  .importActions .button,
+  .importActions .ghostButton {
+    flex: 1;
+  }
+
+  .tableCard {
+    overflow-x: auto;
+  }
+
+  .tableHead,
+  .tableRow {
+    min-width: 42rem;
+  }
+}
+
+.dataTableScroll {
+  overflow-x: auto;
+}
+
+.tableToolbar {
+  display: flex;
+  justify-content: flex-end;
+  border-bottom: 1px solid #292929;
+  padding: 0.75rem 1rem;
+}
+
+.columnMenu {
+  position: relative;
+}
+
+.columnsButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 2.15rem;
+  border: 1px solid #343434;
+  border-radius: 0.5rem;
+  background: #101010;
+  color: #fff;
+  padding: 0 0.75rem;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.columnsButton:hover,
+.columnsButton[aria-expanded="true"] {
+  border-color: #515151;
+  background: #242424;
+}
+
+.columnsButton:focus-visible {
+  border-color: #d7dde8;
+  box-shadow: 0 0 0 3px rgba(215, 221, 232, 0.16);
+  outline: none;
+}
+
+.columnsPanel {
+  position: absolute;
+  top: calc(100% + 0.45rem);
+  right: 0;
+  z-index: 20;
+  display: grid;
+  min-width: 12rem;
+  gap: 0.15rem;
+  border: 1px solid #343434;
+  border-radius: 0.6rem;
+  background: #101010;
+  padding: 0.45rem;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.38);
+}
+
+.columnToggle {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  border-radius: 0.45rem;
+  color: #e8edf5;
+  padding: 0.45rem 0.5rem;
+  font-size: 0.86rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.columnToggle:hover {
+  background: #242424;
+}
+
+.columnToggle input {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  accent-color: #f5f5f5;
+  cursor: pointer;
+}
+
+.crmDataTable {
+  min-width: 58rem;
+}
+
+.crmDataTable th {
+  height: 2.85rem;
+  background: #242424;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 850;
+}
+
+.crmDataTable th:first-child,
+.crmDataTable td:first-child {
+  padding-left: 1.25rem;
+}
+
+.crmDataTable th:last-child,
+.crmDataTable td:last-child {
+  padding-right: 1rem;
+}
+
+.crmDataTable td {
+  border-top: 1px solid #292929;
+  color: #c7ced8;
+  font-size: 0.86rem;
+}
+
+.crmDataTable tr:hover td {
+  background: #1f242b;
+}
+
+.companyCell {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.companyCell span,
+.companyCell small,
+.companyCell a {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.companyCell span {
+  color: #fff;
+  font-weight: 800;
+}
+
+.companyCell small,
+.companyCell a {
+  color: #9ea7b5;
+  font-size: 0.78rem;
+}
+
+.companyCell a:hover {
+  color: #e8edf5;
+}
+
+.emptyCell {
+  height: 8rem;
+  color: #aab6c8 !important;
+  text-align: center;
+}
+
+.emptyCell > svg {
+  margin-right: 0.45rem;
+  vertical-align: middle;
+}
+
+.pagination,
+.paginationControls,
+.rowsPerPage,
+.pageButtons {
+  display: flex;
+  align-items: center;
+}
+
+.pagination {
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid #292929;
+  padding: 1rem;
+}
+
+.selectionCount {
+  color: #b3bdcc;
+  font-size: 0.88rem;
+}
+
+.paginationControls {
+  gap: 1.4rem;
+}
+
+.rowsPerPage {
+  gap: 0.65rem;
+  color: #fff;
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.pageSize {
+  min-width: 5rem;
+  height: 2.25rem;
+  border: 1px solid #343434;
+  border-radius: 0.5rem;
+  background: #101010;
+  color: #fff;
+  padding: 0 0.65rem;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.pageSize:hover {
+  border-color: #515151;
+  background: #1f1f1f;
+}
+
+.pageSize:focus-visible {
+  border-color: #d7dde8;
+  box-shadow: 0 0 0 3px rgba(215, 221, 232, 0.16);
+  outline: none;
+}
+
+.pageCount {
+  color: #fff;
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.pageButtons {
+  gap: 0.35rem;
+}
+
+.pageButtons button {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border: 1px solid #343434;
+  border-radius: 0.45rem;
+  background: #101010;
+  color: #e8edf5;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease;
+}
+
+.pageButtons button:not(:disabled):hover {
+  border-color: #515151;
+  background: #242424;
+  color: #fff;
+}
+
+.pageButtons button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.clickableTableRow {
+  cursor: pointer;
+}
+
+.clickableTableRow:focus-visible td {
+  background: #202832;
+  outline: 0;
+}
+
+.crmDataTable tr[data-state="selected"] td {
+  background: #202832;
+  color: #edf4ff;
+}
+
+.crmDataTable tr[data-state="muted"] td {
+  opacity: 0.68;
+}
+
+.sidePanelContent {
+  display: grid;
+  gap: 1rem;
+}
+
+.sidePanelIcon {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border: 1px solid #343434;
+  border-radius: 0.6rem;
+  background: #101010;
+  color: #e8edf5;
+}
+
+.sidePanelSection {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.sidePanelSection h3 {
+  color: #fff;
+  font-size: 0.92rem;
+  font-weight: 850;
+}
+
+.panelLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 2.35rem;
+  border: 1px solid #343434;
+  border-radius: 0.5rem;
+  background: #f5f5f5;
+  color: #101010;
+  font-size: 0.86rem;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.panelNotes {
+  white-space: pre-wrap;
+  color: #b8c0cc;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
