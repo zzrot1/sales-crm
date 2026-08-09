@@ -248,20 +248,7 @@ export function DataTable<TData>({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell className={styles.emptyCell} colSpan={visibleColumns.length}>
-                  <LoaderCircle className={styles.spinner} size={16} />
-                  {loadingMessage}
-                </TableCell>
-              </TableRow>
-            ) : isError ? (
-              <TableRow>
-                <TableCell className={styles.emptyCell} colSpan={visibleColumns.length}>
-                  Nu am putut incarca datele.
-                </TableCell>
-              </TableRow>
-            ) : visibleData.length ? (
+            {!isLoading && !isError && visibleData.length ? (
               visibleData.map((row) => (
                 <TableRow
                   className={onRowClick ? styles.clickableRow : undefined}
@@ -293,15 +280,23 @@ export function DataTable<TData>({
                   ))}
                 </TableRow>
               ))
-            ) : (
-              <TableRow>
-                <TableCell className={styles.emptyCell} colSpan={visibleColumns.length}>
-                  {emptyMessage}
-                </TableCell>
-              </TableRow>
-            )}
+            ) : null}
           </TableBody>
         </Table>
+        {isLoading || isError || !visibleData.length ? (
+          <div className={styles.emptyOverlay}>
+            <span className={styles.emptyStateContent}>
+              {isLoading ? (
+                <LoaderCircle className={styles.spinner} size={16} />
+              ) : null}
+              {isLoading
+                ? loadingMessage
+                : isError
+                  ? "Nu am putut incarca datele."
+                  : emptyMessage}
+            </span>
+          </div>
+        ) : null}
       </div>
 
       {hasPagination ? (

@@ -139,12 +139,24 @@
   overflow-y: auto;
 }
 
+.emptyOverlay {
+  position: absolute;
+  inset: 2.85rem 0 0 0;
+  display: grid;
+  width: 100%;
+  place-items: center;
+  color: #aab6c8;
+  pointer-events: none;
+  text-align: center;
+}
+
 .scroll :global([data-slot="table-container"]) {
   overflow: visible;
 }
 
 .table {
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   table-layout: fixed;
 }
 
@@ -219,6 +231,7 @@
 }
 
 .table td {
+  background: #171717;
   height: 3.05rem;
   border-bottom: 1px solid #292929;
   color: #c7ced8;
@@ -234,16 +247,19 @@
   border-bottom: 0;
 }
 
-.table tr:hover td {
+.table tr:hover td,
+.table tr:hover td.fixedColumn {
   background: #1f242b;
 }
 
-.table tr[data-state="selected"] td {
+.table tr[data-state="selected"] td,
+.table tr[data-state="selected"] td.fixedColumn {
   background: #202020;
   color: #eef2f7;
 }
 
-.table tr[data-state="selected"]:hover td {
+.table tr[data-state="selected"]:hover td,
+.table tr[data-state="selected"]:hover td.fixedColumn {
   background: #252525;
 }
 
@@ -264,20 +280,20 @@ th.fixedColumn {
   background: #242424;
 }
 
-tr:hover .fixedColumn {
-  background: #1f242b;
-}
-
-tr[data-state="selected"] .fixedColumn {
-  background: #202020;
-}
-
-tr[data-state="selected"]:hover .fixedColumn {
-  background: #252525;
-}
-
 .clickableRow {
   cursor: pointer;
+}
+
+.clickableRow:focus {
+  outline: none;
+}
+
+.clickableRow:focus-visible td,
+.clickableRow:focus-visible td.fixedColumn {
+  background: #1f242b;
+  box-shadow:
+    inset 0 1px 0 #d7dde8,
+    inset 0 -1px 0 #d7dde8;
 }
 
 .emptyCell {
@@ -286,9 +302,11 @@ tr[data-state="selected"]:hover .fixedColumn {
   text-align: center;
 }
 
-.emptyCell > svg {
-  margin-right: 0.45rem;
-  vertical-align: middle;
+.emptyStateContent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
 }
 
 .spinner {
