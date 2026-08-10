@@ -180,6 +180,100 @@
   font-weight: 800;
 }
 
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 1rem;
+}
+
+.modal {
+  display: grid;
+  width: min(28rem, 100%);
+  gap: 1rem;
+  border: 1px solid #343434;
+  border-radius: 0.75rem;
+  background: #171717;
+  padding: 1.15rem;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+}
+
+.modalIcon {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border: 1px solid rgba(250, 204, 21, 0.35);
+  border-radius: 0.65rem;
+  background: rgba(250, 204, 21, 0.12);
+  color: #fde68a;
+}
+
+.modalCopy {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.modalEyebrow {
+  color: #97a0ad;
+  font-size: 0.76rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.modalCopy h2 {
+  color: #fff;
+  font-size: 1.18rem;
+  font-weight: 850;
+}
+
+.modalCopy p:last-child {
+  color: #b8c0cc;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+
+.modalGhostButton,
+.modalPrimaryButton {
+  display: inline-flex;
+  min-height: 2.35rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  padding: 0 0.85rem;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 850;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.modalGhostButton {
+  border: 1px solid #343434;
+  background: #101010;
+  color: #fff;
+}
+
+.modalGhostButton:hover {
+  border-color: #515151;
+  background: #242424;
+}
+
+.modalPrimaryButton {
+  border: 1px solid #f5f5f5;
+  background: #f5f5f5;
+  color: #101010;
+}
+
 @media (min-width: 64rem) {
   .sidebar {
     display: flex;

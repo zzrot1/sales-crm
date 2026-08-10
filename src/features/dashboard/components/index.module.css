@@ -198,6 +198,13 @@
   background: #090909;
 }
 
+.dashboardCompaniesTable {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 6.5rem);
+  min-height: 28rem;
+}
+
 .dataGridScroll {
   overflow-x: auto;
 }

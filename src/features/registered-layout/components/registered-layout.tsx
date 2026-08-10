@@ -4,6 +4,7 @@ import {
   Building2,
   ClipboardList,
   Columns3,
+  AlertCircle,
   FileBarChart,
   LayoutDashboard,
   LogOut,
@@ -13,9 +14,17 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { routes } from "@/common/routes";
 import { cn } from "@/lib/utils";
+import {
+  getGetTasksQueryKey,
+  getGetTodaysTasksQueryKey,
+  useEnsureDailyCallTasks,
+} from "@/service-api/generated/endpoints/tasks/tasks";
+import { getGetCompaniesQueryKey } from "@/service-api/generated/endpoints/companies/companies";
 import styles from "./index.module.css";
 
 const navGroups = [
@@ -41,13 +50,72 @@ type RegisteredLayoutProps = {
   children: React.ReactNode;
 };
 
+type EnsureTaskLike = {
+  completedAt?: string | null;
+  dueDate?: string | null;
+  status?: string;
+};
+
+let hasRequestedDailyCallsEnsure = false;
+
+function getLocalDateKey(value: string | Date) {
+  const date = typeof value === "string" ? new Date(value) : value;
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+function hasOverduePendingTasks(tasks: EnsureTaskLike[]) {
+  const todayKey = getLocalDateKey(new Date());
+
+  return tasks.some((task) => {
+    if (!task.dueDate || task.completedAt || task.status === "COMPLETED") {
+      return false;
+    }
+
+    return getLocalDateKey(task.dueDate) < todayKey;
+  });
+}
+
 export function RegisteredLayout({ children }: RegisteredLayoutProps) {
   const pathname = usePathname();
+  const queryClient = useQueryClient();
+  const [ensureModalMessage, setEnsureModalMessage] = useState<string | null>(null);
   const activeItem = navGroups
     .flatMap((group) => group.items)
     .find((item) => pathname === item.href || pathname.startsWith(`${item.href}/`));
   const quickCreateLabel =
     activeItem?.href === routes.companies.path ? "Company" : "Quick Create";
+  const ensureDailyCallsMutation = useEnsureDailyCallTasks({
+    mutation: {
+      onSuccess: async (response) => {
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: getGetTodaysTasksQueryKey() }),
+          queryClient.invalidateQueries({ queryKey: getGetTasksQueryKey() }),
+          queryClient.invalidateQueries({ queryKey: getGetCompaniesQueryKey() }),
+        ]);
+
+        if (
+          response.data.action === "HAS_PENDING_TASKS" &&
+          response.data.message &&
+          hasOverduePendingTasks(response.data.data)
+        ) {
+          setEnsureModalMessage(response.data.message);
+        }
+      },
+    },
+  });
+
+  useEffect(() => {
+    if (hasRequestedDailyCallsEnsure) {
+      return;
+    }
+
+    hasRequestedDailyCallsEnsure = true;
+    ensureDailyCallsMutation.mutate({ data: { limit: 10 } });
+  }, [ensureDailyCallsMutation]);
 
   return (
     <div className={styles.shell}>
@@ -115,6 +183,42 @@ export function RegisteredLayout({ children }: RegisteredLayoutProps) {
 
         <main className={styles.main}>{children}</main>
       </div>
+
+      {ensureModalMessage ? (
+        <div className={styles.modalOverlay} role="presentation">
+          <section
+            aria-labelledby="daily-calls-modal-title"
+            aria-modal="true"
+            className={styles.modal}
+            role="dialog"
+          >
+            <div className={styles.modalIcon}>
+              <AlertCircle size={20} />
+            </div>
+            <div className={styles.modalCopy}>
+              <p className={styles.modalEyebrow}>Task-uri pending</p>
+              <h2 id="daily-calls-modal-title">Ai call-uri de terminat</h2>
+              <p>{ensureModalMessage}</p>
+            </div>
+            <div className={styles.modalActions}>
+              <button
+                className={styles.modalGhostButton}
+                type="button"
+                onClick={() => setEnsureModalMessage(null)}
+              >
+                Închid
+              </button>
+              <Link
+                className={styles.modalPrimaryButton}
+                href={routes.tasks.path}
+                onClick={() => setEnsureModalMessage(null)}
+              >
+                Vezi task-urile
+              </Link>
+            </div>
+          </section>
+        </div>
+      ) : null}
     </div>
   );
 }

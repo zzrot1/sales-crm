@@ -1,11 +1,19 @@
+"use client";
+
 import {
   ArrowDownRight,
   ArrowUpRight,
-  ChevronDown,
-  Columns3,
-  Plus,
 } from "lucide-react";
-import { SectionsDataTable } from "./sections-data-table";
+import { useMemo, useState } from "react";
+
+import { CompaniesDataTable } from "@/features/crm-pages/components/companies-page";
+import { useGetCompanies } from "@/service-api/generated/endpoints/companies/companies";
+import {
+  GetCompaniesSortBy,
+  GetCompaniesSortOrder,
+  type CompanyListItemDto,
+} from "@/service-api/generated/models";
+import crmStyles from "@/features/crm-pages/components/index.module.css";
 import styles from "./index.module.css";
 
 const stats = [
@@ -44,6 +52,39 @@ const stats = [
 ];
 
 export function DashboardPage() {
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(100);
+  const [search, setSearch] = useState("");
+  const [selectedCompany, setSelectedCompany] =
+    useState<CompanyListItemDto | null>(null);
+
+  const companiesQuery = useGetCompanies({
+    page,
+    limit,
+    search: search.trim() || undefined,
+    sortBy: GetCompaniesSortBy.createdAt,
+    sortOrder: GetCompaniesSortOrder.desc,
+  });
+
+  const pageData = companiesQuery.data?.data;
+  const companies = useMemo(() => pageData?.data ?? [], [pageData?.data]);
+  const total = pageData?.total ?? 0;
+  const totalPages = Math.max(pageData?.totalPages ?? 1, 1);
+
+  const goToPage = (nextPage: number) => {
+    setPage(Math.min(Math.max(nextPage, 1), totalPages));
+  };
+
+  const handleLimitChange = (nextLimit: number) => {
+    setLimit(nextLimit);
+    setPage(1);
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
+
   return (
     <div className={styles.dashboard}>
       <section className={styles.statsGrid}>
@@ -116,32 +157,33 @@ export function DashboardPage() {
         </div>
       </section>
 
-      <section className={styles.toolbar}>
-        <div className={styles.tabs}>
-          <button className={`${styles.pill} ${styles.pillActive}`} type="button">
-            Outline
-          </button>
-          <button className={styles.pill} type="button">
-            Past Performance <span className={styles.counter}>3</span>
-          </button>
-          <button className={styles.pill} type="button">
-            Key Personnel <span className={styles.counter}>2</span>
-          </button>
-          <button className={styles.pill} type="button">
-            Focus Documents
-          </button>
-        </div>
-        <div className={styles.actions}>
-          <button className={styles.action} type="button">
-            <Columns3 size={14} /> Customize Columns <ChevronDown size={14} />
-          </button>
-          <button className={styles.action} type="button">
-            <Plus size={14} /> Add Section
-          </button>
-        </div>
+      <section className={`${crmStyles.tableCard} ${styles.dashboardCompaniesTable}`}>
+        <CompaniesDataTable
+          companies={companies}
+          isError={companiesQuery.isError}
+          isFetching={companiesQuery.isFetching}
+          isLoading={companiesQuery.isLoading}
+          onSelectCompany={setSelectedCompany}
+          pagination={{
+            isDisabled: companiesQuery.isFetching,
+            onPageChange: goToPage,
+            onPageSizeChange: handleLimitChange,
+            page,
+            pageSize: limit,
+            pageSizeLabel: "Randuri pe pagina",
+            pageSizeOptions: [10, 25, 50, 100],
+            rowsLabel: `${total} compan${total === 1 ? "ie" : "ii"} in total`,
+            total,
+            totalPages,
+          }}
+          search={{
+            onChange: handleSearchChange,
+            placeholder: "Cauta companii...",
+            value: search,
+          }}
+          selectedCompanyId={selectedCompany?.id ?? null}
+        />
       </section>
-
-      <SectionsDataTable />
     </div>
   );
 }

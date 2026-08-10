@@ -4,16 +4,16 @@
  * sales-crm
  * OpenAPI spec version: 1.0.0
  */
-import type { CompanyDtoStatus } from './companyDtoStatus';
+import type { CompanyStatusDto } from './companyStatusDto';
 
-export interface CompanyDto {
+export interface TaskCompanyDto {
   updatedAt: string;
   createdAt: string;
   /** @nullable */
   notes: string | null;
   /** @nullable */
   hasItTeam: boolean | null;
-  status: CompanyDtoStatus;
+  status: CompanyStatusDto;
   ownerId: number;
   /** @nullable */
   industry: string | null;

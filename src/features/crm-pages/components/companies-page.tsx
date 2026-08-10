@@ -2,13 +2,27 @@
 
 import {
   Building2,
+  Edit3,
   ExternalLink,
+  LoaderCircle,
 } from "lucide-react";
 import { type ComponentProps, useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { DataTable, type DataTableColumn } from "@/components/data-table";
 import { SidePanel } from "@/components/side-panel/side-panel";
-import { useGetCompanies } from "@/service-api/generated/endpoints/companies/companies";
+import {
+  getGetCompaniesQueryKey,
+  useGetCompanies,
+} from "@/service-api/generated/endpoints/companies/companies";
+import {
+  getGetContactsQueryKey,
+  useUpdateContact,
+} from "@/service-api/generated/endpoints/contacts/contacts";
+import {
+  getGetTasksQueryKey,
+  getGetTodaysTasksQueryKey,
+} from "@/service-api/generated/endpoints/tasks/tasks";
 import {
   GetCompaniesSortBy,
   GetCompaniesSortOrder,
@@ -19,11 +33,19 @@ import styles from "./index.module.css";
 const pageSizeOptions = [10, 25, 50, 100];
 
 export function CompaniesPage() {
+  const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(100);
   const [search, setSearch] = useState("");
   const [selectedCompany, setSelectedCompany] =
     useState<CompanyListItemDto | null>(null);
+  const [editingCompany, setEditingCompany] =
+    useState<CompanyListItemDto | null>(null);
+  const [contactForm, setContactForm] = useState({
+    email: "",
+    jobTitle: "",
+    phone: "",
+  });
 
   const companiesQuery = useGetCompanies({
     page,
@@ -52,6 +74,45 @@ export function CompaniesPage() {
     setPage(1);
   };
 
+  const openContactEditor = (company: CompanyListItemDto) => {
+    setEditingCompany(company);
+    setContactForm({
+      email: company.primaryContactEmail ?? "",
+      jobTitle: company.primaryContactJobTitle ?? "",
+      phone: company.primaryContactPhone ?? "",
+    });
+  };
+
+  const updateContactMutation = useUpdateContact({
+    mutation: {
+      onSuccess: async () => {
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: getGetCompaniesQueryKey() }),
+          queryClient.invalidateQueries({ queryKey: getGetContactsQueryKey() }),
+          queryClient.invalidateQueries({ queryKey: getGetTodaysTasksQueryKey() }),
+          queryClient.invalidateQueries({ queryKey: getGetTasksQueryKey() }),
+        ]);
+
+        setEditingCompany(null);
+      },
+    },
+  });
+
+  const saveContact = () => {
+    if (!editingCompany?.primaryContactId) {
+      return;
+    }
+
+    updateContactMutation.mutate({
+      contactId: editingCompany.primaryContactId,
+      data: {
+        email: contactForm.email.trim(),
+        jobTitle: contactForm.jobTitle.trim(),
+        phone: contactForm.phone.trim(),
+      },
+    });
+  };
+
   return (
     <div className={styles.page}>
       <section className={styles.tableCard}>
@@ -60,6 +121,7 @@ export function CompaniesPage() {
           isError={companiesQuery.isError}
           isFetching={companiesQuery.isFetching}
           isLoading={companiesQuery.isLoading}
+          onEditCompany={openContactEditor}
           onSelectCompany={setSelectedCompany}
           selectedCompanyId={selectedCompany?.id ?? null}
           pagination={{
@@ -88,15 +150,131 @@ export function CompaniesPage() {
           if (!open) setSelectedCompany(null);
         }}
       />
+
+      {editingCompany ? (
+        <div
+          className={styles.dialogOverlay}
+          role="presentation"
+          onMouseDown={() => {
+            if (!updateContactMutation.isPending) setEditingCompany(null);
+          }}
+        >
+          <section
+            aria-labelledby="edit-contact-title"
+            aria-modal="true"
+            className={styles.dialog}
+            role="dialog"
+            onMouseDown={(event) => event.stopPropagation()}
+          >
+            <div className={styles.dialogHeader}>
+              <div>
+                <p className={styles.eyebrow}>Contact principal</p>
+                <h3 className={styles.cardTitle} id="edit-contact-title">
+                  Editeaza {editingCompany.name}
+                </h3>
+                <p className={styles.muted}>
+                  Actualizeaza datele folosite in task-uri si in tabel.
+                </p>
+              </div>
+              <button
+                aria-label="Inchide dialogul"
+                className={styles.iconButton}
+                disabled={updateContactMutation.isPending}
+                type="button"
+                onClick={() => setEditingCompany(null)}
+              >
+                ×
+              </button>
+            </div>
+
+            {!editingCompany.primaryContactId ? (
+              <p className={styles.formError}>
+                Compania nu are contact principal de editat.
+              </p>
+            ) : null}
+
+            <label className={styles.dialogField}>
+              <span>Email</span>
+              <input
+                value={contactForm.email}
+                placeholder="contact@companie.ro"
+                onChange={(event) =>
+                  setContactForm((current) => ({
+                    ...current,
+                    email: event.target.value,
+                  }))
+                }
+              />
+            </label>
+
+            <label className={styles.dialogField}>
+              <span>Telefon</span>
+              <input
+                value={contactForm.phone}
+                placeholder="+40..."
+                onChange={(event) =>
+                  setContactForm((current) => ({
+                    ...current,
+                    phone: event.target.value,
+                  }))
+                }
+              />
+            </label>
+
+            <label className={styles.dialogField}>
+              <span>Functie</span>
+              <input
+                value={contactForm.jobTitle}
+                placeholder="CEO, Founder, Director..."
+                onChange={(event) =>
+                  setContactForm((current) => ({
+                    ...current,
+                    jobTitle: event.target.value,
+                  }))
+                }
+              />
+            </label>
+
+            {updateContactMutation.isError ? (
+              <p className={styles.formError}>
+                Nu am putut salva contactul. Incearca din nou.
+              </p>
+            ) : null}
+
+            <div className={styles.dialogActions}>
+              <button
+                className={styles.ghostButton}
+                disabled={updateContactMutation.isPending}
+                type="button"
+                onClick={() => setEditingCompany(null)}
+              >
+                Anuleaza
+              </button>
+              <button
+                className={styles.button}
+                disabled={!editingCompany.primaryContactId || updateContactMutation.isPending}
+                type="button"
+                onClick={saveContact}
+              >
+                {updateContactMutation.isPending ? (
+                  <LoaderCircle className={styles.spinner} size={16} />
+                ) : null}
+                Salveaza
+              </button>
+            </div>
+          </section>
+        </div>
+      ) : null}
     </div>
   );
 }
 
-function CompaniesDataTable({
+export function CompaniesDataTable({
   companies,
   isError,
   isFetching,
   isLoading,
+  onEditCompany,
   onSelectCompany,
   pagination,
   search,
@@ -106,6 +284,7 @@ function CompaniesDataTable({
   isError: boolean;
   isFetching: boolean;
   isLoading: boolean;
+  onEditCompany?: (company: CompanyListItemDto) => void;
   onSelectCompany: (company: CompanyListItemDto) => void;
   pagination: ComponentProps<typeof DataTable<CompanyListItemDto>>["pagination"];
   search: ComponentProps<typeof DataTable<CompanyListItemDto>>["search"];
@@ -162,8 +341,33 @@ function CompaniesDataTable({
           <span className={styles.status}>{formatItTeam(company.hasItTeam)}</span>
         ),
       },
+      {
+        id: "actions",
+        header: "Actiune",
+        minWidth: 86,
+        width: 92,
+        cell: (company) => (
+          <button
+            aria-label={`Editeaza contactul pentru ${company.name}`}
+            className={styles.tableIconButton}
+            disabled={!company.primaryContactId || !onEditCompany}
+            title={
+              company.primaryContactId && onEditCompany
+                ? "Editeaza contact"
+                : "Compania nu are contact principal"
+            }
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              onEditCompany?.(company);
+            }}
+          >
+            <Edit3 size={15} />
+          </button>
+        ),
+      },
     ],
-    [],
+    [onEditCompany],
   );
 
   return (

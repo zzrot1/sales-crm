@@ -167,6 +167,447 @@
   grid-template-columns: 1.6fr 0.9fr 0.9fr 0.8fr;
 }
 
+.tasksHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(22rem, 0.48fr);
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.tasksHeaderCopy,
+.dailyProgressCard,
+.taskSectionCard {
+  border: 1px solid #2f2f2f;
+  border-radius: 0.75rem;
+  background: #171717;
+}
+
+.tasksHeaderCopy {
+  padding: 1.35rem;
+}
+
+.dailyProgressCard {
+  display: grid;
+  align-content: center;
+  gap: 0.85rem;
+  padding: 1rem;
+}
+
+.dailyProgressTop,
+.taskSectionHeader,
+.dialogHeader,
+.dialogActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.dailyProgressTop strong {
+  display: block;
+  margin-top: 0.2rem;
+  color: #fff;
+  font-size: 1.45rem;
+  font-weight: 850;
+}
+
+.progressLabel {
+  color: #97a0ad;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.progressTrack {
+  height: 0.55rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #0c0c0c;
+  box-shadow: inset 0 0 0 1px #2b2b2b;
+}
+
+.progressTrack span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #74d99f, #d7dde8);
+  transition: width 220ms ease;
+}
+
+.generateTasksButton {
+  background: #f5f5f5;
+  color: #101010;
+  font-weight: 850;
+}
+
+.completeTaskButton {
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid rgba(45, 212, 122, 0.42);
+  border-radius: 999px;
+  background: rgba(45, 212, 122, 0.18);
+  color: #a9f3c4;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.completeTaskButton:hover {
+  border-color: rgba(45, 212, 122, 0.72);
+  background: #22c55e;
+  color: #07120b;
+  transform: translateY(-1px);
+}
+
+.completeTaskButton:focus-visible {
+  border-color: #a9f3c4;
+  box-shadow: 0 0 0 3px rgba(45, 212, 122, 0.22);
+  outline: none;
+}
+
+.generateTasksButton:disabled {
+  cursor: not-allowed;
+}
+
+.taskSections {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.taskSectionCard {
+  min-height: 24rem;
+  overflow: hidden;
+}
+
+.taskSectionHeader {
+  border-bottom: 1px solid #292929;
+  padding: 1rem;
+}
+
+.taskSectionHeader svg {
+  width: 1.2rem;
+  height: 1.2rem;
+  color: #cbd5e1;
+}
+
+.taskTableWrap {
+  overflow-x: auto;
+}
+
+.taskTable {
+  width: 100%;
+  min-width: 50rem;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.taskTable th,
+.taskTable td {
+  padding: 0.85rem 1rem;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.taskTable th {
+  background: #242424;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 850;
+}
+
+.taskTable td {
+  border-top: 1px solid #292929;
+  color: #c7ced8;
+  font-size: 0.88rem;
+}
+
+.taskTable tbody tr:hover td {
+  background: #1f242b;
+}
+
+.taskTable th:nth-child(4),
+.taskTable td:nth-child(4),
+.taskTable th:nth-child(5),
+.taskTable td:nth-child(5) {
+  text-align: center;
+}
+
+.taskCompany,
+.taskContact {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.taskCompany span,
+.taskContact span {
+  overflow: hidden;
+  color: #fff;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.taskCompany small,
+.taskContact small {
+  overflow: hidden;
+  color: #9ea7b5;
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contactMethod {
+  display: inline-flex;
+  max-width: 13rem;
+  align-items: center;
+  gap: 0.45rem;
+  color: #cfe2ff;
+  font-size: 0.82rem;
+  font-weight: 750;
+  text-decoration: none;
+  vertical-align: middle;
+}
+
+.contactMethod svg {
+  flex: 0 0 auto;
+  width: 0.95rem;
+  height: 0.95rem;
+  color: #97a7c4;
+}
+
+.contactMethod:hover {
+  color: #fff;
+}
+
+.contactMethod:not(.contactMethodMuted) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contactMethodMuted {
+  color: #9ea7b5;
+}
+
+.taskTypeBadge,
+.outcomeBadge {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #343434;
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.76rem;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.taskTypeBadge {
+  background: #101010;
+  color: #d7dde8;
+}
+
+.outcomegreen {
+  border-color: rgba(45, 212, 122, 0.36);
+  background: rgba(45, 212, 122, 0.12);
+  color: #a9f3c4;
+}
+
+.outcomeyellow {
+  border-color: rgba(250, 204, 21, 0.36);
+  background: rgba(250, 204, 21, 0.12);
+  color: #fde68a;
+}
+
+.outcomered {
+  border-color: rgba(248, 113, 113, 0.38);
+  background: rgba(248, 113, 113, 0.12);
+  color: #fecaca;
+}
+
+.outcomeblue {
+  border-color: rgba(96, 165, 250, 0.38);
+  background: rgba(96, 165, 250, 0.12);
+  color: #bfdbfe;
+}
+
+.outcomeNeutral {
+  background: #101010;
+  color: #cbd5e1;
+}
+
+.taskEmptyCell {
+  height: 9rem;
+  color: #aab6c8 !important;
+  text-align: center !important;
+}
+
+.taskEmptyCell svg {
+  margin-right: 0.45rem;
+  vertical-align: middle;
+}
+
+.taskEmptyState {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+}
+
+.taskEmptyState svg {
+  margin-right: 0;
+}
+
+.dialogOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.68);
+  padding: 1rem;
+}
+
+.dialog {
+  display: grid;
+  width: min(32rem, 100%);
+  gap: 1rem;
+  border: 1px solid #343434;
+  border-radius: 0.75rem;
+  background: #171717;
+  padding: 1.15rem;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.48);
+}
+
+.iconButton {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border: 1px solid #343434;
+  border-radius: 0.5rem;
+  background: #101010;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.iconButton:hover {
+  border-color: #515151;
+  background: #242424;
+}
+
+.dialogField {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.dialogField span {
+  color: #aab2bf;
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+
+.dialogField input,
+.dialogField select,
+.dialogField textarea {
+  width: 100%;
+  border: 1px solid #333;
+  border-radius: 0.5rem;
+  background: #101010;
+  color: #fff;
+  font: inherit;
+  font-size: 0.9rem;
+}
+
+.dialogField input,
+.dialogField select {
+  min-height: 2.45rem;
+  padding: 0 0.75rem;
+}
+
+.dialogField textarea {
+  min-height: 7rem;
+  resize: vertical;
+  padding: 0.75rem;
+  line-height: 1.5;
+}
+
+.dialogField input:focus,
+.dialogField select:focus,
+.dialogField textarea:focus,
+.iconButton:focus-visible {
+  border-color: #d7dde8;
+  box-shadow: 0 0 0 3px rgba(215, 221, 232, 0.16);
+  outline: none;
+}
+
+.formError {
+  color: #ffb4a8;
+  font-size: 0.88rem;
+  font-weight: 750;
+}
+
+.tableIconButton {
+  display: inline-grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border: 1px solid #343434;
+  border-radius: 999px;
+  background: #101010;
+  color: #d7dde8;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.tableIconButton:hover:not(:disabled) {
+  border-color: #515151;
+  background: #242424;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.tableIconButton:focus-visible {
+  border-color: #d7dde8;
+  box-shadow: 0 0 0 3px rgba(215, 221, 232, 0.16);
+  outline: none;
+}
+
+.tableIconButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+@media (max-width: 72rem) {
+  .tasksHeader,
+  .taskSections {
+    grid-template-columns: 1fr;
+  }
+
+  .dailyProgressTop,
+  .dialogActions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .generateTasksButton,
+  .dialogActions button {
+    width: 100%;
+  }
+}
+
 .reportsTable {
   grid-template-columns: 1.3fr 0.9fr 0.8fr 0.8fr;
 }

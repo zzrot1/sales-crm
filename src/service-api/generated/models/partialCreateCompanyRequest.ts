@@ -4,6 +4,7 @@
  * sales-crm
  * OpenAPI spec version: 1.0.0
  */
+import type { PartialCreateCompanyRequestStatus } from './partialCreateCompanyRequestStatus';
 
 /**
  * Make all properties in T optional
@@ -12,6 +13,7 @@ export interface PartialCreateCompanyRequest {
   name?: string;
   website?: string;
   industry?: string;
+  status?: PartialCreateCompanyRequestStatus;
   hasItTeam?: boolean;
   notes?: string;
 }

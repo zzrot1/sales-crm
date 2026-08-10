@@ -4,12 +4,14 @@
  * sales-crm
  * OpenAPI spec version: 1.0.0
  */
+import type { CreateCompanyRequestStatus } from './createCompanyRequestStatus';
 
 export interface CreateCompanyRequest {
   /** @nullable */
   notes?: string | null;
   /** @nullable */
   hasItTeam?: boolean | null;
+  status?: CreateCompanyRequestStatus;
   /** @nullable */
   industry?: string | null;
   /** @nullable */
