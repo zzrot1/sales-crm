@@ -8,12 +8,13 @@ import {
   FileBarChart,
   LayoutDashboard,
   LogOut,
-  PlusCircle,
+  PanelLeftClose,
+  PanelLeftOpen,
   Settings,
   Upload,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -25,6 +26,7 @@ import {
   useEnsureDailyCallTasks,
 } from "@/service-api/generated/endpoints/tasks/tasks";
 import { getGetCompaniesQueryKey } from "@/service-api/generated/endpoints/companies/companies";
+import { useLogout, useMe } from "@/service-api/generated/endpoints/auth/auth";
 import styles from "./index.module.css";
 
 const navGroups = [
@@ -81,13 +83,18 @@ function hasOverduePendingTasks(tasks: EnsureTaskLike[]) {
 
 export function RegisteredLayout({ children }: RegisteredLayoutProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const queryClient = useQueryClient();
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [ensureModalMessage, setEnsureModalMessage] = useState<string | null>(null);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const meQuery = useMe();
+  const authUser = meQuery.data?.data.user;
+  const userDisplayName = authUser?.name?.trim() || authUser?.email || "User";
+  const userInitials = getUserInitials(userDisplayName);
   const activeItem = navGroups
     .flatMap((group) => group.items)
     .find((item) => pathname === item.href || pathname.startsWith(`${item.href}/`));
-  const quickCreateLabel =
-    activeItem?.href === routes.companies.path ? "Company" : "Quick Create";
   const ensureDailyCallsMutation = useEnsureDailyCallTasks({
     mutation: {
       onSuccess: async (response) => {
@@ -107,6 +114,14 @@ export function RegisteredLayout({ children }: RegisteredLayoutProps) {
       },
     },
   });
+  const logoutMutation = useLogout({
+    mutation: {
+      onSettled: () => {
+        queryClient.clear();
+        router.replace(routes.login.path);
+      },
+    },
+  });
 
   useEffect(() => {
     if (hasRequestedDailyCallsEnsure) {
@@ -117,12 +132,25 @@ export function RegisteredLayout({ children }: RegisteredLayoutProps) {
     ensureDailyCallsMutation.mutate({ data: { limit: 10 } });
   }, [ensureDailyCallsMutation]);
 
+  const confirmLogout = () => {
+    logoutMutation.mutate({
+      data: {
+        refreshToken: "",
+      },
+    });
+  };
+
   return (
     <div className={styles.shell}>
-      <aside className={styles.sidebar}>
+      <aside
+        className={cn(
+          styles.sidebar,
+          isSidebarCollapsed && styles.sidebarCollapsed,
+        )}
+      >
         <Link className={styles.brand} href={routes.dashboard.path}>
           <span className={styles.brandMark} />
-          <span>Acme Inc.</span>
+          <span className={styles.brandName}>sales-crm</span>
         </Link>
 
         <nav className={styles.nav}>
@@ -142,9 +170,10 @@ export function RegisteredLayout({ children }: RegisteredLayoutProps) {
                     )}
                     href={item.href}
                     key={item.href}
+                    title={isSidebarCollapsed ? item.name : undefined}
                   >
                     <Icon size={16} />
-                    {item.name}
+                    <span className={styles.navItemLabel}>{item.name}</span>
                   </Link>
                 );
               })}
@@ -154,31 +183,53 @@ export function RegisteredLayout({ children }: RegisteredLayoutProps) {
 
         <div className={styles.footer}>
           <div className={styles.workspace}>
-            <span className={styles.workspaceAvatar}>AC</span>
+            <span className={styles.workspaceAvatar}>{userInitials}</span>
             <div className={styles.workspaceDetails}>
-              <p className={styles.workspaceName}>Acme Inc.</p>
-              <p className={styles.workspaceHint}>Workspace</p>
+              <p className={styles.workspaceName}>{userDisplayName}</p>
+              <p className={styles.workspaceHint}>{authUser?.email ?? "Workspace"}</p>
             </div>
             <button
               aria-label="Logout"
               className={styles.iconButton}
               type="button"
+              onClick={() => setIsLogoutModalOpen(true)}
             >
               <LogOut size={16} />
             </button>
           </div>
+          <button
+            aria-label={
+              isSidebarCollapsed ? "Extinde meniul lateral" : "Restrange meniul lateral"
+            }
+            className={styles.collapseButton}
+            title={
+              isSidebarCollapsed ? "Extinde meniul" : "Restrange meniul"
+            }
+            type="button"
+            onClick={() => setIsSidebarCollapsed((current) => !current)}
+          >
+            {isSidebarCollapsed ? (
+              <PanelLeftOpen size={16} />
+            ) : (
+              <PanelLeftClose size={16} />
+            )}
+            <span className={styles.collapseButtonLabel}>
+              {isSidebarCollapsed ? "Extinde" : "Restrange"}
+            </span>
+          </button>
         </div>
       </aside>
 
-      <div className={styles.content}>
+      <div
+        className={cn(
+          styles.content,
+          isSidebarCollapsed && styles.contentCollapsed,
+        )}
+      >
         <header className={styles.header}>
           <h1 className={styles.pageTitle}>
             {activeItem?.name ?? routes.dashboard.name}
           </h1>
-          <button className={styles.quickCreate} type="button">
-            <PlusCircle size={15} />
-            {quickCreateLabel}
-          </button>
         </header>
 
         <main className={styles.main}>{children}</main>
@@ -219,6 +270,65 @@ export function RegisteredLayout({ children }: RegisteredLayoutProps) {
           </section>
         </div>
       ) : null}
+
+      {isLogoutModalOpen ? (
+        <div
+          className={styles.modalOverlay}
+          role="presentation"
+          onMouseDown={() => {
+            if (!logoutMutation.isPending) {
+              setIsLogoutModalOpen(false);
+            }
+          }}
+        >
+          <section
+            aria-labelledby="logout-modal-title"
+            aria-modal="true"
+            className={styles.modal}
+            role="dialog"
+            onMouseDown={(event) => event.stopPropagation()}
+          >
+            <div className={styles.modalHeader}>
+              <div className={styles.modalIcon}>
+                <LogOut size={20} />
+              </div>
+              <button
+                aria-label="Inchide dialogul"
+                className={styles.iconButton}
+                disabled={logoutMutation.isPending}
+                type="button"
+                onClick={() => setIsLogoutModalOpen(false)}
+              >
+                x
+              </button>
+            </div>
+            <div className={styles.modalCopy}>
+              <p className={styles.modalEyebrow}>Logout</p>
+              <h2 id="logout-modal-title">Are you sure you want to logout?</h2>
+              <p>You will need to sign in again to access the CRM.</p>
+            </div>
+            <div className={styles.modalActions}>
+              <button
+                className={styles.modalDangerButton}
+                disabled={logoutMutation.isPending}
+                type="button"
+                onClick={confirmLogout}
+              >
+                {logoutMutation.isPending ? "Logging out..." : "Logout"}
+              </button>
+            </div>
+          </section>
+        </div>
+      ) : null}
     </div>
   );
+}
+
+function getUserInitials(value: string) {
+  const parts = value
+    .split(/[\s@._-]+/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  return (parts[0]?.[0] ?? "U").concat(parts[1]?.[0] ?? "").toUpperCase();
 }

@@ -1,38 +1,34 @@
 import { LoaderCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import type { CallOutcomeDto, TaskListItemDto } from "@/service-api/generated/models";
+import type { TaskListItemDto } from "@/service-api/generated/models";
 
 import styles from "../index.module.css";
-import { getContactLine, outcomeOptions } from "./task-helpers";
+import { getContactLine } from "./task-helpers";
 
-type CompleteTaskDialogProps = {
+type TaskNotesDialogProps = {
   isError: boolean;
   isSaving: boolean;
   notes: string;
   onClose: () => void;
   onNotesChange: (notes: string) => void;
-  onOutcomeChange: (outcome: CallOutcomeDto) => void;
   onSave: () => void;
-  outcome: CallOutcomeDto;
   task: TaskListItemDto;
 };
 
-export function CompleteTaskDialog({
+export function TaskNotesDialog({
   isError,
   isSaving,
   notes,
   onClose,
   onNotesChange,
-  onOutcomeChange,
   onSave,
-  outcome,
   task,
-}: CompleteTaskDialogProps) {
+}: TaskNotesDialogProps) {
   return (
     <div className={styles.dialogOverlay} role="presentation" onMouseDown={onClose}>
       <section
-        aria-labelledby="complete-task-title"
+        aria-labelledby="task-notes-title"
         aria-modal="true"
         className={styles.dialog}
         role="dialog"
@@ -40,8 +36,8 @@ export function CompleteTaskDialog({
       >
         <div className={styles.dialogHeader}>
           <div>
-            <p className={styles.eyebrow}>Completeaza call</p>
-            <h3 className={styles.cardTitle} id="complete-task-title">
+            <p className={styles.eyebrow}>Notes task</p>
+            <h3 className={styles.cardTitle} id="task-notes-title">
               {task.companyName ?? task.title}
             </h3>
             <p className={styles.muted}>{getContactLine(task)}</p>
@@ -49,31 +45,18 @@ export function CompleteTaskDialog({
           <button
             aria-label="Inchide dialogul"
             className={styles.iconButton}
+            disabled={isSaving}
             type="button"
             onClick={onClose}
           >
-            ×
+            x
           </button>
         </div>
 
         <label className={styles.dialogField}>
-          <span>Outcome</span>
-          <select
-            value={outcome}
-            onChange={(event) => onOutcomeChange(event.target.value as CallOutcomeDto)}
-          >
-            {outcomeOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className={styles.dialogField}>
           <span>Notes</span>
           <textarea
-            placeholder="Adauga detalii utile pentru urmatorul pas..."
+            placeholder="Adauga observatii, follow-up sau context pentru task..."
             value={notes}
             onChange={(event) => onNotesChange(event.target.value)}
           />
@@ -81,7 +64,7 @@ export function CompleteTaskDialog({
 
         {isError ? (
           <p className={styles.formError}>
-            Nu am putut salva completarea. Incearca din nou.
+            Nu am putut salva notes. Incearca din nou.
           </p>
         ) : null}
 

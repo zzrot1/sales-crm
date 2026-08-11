@@ -4,15 +4,24 @@ import { useMemo, useState } from "react";
 import { CalendarClock, PhoneCall } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 
-import { getGetCompaniesQueryKey } from "@/service-api/generated/endpoints/companies/companies";
+import {
+  getGetCompaniesQueryKey,
+  useUpdateCompany,
+} from "@/service-api/generated/endpoints/companies/companies";
 import {
   getGetTasksQueryKey,
   getGetTodaysTasksQueryKey,
   useCompleteCallTask,
   useGenerateDailyCallTasks,
+  useGetTasks,
   useGetTodaysTasks,
+  useUpdateTaskNotes,
 } from "@/service-api/generated/endpoints/tasks/tasks";
-import type { CallOutcomeDto, TaskListItemDto } from "@/service-api/generated/models";
+import type {
+  CallOutcomeDto,
+  PartialCreateCompanyRequestStatus,
+  TaskListItemDto,
+} from "@/service-api/generated/models";
 
 import styles from "./index.module.css";
 import { CompleteTaskDialog } from "./tasks/complete-task-dialog";
@@ -22,17 +31,38 @@ import {
   isCompletedToday,
 } from "./tasks/task-helpers";
 import { TaskSection } from "./tasks/task-section";
+import { TaskNotesDialog } from "./tasks/task-notes-dialog";
 import { TasksProgressHeader } from "./tasks/tasks-progress-header";
 
 export function TasksPage() {
   const queryClient = useQueryClient();
   const [selectedTask, setSelectedTask] = useState<TaskListItemDto | null>(null);
+  const [selectedNotesTask, setSelectedNotesTask] =
+    useState<TaskListItemDto | null>(null);
   const [outcome, setOutcome] = useState<CallOutcomeDto>("NO_ANSWER");
   const [notes, setNotes] = useState("");
+  const [taskNotes, setTaskNotes] = useState("");
   const [generateErrorMessage, setGenerateErrorMessage] = useState<string | null>(null);
 
   const todaysTasksQuery = useGetTodaysTasks();
-  const tasks = todaysTasksQuery.data?.data ?? emptyTasks;
+  const pendingTasksQuery = useGetTasks({ status: "PENDING" });
+  const completedTasksQuery = useGetTasks({ status: "COMPLETED" });
+  const todayTasks = todaysTasksQuery.data?.data ?? emptyTasks;
+  const pendingTasks = pendingTasksQuery.data?.data ?? emptyTasks;
+  const completedTasks = completedTasksQuery.data?.data ?? emptyTasks;
+  const tasks = useMemo(() => {
+    const taskById = new Map<string, TaskListItemDto>();
+
+    [...todayTasks, ...pendingTasks, ...completedTasks].forEach((task) => {
+      taskById.set(task.id, task);
+    });
+
+    return Array.from(taskById.values());
+  }, [completedTasks, pendingTasks, todayTasks]);
+  const isLoadingTasks =
+    todaysTasksQuery.isLoading ||
+    pendingTasksQuery.isLoading ||
+    completedTasksQuery.isLoading;
 
   const taskStats = useMemo(() => {
     const pendingTasks = tasks.filter((task) => !task.completedAt);
@@ -77,10 +107,30 @@ export function TasksPage() {
     },
   });
 
+  const updateTaskNotesMutation = useUpdateTaskNotes({
+    mutation: {
+      onSuccess: async () => {
+        await refreshTasks();
+        resetNotesDialog();
+      },
+    },
+  });
+
+  const updateCompanyMutation = useUpdateCompany({
+    mutation: {
+      onSuccess: refreshTasks,
+    },
+  });
+
   const openCompleteDialog = (task: TaskListItemDto) => {
     setSelectedTask(task);
     setOutcome("NO_ANSWER");
-    setNotes("");
+    setNotes(task.notes ?? "");
+  };
+
+  const openNotesDialog = (task: TaskListItemDto) => {
+    setSelectedNotesTask(task);
+    setTaskNotes(task.notes ?? "");
   };
 
   const closeCompleteDialog = () => {
@@ -89,10 +139,21 @@ export function TasksPage() {
     }
   };
 
+  const closeNotesDialog = () => {
+    if (!updateTaskNotesMutation.isPending) {
+      setSelectedNotesTask(null);
+    }
+  };
+
   const resetCompleteDialog = () => {
     setSelectedTask(null);
     setNotes("");
     setOutcome("NO_ANSWER");
+  };
+
+  const resetNotesDialog = () => {
+    setSelectedNotesTask(null);
+    setTaskNotes("");
   };
 
   const saveCompletion = () => {
@@ -109,6 +170,35 @@ export function TasksPage() {
     });
   };
 
+  const saveTaskNotes = () => {
+    if (!selectedNotesTask) {
+      return;
+    }
+
+    updateTaskNotesMutation.mutate({
+      data: {
+        notes: taskNotes.trim() || null,
+      },
+      taskId: selectedNotesTask.id,
+    });
+  };
+
+  const changeCompanyStatus = (
+    task: TaskListItemDto,
+    status: PartialCreateCompanyRequestStatus,
+  ) => {
+    if (!task.companyId) {
+      return;
+    }
+
+    updateCompanyMutation.mutate({
+      companyId: task.companyId,
+      data: {
+        status,
+      },
+    });
+  };
+
   return (
     <div className={styles.page}>
       <TasksProgressHeader
@@ -116,7 +206,7 @@ export function TasksPage() {
         generateErrorMessage={generateErrorMessage}
         hasPendingTasks={taskStats.pendingTasks.length > 0}
         isGenerating={generateTasksMutation.isPending}
-        isLoading={todaysTasksQuery.isLoading}
+        isLoading={isLoadingTasks}
         progressValue={taskStats.progressValue}
         totalCount={tasks.length}
         onGenerate={() => generateTasksMutation.mutate({ data: { limit: 10 } })}
@@ -125,13 +215,15 @@ export function TasksPage() {
       <section className={styles.taskSections}>
         <TaskSection
           actionHeader="Actiune"
-          emptyMessage="Nu mai ai task-uri pending pentru azi."
+          emptyMessage="Nu mai ai task-uri pending."
           icon={<PhoneCall />}
-          isLoading={todaysTasksQuery.isLoading}
+          isLoading={isLoadingTasks}
           subtitle={`${taskStats.pendingTasks.length} task-uri pending`}
           tasks={taskStats.pendingTasks}
           title="De facut"
           onComplete={openCompleteDialog}
+          onChangeCompanyStatus={changeCompanyStatus}
+          onOpenNotes={openNotesDialog}
         />
 
         <TaskSection
@@ -139,10 +231,12 @@ export function TasksPage() {
           emptyIcon={<CalendarClock />}
           emptyMessage="Inca nu ai task-uri completate azi."
           icon={<CalendarClock />}
-          isLoading={todaysTasksQuery.isLoading}
+          isLoading={isLoadingTasks}
           subtitle={`${taskStats.completedTodayTasks.length} task-uri inchise`}
           tasks={taskStats.completedTodayTasks}
           title="Completate azi"
+          onChangeCompanyStatus={changeCompanyStatus}
+          onOpenNotes={openNotesDialog}
         />
       </section>
 
@@ -157,6 +251,18 @@ export function TasksPage() {
           onNotesChange={setNotes}
           onOutcomeChange={setOutcome}
           onSave={saveCompletion}
+        />
+      ) : null}
+
+      {selectedNotesTask ? (
+        <TaskNotesDialog
+          isError={updateTaskNotesMutation.isError}
+          isSaving={updateTaskNotesMutation.isPending}
+          notes={taskNotes}
+          task={selectedNotesTask}
+          onClose={closeNotesDialog}
+          onNotesChange={setTaskNotes}
+          onSave={saveTaskNotes}
         />
       ) : null}
     </div>

@@ -30,7 +30,9 @@ import type {
   GenerateDailyCallTasksRequest,
   GenerateDailyCallTasksResponse,
   GetTasksParams,
-  TaskListItemDto
+  TaskDto,
+  TaskListItemDto,
+  UpdateTaskNotesRequest
 } from '../../models';
 
 import { apiFetch } from '../../../mutator/api-fetch';
@@ -487,6 +489,84 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
 
       const mutationOptions = getCompleteCallTaskMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    export type updateTaskNotesResponse200 = {
+  data: TaskDto
+  status: 200
+}
+    
+export type updateTaskNotesResponseSuccess = (updateTaskNotesResponse200) & {
+  headers: Headers;
+};
+;
+
+export type updateTaskNotesResponse = (updateTaskNotesResponseSuccess)
+
+export const getUpdateTaskNotesUrl = (taskId: string,) => {
+
+
+  
+
+  return `/tasks/${taskId}/notes`
+}
+
+export const updateTaskNotes = async (taskId: string,
+    updateTaskNotesRequest: UpdateTaskNotesRequest, options?: RequestInit): Promise<updateTaskNotesResponse> => {
+  
+  return apiFetch<updateTaskNotesResponse>(getUpdateTaskNotesUrl(taskId),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateTaskNotesRequest,)
+  }
+);}
+
+
+
+
+export const getUpdateTaskNotesMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTaskNotes>>, TError,{taskId: string;data: BodyType<UpdateTaskNotesRequest>}, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateTaskNotes>>, TError,{taskId: string;data: BodyType<UpdateTaskNotesRequest>}, TContext> => {
+
+const mutationKey = ['updateTaskNotes'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateTaskNotes>>, {taskId: string;data: BodyType<UpdateTaskNotesRequest>}> = (props) => {
+          const {taskId,data} = props ?? {};
+
+          return  updateTaskNotes(taskId,data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateTaskNotesMutationResult = NonNullable<Awaited<ReturnType<typeof updateTaskNotes>>>
+    export type UpdateTaskNotesMutationBody = BodyType<UpdateTaskNotesRequest>
+    export type UpdateTaskNotesMutationError = ErrorType<unknown>
+
+    export const useUpdateTaskNotes = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTaskNotes>>, TError,{taskId: string;data: BodyType<UpdateTaskNotesRequest>}, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateTaskNotes>>,
+        TError,
+        {taskId: string;data: BodyType<UpdateTaskNotesRequest>},
+        TContext
+      > => {
+
+      const mutationOptions = getUpdateTaskNotesMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

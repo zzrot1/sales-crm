@@ -5,12 +5,12 @@
  * OpenAPI spec version: 1.0.0
  */
 
-/**
- */
 export type TaskTypeDto = typeof TaskTypeDto[keyof typeof TaskTypeDto];
 
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const TaskTypeDto = {
   CALL: 'CALL',
+  EMAIL: 'EMAIL',
+  TO_INVESTIGATE: 'TO_INVESTIGATE',
 } as const;

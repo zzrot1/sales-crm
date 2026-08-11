@@ -6,7 +6,8 @@ import {
   ExternalLink,
   LoaderCircle,
 } from "lucide-react";
-import { type ComponentProps, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { type ComponentProps, useEffect, useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { DataTable, type DataTableColumn } from "@/components/data-table";
@@ -24,6 +25,7 @@ import {
   getGetTodaysTasksQueryKey,
 } from "@/service-api/generated/endpoints/tasks/tasks";
 import {
+  type CompanyDtoStatus,
   GetCompaniesSortBy,
   GetCompaniesSortOrder,
   type CompanyListItemDto,
@@ -32,11 +34,41 @@ import styles from "./index.module.css";
 
 const pageSizeOptions = [10, 25, 50, 100];
 
+const companyStatusLabels: Record<CompanyDtoStatus, string> = {
+  CALLED_NO_ANSWER: "Sunat - fara raspuns",
+  DEAL_IN_PROGRESS: "Deal in progres",
+  FOLLOW_UP_LATER: "Follow-up",
+  INTERESTED: "Interesat",
+  LOST: "Pierdut",
+  MEETING_REQUIRED: "Necesita meeting",
+  MEETING_SCHEDULED: "Meeting programat",
+  NEW: "Nou",
+  NOT_INTERESTED: "Neinteresat",
+  TO_CALL: "De sunat",
+  WON: "Castigat",
+};
+
+const companyStatusTones: Record<CompanyDtoStatus, string> = {
+  CALLED_NO_ANSWER: "statusToneYellow",
+  DEAL_IN_PROGRESS: "statusToneBlue",
+  FOLLOW_UP_LATER: "statusToneYellow",
+  INTERESTED: "statusToneGreen",
+  LOST: "statusToneRed",
+  MEETING_REQUIRED: "statusToneBlue",
+  MEETING_SCHEDULED: "statusToneBlue",
+  NEW: "statusToneNeutral",
+  NOT_INTERESTED: "statusToneRed",
+  TO_CALL: "statusToneNeutral",
+  WON: "statusToneGreen",
+};
+
 export function CompaniesPage() {
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const companySearchParam = searchParams.get("search") ?? "";
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(100);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(companySearchParam);
   const [selectedCompany, setSelectedCompany] =
     useState<CompanyListItemDto | null>(null);
   const [editingCompany, setEditingCompany] =
@@ -59,6 +91,11 @@ export function CompaniesPage() {
   const companies = useMemo(() => pageData?.data ?? [], [pageData?.data]);
   const total = pageData?.total ?? 0;
   const totalPages = Math.max(pageData?.totalPages ?? 1, 1);
+
+  useEffect(() => {
+    setSearch(companySearchParam);
+    setPage(1);
+  }, [companySearchParam]);
 
   const goToPage = (nextPage: number) => {
     setPage(Math.min(Math.max(nextPage, 1), totalPages));
@@ -243,14 +280,6 @@ export function CompaniesPage() {
 
             <div className={styles.dialogActions}>
               <button
-                className={styles.ghostButton}
-                disabled={updateContactMutation.isPending}
-                type="button"
-                onClick={() => setEditingCompany(null)}
-              >
-                Anuleaza
-              </button>
-              <button
                 className={styles.button}
                 disabled={!editingCompany.primaryContactId || updateContactMutation.isPending}
                 type="button"
@@ -335,6 +364,12 @@ export function CompaniesDataTable({
       },
       {
         canCollapse: true,
+        id: "status",
+        header: "Status",
+        cell: (company) => <CompanyStatusBadge status={company.status} />,
+      },
+      {
+        canCollapse: true,
         id: "itTeam",
         header: "Echipa IT",
         cell: (company) => (
@@ -382,7 +417,7 @@ export function CompaniesDataTable({
       isError={isError}
       isLoading={isLoading}
       loadingMessage="Se incarca companiile..."
-      minWidth="58rem"
+      minWidth="64rem"
       onRowClick={onSelectCompany}
       pagination={pagination}
       rowState={(company) =>
@@ -485,6 +520,14 @@ function DetailRow({ label, value }: { label: string; value: string }) {
 
 function fallback(value?: string | null) {
   return value?.trim() || "-";
+}
+
+function CompanyStatusBadge({ status }: { status: CompanyDtoStatus }) {
+  return (
+    <span className={`${styles.status} ${styles[companyStatusTones[status]]}`}>
+      {companyStatusLabels[status]}
+    </span>
+  );
 }
 
 function formatItTeam(value: boolean | null) {

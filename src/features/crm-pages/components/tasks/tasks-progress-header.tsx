@@ -48,7 +48,7 @@ export function TasksProgressHeader({
             onClick={onGenerate}
           >
             {isGenerating ? <LoaderCircle className={styles.spinner} /> : <Plus />}
-            Genereaza task-uri noi
+            New
           </Button>
         </div>
         <div

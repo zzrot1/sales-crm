@@ -13,11 +13,13 @@
   flex-direction: column;
   border-right: 1px solid #2b2b2b;
   background: #151515;
+  transition: width 180ms ease;
 }
 
 .content {
   min-height: 100vh;
   background: #0b0b0b;
+  transition: padding-left 180ms ease;
 }
 
 .header {
@@ -49,6 +51,16 @@
   padding: 0 1rem;
   color: #fff;
   font-weight: 800;
+}
+
+.brandName,
+.navItemLabel,
+.workspaceDetails,
+.collapseButtonLabel,
+.navLabel {
+  transition:
+    opacity 140ms ease,
+    transform 140ms ease;
 }
 
 .brandMark {
@@ -92,12 +104,18 @@
   text-decoration: none;
 }
 
+.navItem svg {
+  flex: 0 0 auto;
+}
+
 .navItem:hover,
 .activeNavItem {
   background: #292929;
 }
 
 .footer {
+  display: grid;
+  gap: 0.75rem;
   border-top: 1px solid #2b2b2b;
   padding: 0.85rem 1rem;
   color: #c8d1df;
@@ -149,7 +167,7 @@
 }
 
 .iconButton,
-.quickCreate {
+.collapseButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -165,13 +183,44 @@
   height: 1.85rem;
   background: transparent;
   color: #d6dce6;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
 }
 
-.quickCreate {
-  gap: 0.45rem;
-  background: #f5f5f5;
-  color: #0c0c0c;
-  padding: 0.42rem 0.75rem;
+.iconButton:hover:not(:disabled) {
+  background: #242424;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.iconButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.collapseButton {
+  gap: 0.5rem;
+  min-height: 2.15rem;
+  border: 1px solid #343434;
+  background: #101010;
+  color: #e8edf5;
+  cursor: pointer;
+  font-size: 0.84rem;
+}
+
+.collapseButton:hover {
+  border-color: #515151;
+  background: #242424;
+}
+
+.collapseButton:focus-visible,
+.iconButton:focus-visible,
+.navItem:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(215, 221, 232, 0.16);
 }
 
 .pageTitle {
@@ -212,6 +261,13 @@
   color: #fde68a;
 }
 
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
 .modalCopy {
   display: grid;
   gap: 0.35rem;
@@ -243,6 +299,7 @@
 }
 
 .modalGhostButton,
+.modalDangerButton,
 .modalPrimaryButton {
   display: inline-flex;
   min-height: 2.35rem;
@@ -274,13 +331,142 @@
   color: #101010;
 }
 
+.modalPrimaryButton:hover:not(:disabled) {
+  border-color: #d7dde8;
+  background: #d7dde8;
+}
+
+.modalDangerButton {
+  border: 1px solid rgba(248, 113, 113, 0.42);
+  background: rgba(248, 113, 113, 0.14);
+  color: #fecaca;
+}
+
+.modalDangerButton:hover:not(:disabled) {
+  border-color: rgba(248, 113, 113, 0.72);
+  background: #f87171;
+  color: #170707;
+}
+
+.modalDangerButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
 @media (min-width: 64rem) {
   .sidebar {
     display: flex;
   }
 
+  .sidebarCollapsed {
+    width: 4.75rem;
+  }
+
+  .sidebarCollapsed .brand,
+  .sidebarCollapsed .navItem,
+  .sidebarCollapsed .workspace,
+  .sidebarCollapsed .collapseButton {
+    display: grid;
+    place-items: center;
+    gap: 0;
+  }
+
+  .sidebarCollapsed .brand,
+  .sidebarCollapsed .nav,
+  .sidebarCollapsed .footer {
+    align-items: center;
+    width: 100%;
+  }
+
+  .sidebarCollapsed .brand {
+    height: 4rem;
+    padding-inline: 0;
+  }
+
+  .sidebarCollapsed .brandMark {
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+
+  .sidebarCollapsed .nav {
+    gap: 0;
+    padding: 1.1rem 0;
+  }
+
+  .sidebarCollapsed .navGroup {
+    width: 2.75rem;
+    gap: 0.45rem;
+    place-items: center;
+  }
+
+  .sidebarCollapsed .navItem {
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-inline: auto;
+    padding: 0;
+    border-radius: 0.65rem;
+  }
+
+  .sidebarCollapsed .navItem svg {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+
+  .sidebarCollapsed .activeNavItem {
+    background: #303030;
+    box-shadow: inset 0 0 0 1px #3a3a3a;
+  }
+
+  .sidebarCollapsed .brandName,
+  .sidebarCollapsed .navItemLabel,
+  .sidebarCollapsed .workspaceDetails,
+  .sidebarCollapsed .iconButton,
+  .sidebarCollapsed .collapseButtonLabel,
+  .sidebarCollapsed .navLabel {
+    display: none;
+    width: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transform: translateX(-0.25rem);
+  }
+
+  .sidebarCollapsed .navLabel {
+    display: none;
+    margin: 0;
+  }
+
+  .sidebarCollapsed .footer {
+    justify-items: center;
+    padding-inline: 0;
+  }
+
+  .sidebarCollapsed .workspace {
+    width: 2.75rem;
+    min-height: 2.75rem;
+    margin-inline: auto;
+  }
+
+  .sidebarCollapsed .workspaceAvatar {
+    width: 2.15rem;
+    height: 2.15rem;
+    margin: 0;
+  }
+
+  .sidebarCollapsed .collapseButton {
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-inline: auto;
+    padding: 0;
+    border-radius: 0.65rem;
+  }
+
   .content {
     padding-left: 16rem;
+  }
+
+  .contentCollapsed {
+    padding-left: 4.75rem;
   }
 
   .header,

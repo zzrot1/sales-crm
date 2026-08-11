@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { CheckCircle2, LoaderCircle } from "lucide-react";
 
 import type { TaskListItemDto } from "@/service-api/generated/models";
+import type { PartialCreateCompanyRequestStatus } from "@/service-api/generated/models";
 
 import styles from "../index.module.css";
 import { TaskRow } from "./task-row";
@@ -12,7 +13,12 @@ type TaskSectionProps = {
   emptyMessage: string;
   icon: ReactNode;
   isLoading: boolean;
+  onChangeCompanyStatus?: (
+    task: TaskListItemDto,
+    status: PartialCreateCompanyRequestStatus,
+  ) => void;
   onComplete?: (task: TaskListItemDto) => void;
+  onOpenNotes?: (task: TaskListItemDto) => void;
   subtitle: string;
   tasks: TaskListItemDto[];
   title: string;
@@ -24,7 +30,9 @@ export function TaskSection({
   emptyMessage,
   icon,
   isLoading,
+  onChangeCompanyStatus,
   onComplete,
+  onOpenNotes,
   subtitle,
   tasks,
   title,
@@ -54,7 +62,13 @@ export function TaskSection({
               <EmptyRow icon={<LoaderCircle className={styles.spinner} />} message="Se incarca task-urile..." />
             ) : tasks.length > 0 ? (
               tasks.map((task) => (
-                <TaskRow key={task.id} task={task} onComplete={onComplete} />
+                <TaskRow
+                  key={task.id}
+                  task={task}
+                  onChangeCompanyStatus={onChangeCompanyStatus}
+                  onComplete={onComplete}
+                  onOpenNotes={onOpenNotes}
+                />
               ))
             ) : (
               <EmptyRow icon={emptyIcon ?? <CheckCircle2 />} message={emptyMessage} />

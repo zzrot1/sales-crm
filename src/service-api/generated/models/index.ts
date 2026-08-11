@@ -76,6 +76,7 @@ export * from './taskStatusDto';
 export * from './taskTypeDto';
 export * from './updateCompanyRequest';
 export * from './updateContactRequest';
+export * from './updateTaskNotesRequest';
 export * from './updateUserRequest';
 export * from './updateUserRequestRole';
 export * from './userDto';

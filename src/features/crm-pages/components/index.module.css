@@ -51,11 +51,34 @@
   font-size: 0.88rem;
   font-weight: 800;
   white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.button:hover:not(:disabled) {
+  background: #d7dde8;
+  color: #050505;
+  transform: translateY(-1px);
+}
+
+.dialogActions button {
+  cursor: pointer;
+}
+
+.dialogActions button:hover:not(:disabled) {
+  transform: translateY(-1px);
 }
 
 .button:disabled {
   cursor: not-allowed;
   opacity: 0.55;
+}
+
+.dialogActions button:disabled {
+  cursor: not-allowed;
 }
 
 .secondaryButton,
@@ -234,18 +257,14 @@
 }
 
 .generateTasksButton {
+  gap: 0.4rem;
+  min-width: 5.2rem;
+  border: 1px solid #f5f5f5;
+  border-radius: 999px;
   background: #f5f5f5;
   color: #101010;
+  padding-inline: 0.85rem;
   font-weight: 850;
-}
-
-.completeTaskButton {
-  width: 2rem;
-  height: 2rem;
-  border: 1px solid rgba(45, 212, 122, 0.42);
-  border-radius: 999px;
-  background: rgba(45, 212, 122, 0.18);
-  color: #a9f3c4;
   cursor: pointer;
   transition:
     background 160ms ease,
@@ -254,21 +273,139 @@
     transform 160ms ease;
 }
 
-.completeTaskButton:hover {
-  border-color: rgba(45, 212, 122, 0.72);
-  background: #22c55e;
-  color: #07120b;
+.generateTasksButton svg {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.generateTasksButton:hover:not(:disabled) {
+  border-color: #d7dde8;
+  background: #d7dde8;
   transform: translateY(-1px);
 }
 
-.completeTaskButton:focus-visible {
-  border-color: #a9f3c4;
-  box-shadow: 0 0 0 3px rgba(45, 212, 122, 0.22);
-  outline: none;
+.taskOutcomeActions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .generateTasksButton:disabled {
   cursor: not-allowed;
+}
+
+.taskActionMenu {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+}
+
+.taskActionMenuButton {
+  display: inline-grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border: 1px solid #343434;
+  border-radius: 999px;
+  background: #101010;
+  color: #d7dde8;
+  cursor: pointer;
+  list-style: none;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease;
+}
+
+.taskActionMenuButton::-webkit-details-marker {
+  display: none;
+}
+
+.taskActionMenuButton svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.taskActionMenu[open] .taskActionMenuButton,
+.taskActionMenuButton:hover {
+  border-color: #515151;
+  background: #242424;
+  color: #fff;
+}
+
+.taskActionMenuButton:focus-visible {
+  border-color: #d7dde8;
+  box-shadow: 0 0 0 3px rgba(215, 221, 232, 0.16);
+  outline: none;
+}
+
+.taskActionMenuPanel {
+  position: absolute;
+  top: calc(100% + 0.45rem);
+  right: 0;
+  z-index: 40;
+  display: grid;
+  min-width: 11rem;
+  gap: 0.15rem;
+  border: 1px solid #343434;
+  border-radius: 0.6rem;
+  background: #101010;
+  padding: 0.35rem;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.42);
+}
+
+.taskActionMenuItem {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.55rem;
+  border: 0;
+  border-radius: 0.45rem;
+  background: transparent;
+  color: #e8edf5;
+  padding: 0.5rem 0.55rem;
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 800;
+  text-align: left;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.taskActionMenuItem svg {
+  flex: 0 0 auto;
+  width: 0.95rem;
+  height: 0.95rem;
+  color: #aab6c8;
+}
+
+.taskActionMenuItem:hover,
+.taskActionMenuItem:focus-visible {
+  background: #242424;
+  color: #fff;
+  outline: none;
+}
+
+.taskActionMenuItemActive svg {
+  color: #fde68a;
+}
+
+.taskActionMenuItemActive {
+  background: rgba(96, 165, 250, 0.12);
+  color: #bfdbfe;
+}
+
+.taskActionMenuLabel {
+  margin-top: 0.2rem;
+  border-top: 1px solid #2d2d2d;
+  color: #97a0ad;
+  padding: 0.55rem 0.55rem 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 850;
+  text-align: left;
+  text-transform: uppercase;
 }
 
 .taskSections {
@@ -278,6 +415,8 @@
 }
 
 .taskSectionCard {
+  display: flex;
+  flex-direction: column;
   min-height: 24rem;
   overflow: hidden;
 }
@@ -294,7 +433,10 @@
 }
 
 .taskTableWrap {
-  overflow-x: auto;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 0 0.75rem 0.75rem;
 }
 
 .taskTable {
@@ -412,6 +554,12 @@
   color: #d7dde8;
 }
 
+.taskTypeBadgeInvestigation {
+  border-color: rgba(125, 211, 252, 0.36);
+  background: rgba(14, 116, 144, 0.18);
+  color: #bae6fd;
+}
+
 .outcomegreen {
   border-color: rgba(45, 212, 122, 0.36);
   background: rgba(45, 212, 122, 0.12);
@@ -436,7 +584,8 @@
   color: #bfdbfe;
 }
 
-.outcomeNeutral {
+.outcomeNeutral,
+.outcomeneutral {
   background: #101010;
   color: #cbd5e1;
 }
@@ -621,10 +770,42 @@
   width: fit-content;
   border: 1px solid #3a3a3a;
   border-radius: 999px;
+  background: #101010;
   color: #fff;
   padding: 0.2rem 0.55rem;
   font-size: 0.76rem;
   font-weight: 800;
+  white-space: nowrap;
+}
+
+.statusToneNeutral {
+  border-color: rgba(148, 163, 184, 0.32);
+  background: rgba(148, 163, 184, 0.1);
+  color: #cbd5e1;
+}
+
+.statusToneYellow {
+  border-color: rgba(250, 204, 21, 0.36);
+  background: rgba(250, 204, 21, 0.12);
+  color: #fde68a;
+}
+
+.statusToneGreen {
+  border-color: rgba(45, 212, 122, 0.36);
+  background: rgba(45, 212, 122, 0.12);
+  color: #a9f3c4;
+}
+
+.statusToneBlue {
+  border-color: rgba(96, 165, 250, 0.38);
+  background: rgba(96, 165, 250, 0.12);
+  color: #bfdbfe;
+}
+
+.statusToneRed {
+  border-color: rgba(248, 113, 113, 0.38);
+  background: rgba(248, 113, 113, 0.12);
+  color: #fecaca;
 }
 
 .detailsList {

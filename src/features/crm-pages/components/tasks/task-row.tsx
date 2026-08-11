@@ -1,17 +1,57 @@
-import { CheckCircle2, Mail, Phone } from "lucide-react";
+import {
+  Building2,
+  CheckCircle2,
+  Mail,
+  MoreHorizontal,
+  Phone,
+  StickyNote,
+} from "lucide-react";
+import Link from "next/link";
 
-import { Button } from "@/components/ui/button";
-import type { CallOutcomeDto, TaskListItemDto } from "@/service-api/generated/models";
+import { routes } from "@/common/routes";
+import type {
+  CallOutcomeDto,
+  PartialCreateCompanyRequestStatus,
+  TaskListItemDto,
+} from "@/service-api/generated/models";
 
 import styles from "../index.module.css";
-import { getContactLine, outcomeByValue, typeLabels } from "./task-helpers";
+import {
+  companyStatusByValue,
+  getContactLine,
+  outcomeByValue,
+  outcomeOptions,
+  typeLabels,
+} from "./task-helpers";
 
 type TaskRowProps = {
   task: TaskListItemDto;
+  onChangeCompanyStatus?: (
+    task: TaskListItemDto,
+    status: PartialCreateCompanyRequestStatus,
+  ) => void;
   onComplete?: (task: TaskListItemDto) => void;
+  onOpenNotes?: (task: TaskListItemDto) => void;
 };
 
-export function TaskRow({ task, onComplete }: TaskRowProps) {
+const companyStatusByOutcome: Record<
+  CallOutcomeDto,
+  PartialCreateCompanyRequestStatus
+> = {
+  DEAL_WON: "WON",
+  FOLLOW_UP_LATER: "FOLLOW_UP_LATER",
+  INTERESTED: "INTERESTED",
+  MEETING_REQUIRED: "MEETING_REQUIRED",
+  NOT_INTERESTED: "NOT_INTERESTED",
+  NO_ANSWER: "CALLED_NO_ANSWER",
+};
+
+export function TaskRow({
+  task,
+  onChangeCompanyStatus,
+  onComplete,
+  onOpenNotes,
+}: TaskRowProps) {
   return (
     <tr>
       <td>
@@ -34,29 +74,140 @@ export function TaskRow({ task, onComplete }: TaskRowProps) {
       </td>
       <td>
         {onComplete ? (
-          <Button
-            aria-label={`Completeaza task-ul pentru ${task.companyName ?? task.title}`}
-            className={styles.completeTaskButton}
-            size="icon"
-            type="button"
-            onClick={() => onComplete(task)}
-          >
-            <CheckCircle2 />
-          </Button>
+          <TaskActionsMenu
+            task={task}
+            onChangeCompanyStatus={onChangeCompanyStatus}
+            onComplete={onComplete}
+            onOpenNotes={onOpenNotes}
+          />
         ) : (
-          <OutcomeBadge outcome={task.outcome} />
+          <div className={styles.taskOutcomeActions}>
+            <OutcomeBadge
+              companyStatus={task.companyStatus}
+              outcome={task.outcome}
+            />
+            <TaskActionsMenu
+              task={task}
+              onChangeCompanyStatus={onChangeCompanyStatus}
+              onOpenNotes={onOpenNotes}
+            />
+          </div>
         )}
       </td>
     </tr>
   );
 }
 
-function TaskTypeBadge({ type }: { type: string }) {
-  return <span className={styles.taskTypeBadge}>{typeLabels[type] ?? type}</span>;
+function TaskActionsMenu({
+  task,
+  onChangeCompanyStatus,
+  onComplete,
+  onOpenNotes,
+}: {
+  task: TaskListItemDto;
+  onChangeCompanyStatus?: (
+    task: TaskListItemDto,
+    status: PartialCreateCompanyRequestStatus,
+  ) => void;
+  onComplete?: (task: TaskListItemDto) => void;
+  onOpenNotes?: (task: TaskListItemDto) => void;
+}) {
+  const hasNotes = Boolean(task.notes?.trim());
+  const companyHref = `${routes.companies.path}?search=${encodeURIComponent(
+    task.companyName ?? task.title,
+  )}`;
+
+  return (
+    <details className={styles.taskActionMenu}>
+      <summary
+        aria-label={`Actiuni pentru ${task.companyName ?? task.title}`}
+        className={styles.taskActionMenuButton}
+        title="Actiuni"
+      >
+        <MoreHorizontal />
+      </summary>
+      <div className={styles.taskActionMenuPanel}>
+        {onComplete ? (
+          <Link className={styles.taskActionMenuItem} href={companyHref}>
+            <Building2 />
+            Vezi compania
+          </Link>
+        ) : null}
+
+        {onOpenNotes ? (
+          <button
+            className={`${styles.taskActionMenuItem} ${
+              hasNotes ? styles.taskActionMenuItemActive : ""
+            }`}
+            type="button"
+            onClick={() => onOpenNotes(task)}
+          >
+            <StickyNote />
+            {hasNotes ? "Vezi notes" : "Adauga notes"}
+          </button>
+        ) : null}
+
+        {onChangeCompanyStatus && task.companyId ? (
+          <>
+            <span className={styles.taskActionMenuLabel}>Schimba status</span>
+            {outcomeOptions.map((option) => (
+              <button
+                className={`${styles.taskActionMenuItem} ${
+                  task.companyStatus === companyStatusByOutcome[option.value]
+                    ? styles.taskActionMenuItemActive
+                    : ""
+                }`}
+                key={option.value}
+                type="button"
+                onClick={() =>
+                  onChangeCompanyStatus(task, companyStatusByOutcome[option.value])
+                }
+              >
+                {option.label}
+              </button>
+            ))}
+          </>
+        ) : null}
+
+        {onComplete ? (
+          <button
+            className={styles.taskActionMenuItem}
+            type="button"
+            onClick={() => onComplete(task)}
+          >
+            <CheckCircle2 />
+            Completeaza
+          </button>
+        ) : null}
+      </div>
+    </details>
+  );
 }
 
-function OutcomeBadge({ outcome }: { outcome: CallOutcomeDto | null }) {
-  const option = outcome ? outcomeByValue[outcome] : undefined;
+function TaskTypeBadge({ type }: { type: string }) {
+  const isInvestigation = type === "TO_INVESTIGATE";
+
+  return (
+    <span
+      className={`${styles.taskTypeBadge} ${
+        isInvestigation ? styles.taskTypeBadgeInvestigation : ""
+      }`}
+    >
+      {typeLabels[type] ?? type}
+    </span>
+  );
+}
+
+function OutcomeBadge({
+  companyStatus,
+  outcome,
+}: {
+  companyStatus: TaskListItemDto["companyStatus"];
+  outcome: CallOutcomeDto | null;
+}) {
+  const option =
+    (companyStatus ? companyStatusByValue[companyStatus] : undefined) ??
+    (outcome ? outcomeByValue[outcome] : undefined);
 
   if (!option) {
     return (

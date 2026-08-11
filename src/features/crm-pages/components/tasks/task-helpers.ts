@@ -1,4 +1,8 @@
-import type { CallOutcomeDto, TaskListItemDto } from "@/service-api/generated/models";
+import type {
+  CallOutcomeDto,
+  CompanyStatusDto,
+  TaskListItemDto,
+} from "@/service-api/generated/models";
 
 export type OutcomeOption = {
   label: string;
@@ -23,10 +27,27 @@ export const outcomeByValue = outcomeOptions.reduce<Record<string, OutcomeOption
   {},
 );
 
+export const companyStatusByValue: Record<
+  CompanyStatusDto,
+  { label: string; tone: OutcomeOption["tone"] | "neutral" }
+> = {
+  CALLED_NO_ANSWER: { label: "Nu a raspuns", tone: "yellow" },
+  DEAL_IN_PROGRESS: { label: "Deal in progres", tone: "blue" },
+  FOLLOW_UP_LATER: { label: "Revin mai tarziu", tone: "yellow" },
+  INTERESTED: { label: "Interesat", tone: "green" },
+  LOST: { label: "Pierdut", tone: "red" },
+  MEETING_REQUIRED: { label: "Necesita intalnire", tone: "blue" },
+  MEETING_SCHEDULED: { label: "Meeting programat", tone: "blue" },
+  NEW: { label: "Nou", tone: "neutral" },
+  NOT_INTERESTED: { label: "Nu e interesat", tone: "red" },
+  TO_CALL: { label: "De sunat", tone: "neutral" },
+  WON: { label: "Deal castigat", tone: "green" },
+};
+
 export const typeLabels: Record<string, string> = {
   CALL: "Call",
   EMAIL: "Email",
-  LINKEDIN: "LinkedIn",
+  TO_INVESTIGATE: "De verificat",
 };
 
 export const emptyTasks: TaskListItemDto[] = [];
