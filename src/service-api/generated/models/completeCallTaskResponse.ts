@@ -4,11 +4,14 @@
  * sales-crm
  * OpenAPI spec version: 1.0.0
  */
+import type { CompleteCallTaskResponseDeal } from './completeCallTaskResponseDeal';
 import type { CompleteCallTaskResponseFollowUpTask } from './completeCallTaskResponseFollowUpTask';
 import type { CompleteCallTaskResponseCompany } from './completeCallTaskResponseCompany';
 import type { TaskDto } from './taskDto';
 
 export interface CompleteCallTaskResponse {
+  /** @nullable */
+  deal: CompleteCallTaskResponseDeal;
   /** @nullable */
   followUpTask: CompleteCallTaskResponseFollowUpTask;
   /** @nullable */

@@ -68,6 +68,26 @@ export function isCompletedToday(task: TaskListItemDto) {
   );
 }
 
+export function isTaskCompleted(task: TaskListItemDto) {
+  return task.completed || task.status === "COMPLETED" || Boolean(task.completedAt);
+}
+
+export function isTaskDueToday(task: TaskListItemDto) {
+  return Boolean(
+    task.dueDate && getLocalDateKey(task.dueDate) === getLocalDateKey(new Date()),
+  );
+}
+
+export function isCompletedTodayTask(
+  task: TaskListItemDto,
+  todaysTaskIds: Set<string>,
+) {
+  return (
+    isTaskCompleted(task) &&
+    (isCompletedToday(task) || isTaskDueToday(task) || todaysTaskIds.has(task.id))
+  );
+}
+
 export function getContactLine(task: TaskListItemDto) {
   if (!task.primaryContactName && !task.primaryContactJobTitle) {
     return "Contact principal necompletat";

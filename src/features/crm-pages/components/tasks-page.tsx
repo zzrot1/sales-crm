@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { CalendarClock, PhoneCall } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 import {
   getGetCompaniesQueryKey,
@@ -28,7 +29,8 @@ import { CompleteTaskDialog } from "./tasks/complete-task-dialog";
 import {
   emptyTasks,
   getApiErrorMessage,
-  isCompletedToday,
+  isCompletedTodayTask,
+  isTaskCompleted,
 } from "./tasks/task-helpers";
 import { TaskSection } from "./tasks/task-section";
 import { TaskNotesDialog } from "./tasks/task-notes-dialog";
@@ -36,6 +38,7 @@ import { TasksProgressHeader } from "./tasks/tasks-progress-header";
 
 export function TasksPage() {
   const queryClient = useQueryClient();
+  const router = useRouter();
   const [selectedTask, setSelectedTask] = useState<TaskListItemDto | null>(null);
   const [selectedNotesTask, setSelectedNotesTask] =
     useState<TaskListItemDto | null>(null);
@@ -65,18 +68,23 @@ export function TasksPage() {
     completedTasksQuery.isLoading;
 
   const taskStats = useMemo(() => {
-    const pendingTasks = tasks.filter((task) => !task.completedAt);
-    const completedTodayTasks = tasks.filter(isCompletedToday);
-    const completedCount = tasks.filter((task) => Boolean(task.completedAt)).length;
+    const todaysTaskIds = new Set(todayTasks.map((task) => task.id));
+    const pendingTasks = tasks.filter((task) => !isTaskCompleted(task));
+    const closedTasks = tasks.filter(isTaskCompleted);
+    const completedTodayTasks = tasks.filter((task) =>
+      isCompletedTodayTask(task, todaysTaskIds),
+    );
+    const completedCount = completedTodayTasks.length;
 
     return {
       completedCount,
       completedTodayTasks,
+      closedTasks,
       pendingTasks,
       progressValue:
         tasks.length > 0 ? Math.round((completedCount / tasks.length) * 100) : 0,
     };
-  }, [tasks]);
+  }, [tasks, todayTasks]);
 
   const refreshTasks = async () => {
     await Promise.all([
@@ -103,6 +111,18 @@ export function TasksPage() {
       onSuccess: async () => {
         await refreshTasks();
         resetCompleteDialog();
+      },
+    },
+  });
+
+  const quickDealOutcomeMutation = useCompleteCallTask({
+    mutation: {
+      onSuccess: async (response) => {
+        await refreshTasks();
+
+        if (response.data.deal?.id) {
+          router.push(`/deals/${response.data.deal.id}`);
+        }
       },
     },
   });
@@ -186,7 +206,23 @@ export function TasksPage() {
   const changeCompanyStatus = (
     task: TaskListItemDto,
     status: PartialCreateCompanyRequestStatus,
+    nextOutcome: CallOutcomeDto,
   ) => {
+    if (
+      nextOutcome === "INTERESTED" ||
+      nextOutcome === "MEETING_REQUIRED" ||
+      nextOutcome === "DEAL_WON"
+    ) {
+      quickDealOutcomeMutation.mutate({
+        data: {
+          notes: task.notes?.trim() || null,
+          outcome: nextOutcome,
+        },
+        taskId: task.id,
+      });
+      return;
+    }
+
     if (!task.companyId) {
       return;
     }
@@ -227,14 +263,14 @@ export function TasksPage() {
         />
 
         <TaskSection
-          actionHeader="Outcome"
+          actionHeader="Actiune"
           emptyIcon={<CalendarClock />}
-          emptyMessage="Inca nu ai task-uri completate azi."
+          emptyMessage="Inca nu ai task-uri inchise."
           icon={<CalendarClock />}
           isLoading={isLoadingTasks}
-          subtitle={`${taskStats.completedTodayTasks.length} task-uri inchise`}
-          tasks={taskStats.completedTodayTasks}
-          title="Completate azi"
+          subtitle={`${taskStats.closedTasks.length} task-uri inchise`}
+          tasks={taskStats.closedTasks}
+          title="Inchise"
           onChangeCompanyStatus={changeCompanyStatus}
           onOpenNotes={openNotesDialog}
         />

@@ -1,1 +1,3465 @@
-{"openapi":"3.0.0","components":{"examples":{},"headers":{},"parameters":{},"requestBodies":{},"responses":{},"schemas":{"UserDto":{"properties":{"updatedAt":{"type":"string","format":"date-time"},"createdAt":{"type":"string","format":"date-time"},"googleId":{"type":"string","nullable":true},"isEmailVerified":{"type":"boolean"},"role":{"type":"string","enum":["USER","ADMIN"]},"name":{"type":"string","nullable":true},"email":{"type":"string"},"id":{"type":"number","format":"double"}},"required":["updatedAt","createdAt","googleId","isEmailVerified","role","name","email","id"],"type":"object"},"CreateUserRequest":{"properties":{"role":{"type":"string","enum":["USER","ADMIN"]},"name":{"type":"string"},"email":{"type":"string"}},"required":["email"],"type":"object"},"PagedUsersResponse":{"properties":{"totalPages":{"type":"number","format":"double"},"limit":{"type":"number","format":"double"},"page":{"type":"number","format":"double"},"total":{"type":"number","format":"double"},"data":{"items":{"$ref":"#/components/schemas/UserDto"},"type":"array"}},"required":["totalPages","limit","page","total","data"],"type":"object"},"UpdateUserRequest":{"properties":{"isEmailVerified":{"type":"boolean"},"role":{"type":"string","enum":["USER","ADMIN"]},"name":{"type":"string","nullable":true},"email":{"type":"string"}},"type":"object"},"TaskTypeDto":{"type":"string","enum":["CALL","EMAIL","TO_INVESTIGATE"]},"TaskStatusDto":{"type":"string","enum":["PENDING","COMPLETED","CANCELLED"]},"CallOutcomeDto":{"type":"string","enum":["NO_ANSWER","NOT_INTERESTED","INTERESTED","MEETING_REQUIRED","DEAL_WON","FOLLOW_UP_LATER"]},"TaskDto":{"properties":{"updatedAt":{"type":"string","format":"date-time"},"createdAt":{"type":"string","format":"date-time"},"completedAt":{"type":"string","format":"date-time","nullable":true},"notes":{"type":"string","nullable":true},"outcome":{"allOf":[{"$ref":"#/components/schemas/CallOutcomeDto"}],"nullable":true},"completed":{"type":"boolean"},"dueDate":{"type":"string","nullable":true},"title":{"type":"string"},"status":{"$ref":"#/components/schemas/TaskStatusDto"},"type":{"$ref":"#/components/schemas/TaskTypeDto"},"assignedTo":{"type":"number","format":"double","nullable":true},"companyId":{"type":"string","nullable":true},"dealId":{"type":"string","nullable":true},"id":{"type":"string"}},"required":["updatedAt","createdAt","completedAt","notes","outcome","completed","dueDate","title","status","type","assignedTo","companyId","dealId","id"],"type":"object"},"CompanyStatusDto":{"type":"string","enum":["NEW","TO_CALL","CALLED_NO_ANSWER","INTERESTED","NOT_INTERESTED","MEETING_REQUIRED","MEETING_SCHEDULED","DEAL_IN_PROGRESS","WON","LOST","FOLLOW_UP_LATER"]},"TaskListItemDto":{"allOf":[{"$ref":"#/components/schemas/TaskDto"},{"properties":{"primaryContactJobTitle":{"type":"string","nullable":true},"primaryContactPhone":{"type":"string","nullable":true},"primaryContactEmail":{"type":"string","nullable":true},"primaryContactName":{"type":"string","nullable":true},"primaryContactId":{"type":"string","nullable":true},"companyStatus":{"allOf":[{"$ref":"#/components/schemas/CompanyStatusDto"}],"nullable":true},"companyName":{"type":"string","nullable":true}},"required":["primaryContactJobTitle","primaryContactPhone","primaryContactEmail","primaryContactName","primaryContactId","companyStatus","companyName"],"type":"object"}]},"GenerateDailyCallTasksResponse":{"properties":{"data":{"items":{"$ref":"#/components/schemas/TaskDto"},"type":"array"},"message":{"type":"string","nullable":true},"canCreateMore":{"type":"boolean"},"created":{"type":"number","format":"double"}},"required":["data","message","canCreateMore","created"],"type":"object"},"GenerateDailyCallTasksRequest":{"properties":{"limit":{"type":"number","format":"double"},"dueDate":{"type":"string"}},"type":"object"},"EnsureDailyCallTasksResponse":{"properties":{"data":{"items":{"anyOf":[{"$ref":"#/components/schemas/TaskDto"},{"$ref":"#/components/schemas/TaskListItemDto"}]},"type":"array"},"message":{"type":"string","nullable":true},"created":{"type":"number","format":"double"},"action":{"type":"string","enum":["CREATED","HAS_PENDING_TASKS","READY_FOR_MORE","NO_COMPANIES_AVAILABLE"]}},"required":["data","message","created","action"],"type":"object"},"TaskCompanyDto":{"properties":{"updatedAt":{"type":"string","format":"date-time"},"createdAt":{"type":"string","format":"date-time"},"notes":{"type":"string","nullable":true},"hasItTeam":{"type":"boolean","nullable":true},"status":{"$ref":"#/components/schemas/CompanyStatusDto"},"ownerId":{"type":"number","format":"double"},"industry":{"type":"string","nullable":true},"website":{"type":"string","nullable":true},"name":{"type":"string"},"id":{"type":"string"}},"required":["updatedAt","createdAt","notes","hasItTeam","status","ownerId","industry","website","name","id"],"type":"object"},"CompleteCallTaskResponse":{"properties":{"followUpTask":{"allOf":[{"$ref":"#/components/schemas/TaskDto"}],"nullable":true},"company":{"allOf":[{"$ref":"#/components/schemas/TaskCompanyDto"}],"nullable":true},"task":{"$ref":"#/components/schemas/TaskDto"}},"required":["followUpTask","company","task"],"type":"object"},"CompleteCallTaskRequest":{"properties":{"notes":{"type":"string","nullable":true},"outcome":{"$ref":"#/components/schemas/CallOutcomeDto"}},"required":["outcome"],"type":"object"},"UpdateTaskNotesRequest":{"properties":{"notes":{"type":"string","nullable":true}},"required":["notes"],"type":"object"},"ContactDto":{"properties":{"updatedAt":{"type":"string","format":"date-time"},"createdAt":{"type":"string","format":"date-time"},"linkedinUrl":{"type":"string","nullable":true},"jobTitle":{"type":"string","nullable":true},"phone":{"type":"string","nullable":true},"email":{"type":"string","nullable":true},"lastName":{"type":"string"},"firstName":{"type":"string"},"companyId":{"type":"string"},"id":{"type":"string"}},"required":["updatedAt","createdAt","linkedinUrl","jobTitle","phone","email","lastName","firstName","companyId","id"],"type":"object"},"CreateContactRequest":{"properties":{"linkedinUrl":{"type":"string","nullable":true},"jobTitle":{"type":"string","nullable":true},"phone":{"type":"string","nullable":true},"email":{"type":"string","nullable":true},"lastName":{"type":"string"},"firstName":{"type":"string"},"companyId":{"type":"string"}},"required":["firstName","companyId"],"type":"object"},"ContactCompanyDto":{"properties":{"website":{"type":"string","nullable":true},"industry":{"type":"string","nullable":true},"name":{"type":"string"},"id":{"type":"string"}},"required":["website","industry","name","id"],"type":"object"},"ContactListItemDto":{"allOf":[{"$ref":"#/components/schemas/ContactDto"},{"properties":{"company":{"allOf":[{"$ref":"#/components/schemas/ContactCompanyDto"}],"nullable":true}},"required":["company"],"type":"object"}]},"PagedContactsResponse":{"properties":{"totalPages":{"type":"number","format":"double"},"limit":{"type":"number","format":"double"},"page":{"type":"number","format":"double"},"total":{"type":"number","format":"double"},"data":{"items":{"$ref":"#/components/schemas/ContactListItemDto"},"type":"array"}},"required":["totalPages","limit","page","total","data"],"type":"object"},"Partial_CreateContactRequest_":{"properties":{"companyId":{"type":"string"},"firstName":{"type":"string"},"lastName":{"type":"string"},"email":{"type":"string"},"phone":{"type":"string"},"jobTitle":{"type":"string"},"linkedinUrl":{"type":"string"}},"type":"object","description":"Make all properties in T optional"},"UpdateContactRequest":{"$ref":"#/components/schemas/Partial_CreateContactRequest_"},"CompanyDto":{"properties":{"updatedAt":{"type":"string","format":"date-time"},"createdAt":{"type":"string","format":"date-time"},"notes":{"type":"string","nullable":true},"hasItTeam":{"type":"boolean","nullable":true},"status":{"type":"string","enum":["NEW","TO_CALL","CALLED_NO_ANSWER","INTERESTED","NOT_INTERESTED","MEETING_REQUIRED","MEETING_SCHEDULED","DEAL_IN_PROGRESS","WON","LOST","FOLLOW_UP_LATER"]},"ownerId":{"type":"number","format":"double"},"industry":{"type":"string","nullable":true},"website":{"type":"string","nullable":true},"name":{"type":"string"},"id":{"type":"string"}},"required":["updatedAt","createdAt","notes","hasItTeam","status","ownerId","industry","website","name","id"],"type":"object"},"CreateCompanyRequest":{"properties":{"notes":{"type":"string","nullable":true},"hasItTeam":{"type":"boolean","nullable":true},"status":{"type":"string","enum":["NEW","TO_CALL","CALLED_NO_ANSWER","INTERESTED","NOT_INTERESTED","MEETING_REQUIRED","MEETING_SCHEDULED","DEAL_IN_PROGRESS","WON","LOST","FOLLOW_UP_LATER"]},"industry":{"type":"string","nullable":true},"website":{"type":"string","nullable":true},"name":{"type":"string"}},"required":["name"],"type":"object"},"CompanyListItemDto":{"allOf":[{"$ref":"#/components/schemas/CompanyDto"},{"properties":{"primaryContactJobTitle":{"type":"string","nullable":true},"primaryContactPhone":{"type":"string","nullable":true},"primaryContactEmail":{"type":"string","nullable":true},"primaryContactName":{"type":"string","nullable":true},"primaryContactId":{"type":"string","nullable":true}},"required":["primaryContactJobTitle","primaryContactPhone","primaryContactEmail","primaryContactName","primaryContactId"],"type":"object"}]},"PagedCompaniesResponse":{"properties":{"totalPages":{"type":"number","format":"double"},"limit":{"type":"number","format":"double"},"page":{"type":"number","format":"double"},"total":{"type":"number","format":"double"},"data":{"items":{"$ref":"#/components/schemas/CompanyListItemDto"},"type":"array"}},"required":["totalPages","limit","page","total","data"],"type":"object"},"ImportedContactDto":{"properties":{"updatedAt":{"type":"string","format":"date-time"},"createdAt":{"type":"string","format":"date-time"},"linkedinUrl":{"type":"string","nullable":true},"jobTitle":{"type":"string","nullable":true},"phone":{"type":"string","nullable":true},"email":{"type":"string","nullable":true},"lastName":{"type":"string"},"firstName":{"type":"string"},"companyId":{"type":"string"},"id":{"type":"string"}},"required":["updatedAt","createdAt","linkedinUrl","jobTitle","phone","email","lastName","firstName","companyId","id"],"type":"object"},"ImportedLeadDto":{"properties":{"contact":{"$ref":"#/components/schemas/ImportedContactDto"},"company":{"$ref":"#/components/schemas/CompanyDto"}},"required":["contact","company"],"type":"object"},"ImportLeadsResponse":{"properties":{"errors":{"items":{"properties":{"message":{"type":"string"},"index":{"type":"number","format":"double"}},"required":["message","index"],"type":"object"},"type":"array"},"data":{"items":{"$ref":"#/components/schemas/ImportedLeadDto"},"type":"array"},"skipped":{"type":"number","format":"double"},"imported":{"type":"number","format":"double"}},"required":["errors","data","skipped","imported"],"type":"object"},"ImportLeadRow":{"properties":{"Status contact":{"type":"string"},"Rând sursă":{"anyOf":[{"type":"string"},{"type":"number","format":"double"}]},"Note":{"type":"string"},"Website":{"type":"string"},"Echipă IT":{"type":"string"},"Pain point":{"type":"string"},"LinkedIn":{"type":"string"},"Email":{"type":"string"},"Telefon":{"type":"string"},"Companie":{"type":"string"},"Functie":{"type":"string"},"Funcție":{"type":"string"},"Nume":{"type":"string"},"Canal principal":{"type":"string"},"Industrie":{"type":"string"},"Pachet principal":{"type":"string"},"Prioritate":{"type":"string"},"contactStatus":{"type":"string"},"sourceRow":{"anyOf":[{"type":"string"},{"type":"number","format":"double"}],"nullable":true},"notes":{"type":"string"},"website":{"type":"string"},"hasItTeam":{"anyOf":[{"type":"boolean"},{"type":"string"}],"nullable":true},"painPoint":{"type":"string"},"linkedinUrl":{"type":"string"},"email":{"type":"string"},"phone":{"type":"string"},"companyName":{"type":"string"},"jobTitle":{"type":"string"},"contactName":{"type":"string"},"channel":{"type":"string"},"industry":{"type":"string"},"packageName":{"type":"string"},"priority":{"type":"string"}},"type":"object"},"ImportLeadsRequest":{"properties":{"rows":{"items":{"$ref":"#/components/schemas/ImportLeadRow"},"type":"array"}},"required":["rows"],"type":"object"},"Partial_CreateCompanyRequest_":{"properties":{"name":{"type":"string"},"website":{"type":"string"},"industry":{"type":"string"},"status":{"type":"string","enum":["NOT_INTERESTED","INTERESTED","MEETING_REQUIRED","FOLLOW_UP_LATER","NEW","TO_CALL","CALLED_NO_ANSWER","MEETING_SCHEDULED","DEAL_IN_PROGRESS","WON","LOST"]},"hasItTeam":{"type":"boolean"},"notes":{"type":"string"}},"type":"object","description":"Make all properties in T optional"},"UpdateCompanyRequest":{"$ref":"#/components/schemas/Partial_CreateCompanyRequest_"},"AuthUserDto":{"properties":{"googleId":{"type":"string","nullable":true},"isEmailVerified":{"type":"boolean"},"role":{"type":"string","enum":["USER","ADMIN"]},"name":{"type":"string","nullable":true},"email":{"type":"string"},"id":{"type":"number","format":"double"}},"required":["googleId","isEmailVerified","role","name","email","id"],"type":"object"},"MeResponse":{"properties":{"user":{"$ref":"#/components/schemas/AuthUserDto"}},"required":["user"],"type":"object"},"AuthToken":{"properties":{"expires":{"type":"string","format":"date-time"},"token":{"type":"string"}},"required":["expires","token"],"type":"object"},"AuthTokensResponse":{"properties":{"refresh":{"$ref":"#/components/schemas/AuthToken"},"access":{"$ref":"#/components/schemas/AuthToken"}},"required":["refresh","access"],"type":"object"},"AuthResponse":{"properties":{"tokens":{"$ref":"#/components/schemas/AuthTokensResponse"},"user":{"$ref":"#/components/schemas/AuthUserDto"}},"required":["tokens","user"],"type":"object"},"RefreshRequest":{"properties":{"refreshToken":{"type":"string"}},"required":["refreshToken"],"type":"object"},"LogoutRequest":{"properties":{"refreshToken":{"type":"string"}},"required":["refreshToken"],"type":"object"}},"securitySchemes":{"bearerAuth":{"type":"http","scheme":"bearer","bearerFormat":"JWT"}}},"info":{"title":"sales-crm","version":"1.0.0","license":{"name":"ISC"},"contact":{"name":"Mihu Ioan"}},"paths":{"/users":{"post":{"operationId":"CreateUser","responses":{"200":{"description":"Ok","content":{"application/json":{"schema":{"$ref":"#/components/schemas/UserDto"}}}}},"tags":["Users"],"security":[{"bearerAuth":[]}],"parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateUserRequest"}}}}},"get":{"operationId":"GetUsers","responses":{"200":{"description":"Ok","content":{"application/json":{"schema":{"$ref":"#/components/schemas/PagedUsersResponse"}}}}},"tags":["Users"],"security":[{"bearerAuth":[]}],"parameters":[{"in":"query","name":"_page","required":false,"schema":{"format":"double","type":"number"}},{"in":"query","name":"_limit","required":false,"schema":{"format":"double","type":"number"}},{"in":"query","name":"_sortBy","required":false,"schema":{"type":"string","enum":["createdAt","email","role"]}},{"in":"query","name":"_sortOrder","required":false,"schema":{"type":"string","enum":["asc","desc"]}}]}},"/users/{userId}":{"get":{"operationId":"GetUser","responses":{"200":{"description":"Ok","content":{"application/json":{"schema":{"$ref":"#/components/schemas/UserDto"}}}}},"tags":["Users"],"security":[{"bearerAuth":[]}],"parameters":[{"in":"path","name":"userId","required":true,"schema":{"format":"double","type":"number"}}]},"patch":{"operationId":"UpdateUser","responses":{"200":{"description":"Ok","content":{"application/json":{"schema":{"$ref":"#/components/schemas/UserDto"}}}}},"tags":["Users"],"security":[{"bearerAuth":[]}],"parameters":[{"in":"path","name":"userId","required":true,"schema":{"format":"double","type":"number"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/UpdateUserRequest"}}}}},"delete":{"operationId":"DeleteUser","responses":{"204":{"description":"No content"}},"tags":["Users"],"security":[{"bearerAuth":[]}],"parameters":[{"in":"path","name":"userId","required":true,"schema":{"format":"double","type":"number"}}]}},"/tasks":{"get":{"operationId":"GetTasks","responses":{"200":{"description":"Ok","content":{"application/json":{"schema":{"items":{"$ref":"#/components/schemas/TaskListItemDto"},"type":"array"}}}}},"tags":["Tasks"],"security":[{"bearerAuth":[]}],"parameters":[{"in":"query","name":"dueDate","required":false,"schema":{"type":"string"}},{"in":"query","name":"status","required":false,"schema":{"$ref":"#/components/schemas/TaskStatusDto"}},{"in":"query","name":"type","required":false,"schema":{"$ref":"#/components/schemas/TaskTypeDto"}},{"in":"query","name":"sortBy","required":false,"schema":{"type":"string","enum":["dueDate","createdAt","updatedAt"]}},{"in":"query","name":"sortOrder","required":false,"schema":{"type":"string","enum":["asc","desc"]}}]}},"/tasks/today":{"get":{"operationId":"GetTodaysTasks","responses":{"200":{"description":"Ok","content":{"application/json":{"schema":{"items":{"$ref":"#/components/schemas/TaskListItemDto"},"type":"array"}}}}},"tags":["Tasks"],"security":[{"bearerAuth":[]}],"parameters":[]}},"/tasks/daily-calls":{"post":{"operationId":"GenerateDailyCallTasks","responses":{"200":{"description":"Ok","content":{"application/json":{"schema":{"$ref":"#/components/schemas/GenerateDailyCallTasksResponse"}}}}},"tags":["Tasks"],"security":[{"bearerAuth":[]}],"parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/GenerateDailyCallTasksRequest"}}}}}},"/tasks/daily-calls/ensure":{"post":{"operationId":"EnsureDailyCallTasks","responses":{"200":{"description":"Ok","content":{"application/json":{"schema":{"$ref":"#/components/schemas/EnsureDailyCallTasksResponse"}}}}},"tags":["Tasks"],"security":[{"bearerAuth":[]}],"parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/GenerateDailyCallTasksRequest"}}}}}},"/tasks/{taskId}/complete-call":{"post":{"operationId":"CompleteCallTask","responses":{"200":{"description":"Ok","content":{"application/json":{"schema":{"$ref":"#/components/schemas/CompleteCallTaskResponse"}}}}},"tags":["Tasks"],"security":[{"bearerAuth":[]}],"parameters":[{"in":"path","name":"taskId","required":true,"schema":{"type":"string"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CompleteCallTaskRequest"}}}}}},"/tasks/{taskId}/notes":{"patch":{"operationId":"UpdateTaskNotes","responses":{"200":{"description":"Ok","content":{"application/json":{"schema":{"$ref":"#/components/schemas/TaskDto"}}}}},"tags":["Tasks"],"security":[{"bearerAuth":[]}],"parameters":[{"in":"path","name":"taskId","required":true,"schema":{"type":"string"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/UpdateTaskNotesRequest"}}}}}},"/contacts":{"post":{"operationId":"CreateContact","responses":{"200":{"description":"Ok","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ContactDto"}}}}},"tags":["Contacts"],"security":[{"bearerAuth":[]}],"parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateContactRequest"}}}}},"get":{"operationId":"GetContacts","responses":{"200":{"description":"Ok","content":{"application/json":{"schema":{"$ref":"#/components/schemas/PagedContactsResponse"}}}}},"tags":["Contacts"],"security":[{"bearerAuth":[]}],"parameters":[{"in":"query","name":"page","required":false,"schema":{"format":"double","type":"number"}},{"in":"query","name":"limit","required":false,"schema":{"format":"double","type":"number"}},{"in":"query","name":"search","required":false,"schema":{"type":"string"}},{"in":"query","name":"searchCriterion","required":false,"schema":{"type":"string"}},{"in":"query","name":"companyId","required":false,"schema":{"type":"string"}},{"in":"query","name":"sortBy","required":false,"schema":{"type":"string","enum":["createdAt","firstName","lastName","email"]}},{"in":"query","name":"sortOrder","required":false,"schema":{"type":"string","enum":["asc","desc"]}}]}},"/contacts/{contactId}":{"get":{"operationId":"GetContact","responses":{"200":{"description":"Ok","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ContactDto"}}}}},"tags":["Contacts"],"security":[{"bearerAuth":[]}],"parameters":[{"in":"path","name":"contactId","required":true,"schema":{"type":"string"}}]},"patch":{"operationId":"UpdateContact","responses":{"200":{"description":"Ok","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ContactDto"}}}}},"tags":["Contacts"],"security":[{"bearerAuth":[]}],"parameters":[{"in":"path","name":"contactId","required":true,"schema":{"type":"string"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/UpdateContactRequest"}}}}},"delete":{"operationId":"DeleteContact","responses":{"200":{"description":"Ok","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ContactDto"}}}}},"tags":["Contacts"],"security":[{"bearerAuth":[]}],"parameters":[{"in":"path","name":"contactId","required":true,"schema":{"type":"string"}}]}},"/companies":{"post":{"operationId":"CreateCompany","responses":{"200":{"description":"Ok","content":{"application/json":{"schema":{"$ref":"#/components/schemas/CompanyDto"}}}}},"tags":["Companies"],"security":[{"bearerAuth":[]}],"parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateCompanyRequest"}}}}},"get":{"operationId":"GetCompanies","responses":{"200":{"description":"Ok","content":{"application/json":{"schema":{"$ref":"#/components/schemas/PagedCompaniesResponse"}}}}},"tags":["Companies"],"security":[{"bearerAuth":[]}],"parameters":[{"in":"query","name":"page","required":false,"schema":{"format":"double","type":"number"}},{"in":"query","name":"limit","required":false,"schema":{"format":"double","type":"number"}},{"in":"query","name":"search","required":false,"schema":{"type":"string"}},{"in":"query","name":"searchCriterion","required":false,"schema":{"type":"string"}},{"in":"query","name":"industry","required":false,"schema":{"type":"string"}},{"in":"query","name":"ownerId","required":false,"schema":{"format":"double","type":"number"}},{"in":"query","name":"sortBy","required":false,"schema":{"type":"string","enum":["createdAt","name","industry"]}},{"in":"query","name":"sortOrder","required":false,"schema":{"type":"string","enum":["asc","desc"]}}]}},"/companies/import":{"post":{"operationId":"ImportLeads","responses":{"200":{"description":"Ok","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ImportLeadsResponse"}}}}},"tags":["Companies"],"security":[{"bearerAuth":[]}],"parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/ImportLeadsRequest"}}}}}},"/companies/{companyId}":{"get":{"operationId":"GetCompany","responses":{"200":{"description":"Ok","content":{"application/json":{"schema":{"$ref":"#/components/schemas/CompanyDto"}}}}},"tags":["Companies"],"security":[{"bearerAuth":[]}],"parameters":[{"in":"path","name":"companyId","required":true,"schema":{"type":"string"}}]},"patch":{"operationId":"UpdateCompany","responses":{"200":{"description":"Ok","content":{"application/json":{"schema":{"$ref":"#/components/schemas/CompanyDto"}}}}},"tags":["Companies"],"security":[{"bearerAuth":[]}],"parameters":[{"in":"path","name":"companyId","required":true,"schema":{"type":"string"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/UpdateCompanyRequest"}}}}},"delete":{"operationId":"DeleteCompany","responses":{"200":{"description":"Ok","content":{"application/json":{"schema":{"$ref":"#/components/schemas/CompanyDto"}}}}},"tags":["Companies"],"security":[{"bearerAuth":[]}],"parameters":[{"in":"path","name":"companyId","required":true,"schema":{"type":"string"}}]}},"/auth/me":{"get":{"operationId":"Me","responses":{"200":{"description":"Ok","content":{"application/json":{"schema":{"$ref":"#/components/schemas/MeResponse"}}}}},"tags":["Auth"],"security":[],"parameters":[]}},"/auth/google":{"get":{"operationId":"Google","responses":{"204":{"description":"No content"}},"tags":["Auth"],"security":[],"parameters":[]}},"/auth/google/callback":{"get":{"operationId":"GoogleCallback","responses":{"200":{"description":"Ok","content":{"application/json":{"schema":{"$ref":"#/components/schemas/AuthResponse"}}}}},"tags":["Auth"],"security":[],"parameters":[{"in":"query","name":"_code","required":true,"schema":{"type":"string"}}]}},"/auth/refresh":{"post":{"operationId":"Refresh","responses":{"200":{"description":"Ok","content":{"application/json":{"schema":{"$ref":"#/components/schemas/AuthTokensResponse"}}}}},"tags":["Auth"],"security":[],"parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/RefreshRequest"}}}}}},"/auth/logout":{"post":{"operationId":"Logout","responses":{"204":{"description":"No content"}},"tags":["Auth"],"security":[],"parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/LogoutRequest"}}}}}}},"servers":[{"url":"/v1"}]}
+{
+	"openapi": "3.0.0",
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {
+			"UserDto": {
+				"properties": {
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"googleId": {
+						"type": "string",
+						"nullable": true
+					},
+					"isEmailVerified": {
+						"type": "boolean"
+					},
+					"role": {
+						"type": "string",
+						"enum": [
+							"USER",
+							"ADMIN"
+						]
+					},
+					"name": {
+						"type": "string",
+						"nullable": true
+					},
+					"email": {
+						"type": "string"
+					},
+					"id": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"updatedAt",
+					"createdAt",
+					"googleId",
+					"isEmailVerified",
+					"role",
+					"name",
+					"email",
+					"id"
+				],
+				"type": "object"
+			},
+			"CreateUserRequest": {
+				"properties": {
+					"role": {
+						"type": "string",
+						"enum": [
+							"USER",
+							"ADMIN"
+						]
+					},
+					"name": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"email"
+				],
+				"type": "object"
+			},
+			"PagedUsersResponse": {
+				"properties": {
+					"totalPages": {
+						"type": "number",
+						"format": "double"
+					},
+					"limit": {
+						"type": "number",
+						"format": "double"
+					},
+					"page": {
+						"type": "number",
+						"format": "double"
+					},
+					"total": {
+						"type": "number",
+						"format": "double"
+					},
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/UserDto"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"totalPages",
+					"limit",
+					"page",
+					"total",
+					"data"
+				],
+				"type": "object"
+			},
+			"UpdateUserRequest": {
+				"properties": {
+					"isEmailVerified": {
+						"type": "boolean"
+					},
+					"role": {
+						"type": "string",
+						"enum": [
+							"USER",
+							"ADMIN"
+						]
+					},
+					"name": {
+						"type": "string",
+						"nullable": true
+					},
+					"email": {
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"TaskTypeDto": {
+				"type": "string",
+				"enum": [
+					"CALL",
+					"EMAIL",
+					"MEETING",
+					"TO_INVESTIGATE"
+				]
+			},
+			"TaskStatusDto": {
+				"type": "string",
+				"enum": [
+					"PENDING",
+					"COMPLETED",
+					"CANCELLED"
+				]
+			},
+			"CallOutcomeDto": {
+				"type": "string",
+				"enum": [
+					"NO_ANSWER",
+					"NOT_INTERESTED",
+					"INTERESTED",
+					"MEETING_REQUIRED",
+					"DEAL_WON",
+					"FOLLOW_UP_LATER"
+				]
+			},
+			"TaskDto": {
+				"properties": {
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"completedAt": {
+						"type": "string",
+						"format": "date-time",
+						"nullable": true
+					},
+					"notes": {
+						"type": "string",
+						"nullable": true
+					},
+					"outcome": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/CallOutcomeDto"
+							}
+						],
+						"nullable": true
+					},
+					"completed": {
+						"type": "boolean"
+					},
+					"dueDate": {
+						"type": "string",
+						"nullable": true
+					},
+					"title": {
+						"type": "string"
+					},
+					"status": {
+						"$ref": "#/components/schemas/TaskStatusDto"
+					},
+					"type": {
+						"$ref": "#/components/schemas/TaskTypeDto"
+					},
+					"assignedTo": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"companyId": {
+						"type": "string",
+						"nullable": true
+					},
+					"dealId": {
+						"type": "string",
+						"nullable": true
+					},
+					"id": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"updatedAt",
+					"createdAt",
+					"completedAt",
+					"notes",
+					"outcome",
+					"completed",
+					"dueDate",
+					"title",
+					"status",
+					"type",
+					"assignedTo",
+					"companyId",
+					"dealId",
+					"id"
+				],
+				"type": "object"
+			},
+			"CompanyStatusDto": {
+				"type": "string",
+				"enum": [
+					"NEW",
+					"TO_CALL",
+					"CALLED_NO_ANSWER",
+					"INTERESTED",
+					"NOT_INTERESTED",
+					"MEETING_REQUIRED",
+					"MEETING_SCHEDULED",
+					"DEAL_IN_PROGRESS",
+					"WON",
+					"LOST",
+					"FOLLOW_UP_LATER"
+				]
+			},
+			"TaskListItemDto": {
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/TaskDto"
+					},
+					{
+						"properties": {
+							"primaryContactJobTitle": {
+								"type": "string",
+								"nullable": true
+							},
+							"primaryContactPhone": {
+								"type": "string",
+								"nullable": true
+							},
+							"primaryContactEmail": {
+								"type": "string",
+								"nullable": true
+							},
+							"primaryContactName": {
+								"type": "string",
+								"nullable": true
+							},
+							"primaryContactId": {
+								"type": "string",
+								"nullable": true
+							},
+							"companyStatus": {
+								"allOf": [
+									{
+										"$ref": "#/components/schemas/CompanyStatusDto"
+									}
+								],
+								"nullable": true
+							},
+							"companyName": {
+								"type": "string",
+								"nullable": true
+							}
+						},
+						"required": [
+							"primaryContactJobTitle",
+							"primaryContactPhone",
+							"primaryContactEmail",
+							"primaryContactName",
+							"primaryContactId",
+							"companyStatus",
+							"companyName"
+						],
+						"type": "object"
+					}
+				]
+			},
+			"CreateTaskRequest": {
+				"properties": {
+					"assignedTo": {
+						"type": "number",
+						"format": "double"
+					},
+					"dueDate": {
+						"type": "string",
+						"nullable": true
+					},
+					"type": {
+						"$ref": "#/components/schemas/TaskTypeDto"
+					},
+					"title": {
+						"type": "string"
+					},
+					"dealId": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"type",
+					"title",
+					"dealId"
+				],
+				"type": "object"
+			},
+			"GenerateDailyCallTasksResponse": {
+				"properties": {
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/TaskDto"
+						},
+						"type": "array"
+					},
+					"message": {
+						"type": "string",
+						"nullable": true
+					},
+					"canCreateMore": {
+						"type": "boolean"
+					},
+					"created": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"data",
+					"message",
+					"canCreateMore",
+					"created"
+				],
+				"type": "object"
+			},
+			"GenerateDailyCallTasksRequest": {
+				"properties": {
+					"limit": {
+						"type": "number",
+						"format": "double"
+					},
+					"dueDate": {
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"EnsureDailyCallTasksResponse": {
+				"properties": {
+					"data": {
+						"items": {
+							"anyOf": [
+								{
+									"$ref": "#/components/schemas/TaskDto"
+								},
+								{
+									"$ref": "#/components/schemas/TaskListItemDto"
+								}
+							]
+						},
+						"type": "array"
+					},
+					"message": {
+						"type": "string",
+						"nullable": true
+					},
+					"created": {
+						"type": "number",
+						"format": "double"
+					},
+					"action": {
+						"type": "string",
+						"enum": [
+							"CREATED",
+							"HAS_PENDING_TASKS",
+							"READY_FOR_MORE",
+							"NO_COMPANIES_AVAILABLE"
+						]
+					}
+				},
+				"required": [
+					"data",
+					"message",
+					"created",
+					"action"
+				],
+				"type": "object"
+			},
+			"TaskCompanyDto": {
+				"properties": {
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"notes": {
+						"type": "string",
+						"nullable": true
+					},
+					"hasItTeam": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"status": {
+						"$ref": "#/components/schemas/CompanyStatusDto"
+					},
+					"ownerId": {
+						"type": "number",
+						"format": "double"
+					},
+					"industry": {
+						"type": "string",
+						"nullable": true
+					},
+					"website": {
+						"type": "string",
+						"nullable": true
+					},
+					"name": {
+						"type": "string"
+					},
+					"id": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"updatedAt",
+					"createdAt",
+					"notes",
+					"hasItTeam",
+					"status",
+					"ownerId",
+					"industry",
+					"website",
+					"name",
+					"id"
+				],
+				"type": "object"
+			},
+			"TaskDealStageDto": {
+				"type": "string",
+				"enum": [
+					"NEW",
+					"QUALIFIED",
+					"PROPOSAL",
+					"WON",
+					"LOST"
+				]
+			},
+			"CompleteCallTaskResponse": {
+				"properties": {
+					"deal": {
+						"properties": {
+							"updatedAt": {
+								"type": "string",
+								"format": "date-time"
+							},
+							"createdAt": {
+								"type": "string",
+								"format": "date-time"
+							},
+							"closeDate": {
+								"type": "string",
+								"nullable": true
+							},
+							"sourceTaskId": {
+								"type": "string",
+								"nullable": true
+							},
+							"lostReason": {
+								"type": "string",
+								"nullable": true
+							},
+							"stage": {
+								"$ref": "#/components/schemas/TaskDealStageDto"
+							},
+							"value": {
+								"type": "string"
+							},
+							"title": {
+								"type": "string"
+							},
+							"ownerId": {
+								"type": "number",
+								"format": "double"
+							},
+							"contactId": {
+								"type": "string",
+								"nullable": true
+							},
+							"companyId": {
+								"type": "string"
+							},
+							"id": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"updatedAt",
+							"createdAt",
+							"closeDate",
+							"sourceTaskId",
+							"lostReason",
+							"stage",
+							"value",
+							"title",
+							"ownerId",
+							"contactId",
+							"companyId",
+							"id"
+						],
+						"type": "object",
+						"nullable": true
+					},
+					"followUpTask": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/TaskDto"
+							}
+						],
+						"nullable": true
+					},
+					"company": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/TaskCompanyDto"
+							}
+						],
+						"nullable": true
+					},
+					"task": {
+						"$ref": "#/components/schemas/TaskDto"
+					}
+				},
+				"required": [
+					"deal",
+					"followUpTask",
+					"company",
+					"task"
+				],
+				"type": "object"
+			},
+			"CompleteCallTaskRequest": {
+				"properties": {
+					"notes": {
+						"type": "string",
+						"nullable": true
+					},
+					"outcome": {
+						"$ref": "#/components/schemas/CallOutcomeDto"
+					}
+				},
+				"required": [
+					"outcome"
+				],
+				"type": "object"
+			},
+			"UpdateTaskNotesRequest": {
+				"properties": {
+					"notes": {
+						"type": "string",
+						"nullable": true
+					}
+				},
+				"required": [
+					"notes"
+				],
+				"type": "object"
+			},
+			"UpdateTaskRequest": {
+				"properties": {
+					"assignedTo": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"dueDate": {
+						"type": "string",
+						"nullable": true
+					},
+					"type": {
+						"$ref": "#/components/schemas/TaskTypeDto"
+					},
+					"title": {
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"DealsDealStageDto": {
+				"type": "string",
+				"enum": [
+					"NEW",
+					"QUALIFIED",
+					"PROPOSAL",
+					"WON",
+					"LOST"
+				]
+			},
+			"DealsListItemCompanyDto": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"id": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"name",
+					"id"
+				],
+				"type": "object"
+			},
+			"DealsListItemContactDto": {
+				"properties": {
+					"lastName": {
+						"type": "string"
+					},
+					"firstName": {
+						"type": "string"
+					},
+					"id": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"lastName",
+					"firstName",
+					"id"
+				],
+				"type": "object"
+			},
+			"DealsTaskTypeDto": {
+				"type": "string",
+				"enum": [
+					"CALL",
+					"EMAIL",
+					"MEETING",
+					"TO_INVESTIGATE"
+				]
+			},
+			"DealsListItemNextTaskDto": {
+				"properties": {
+					"type": {
+						"$ref": "#/components/schemas/DealsTaskTypeDto"
+					},
+					"dueDate": {
+						"type": "string",
+						"nullable": true
+					},
+					"id": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"type",
+					"dueDate",
+					"id"
+				],
+				"type": "object"
+			},
+			"DealsListItemDto": {
+				"properties": {
+					"nextTask": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/DealsListItemNextTaskDto"
+							}
+						],
+						"nullable": true
+					},
+					"contact": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/DealsListItemContactDto"
+							}
+						],
+						"nullable": true
+					},
+					"company": {
+						"$ref": "#/components/schemas/DealsListItemCompanyDto"
+					},
+					"closeDate": {
+						"type": "string",
+						"nullable": true
+					},
+					"stage": {
+						"$ref": "#/components/schemas/DealsDealStageDto"
+					},
+					"value": {
+						"type": "string"
+					},
+					"title": {
+						"type": "string"
+					},
+					"id": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"nextTask",
+					"contact",
+					"company",
+					"closeDate",
+					"stage",
+					"value",
+					"title",
+					"id"
+				],
+				"type": "object"
+			},
+			"DealsDealDto": {
+				"properties": {
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"closeDate": {
+						"type": "string",
+						"nullable": true
+					},
+					"sourceTaskId": {
+						"type": "string",
+						"nullable": true
+					},
+					"lostReason": {
+						"type": "string",
+						"nullable": true
+					},
+					"stage": {
+						"$ref": "#/components/schemas/DealsDealStageDto"
+					},
+					"value": {
+						"type": "string"
+					},
+					"title": {
+						"type": "string"
+					},
+					"ownerId": {
+						"type": "number",
+						"format": "double"
+					},
+					"contactId": {
+						"type": "string",
+						"nullable": true
+					},
+					"companyId": {
+						"type": "string"
+					},
+					"id": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"updatedAt",
+					"createdAt",
+					"closeDate",
+					"sourceTaskId",
+					"lostReason",
+					"stage",
+					"value",
+					"title",
+					"ownerId",
+					"contactId",
+					"companyId",
+					"id"
+				],
+				"type": "object"
+			},
+			"DealsCompanyStatusDto": {
+				"type": "string",
+				"enum": [
+					"NEW",
+					"TO_CALL",
+					"CALLED_NO_ANSWER",
+					"INTERESTED",
+					"NOT_INTERESTED",
+					"MEETING_REQUIRED",
+					"MEETING_SCHEDULED",
+					"DEAL_IN_PROGRESS",
+					"WON",
+					"LOST",
+					"FOLLOW_UP_LATER"
+				]
+			},
+			"DealsCompanyDto": {
+				"properties": {
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"notes": {
+						"type": "string",
+						"nullable": true
+					},
+					"hasItTeam": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"status": {
+						"$ref": "#/components/schemas/DealsCompanyStatusDto"
+					},
+					"ownerId": {
+						"type": "number",
+						"format": "double"
+					},
+					"industry": {
+						"type": "string",
+						"nullable": true
+					},
+					"website": {
+						"type": "string",
+						"nullable": true
+					},
+					"name": {
+						"type": "string"
+					},
+					"id": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"updatedAt",
+					"createdAt",
+					"notes",
+					"hasItTeam",
+					"status",
+					"ownerId",
+					"industry",
+					"website",
+					"name",
+					"id"
+				],
+				"type": "object"
+			},
+			"DealsContactDto": {
+				"properties": {
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"linkedinUrl": {
+						"type": "string",
+						"nullable": true
+					},
+					"jobTitle": {
+						"type": "string",
+						"nullable": true
+					},
+					"phone": {
+						"type": "string",
+						"nullable": true
+					},
+					"email": {
+						"type": "string",
+						"nullable": true
+					},
+					"lastName": {
+						"type": "string"
+					},
+					"firstName": {
+						"type": "string"
+					},
+					"companyId": {
+						"type": "string"
+					},
+					"id": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"updatedAt",
+					"createdAt",
+					"linkedinUrl",
+					"jobTitle",
+					"phone",
+					"email",
+					"lastName",
+					"firstName",
+					"companyId",
+					"id"
+				],
+				"type": "object"
+			},
+			"DealsActivityTypeDto": {
+				"type": "string",
+				"enum": [
+					"CALL",
+					"EMAIL",
+					"MEETING",
+					"LINKEDIN",
+					"NOTE"
+				]
+			},
+			"DealsActivityDto": {
+				"properties": {
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"notes": {
+						"type": "string",
+						"nullable": true
+					},
+					"type": {
+						"$ref": "#/components/schemas/DealsActivityTypeDto"
+					},
+					"contactId": {
+						"type": "string",
+						"nullable": true
+					},
+					"dealId": {
+						"type": "string",
+						"nullable": true
+					},
+					"id": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"createdAt",
+					"notes",
+					"type",
+					"contactId",
+					"dealId",
+					"id"
+				],
+				"type": "object"
+			},
+			"DealsTaskStatusDto": {
+				"type": "string",
+				"enum": [
+					"PENDING",
+					"COMPLETED",
+					"CANCELLED"
+				]
+			},
+			"DealsCallOutcomeDto": {
+				"type": "string",
+				"enum": [
+					"NO_ANSWER",
+					"NOT_INTERESTED",
+					"INTERESTED",
+					"MEETING_REQUIRED",
+					"DEAL_WON",
+					"FOLLOW_UP_LATER"
+				]
+			},
+			"DealsTaskDto": {
+				"properties": {
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"completedAt": {
+						"type": "string",
+						"format": "date-time",
+						"nullable": true
+					},
+					"notes": {
+						"type": "string",
+						"nullable": true
+					},
+					"outcome": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/DealsCallOutcomeDto"
+							}
+						],
+						"nullable": true
+					},
+					"completed": {
+						"type": "boolean"
+					},
+					"dueDate": {
+						"type": "string",
+						"nullable": true
+					},
+					"title": {
+						"type": "string"
+					},
+					"status": {
+						"$ref": "#/components/schemas/DealsTaskStatusDto"
+					},
+					"type": {
+						"$ref": "#/components/schemas/DealsTaskTypeDto"
+					},
+					"assignedTo": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"companyId": {
+						"type": "string",
+						"nullable": true
+					},
+					"dealId": {
+						"type": "string",
+						"nullable": true
+					},
+					"id": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"updatedAt",
+					"createdAt",
+					"completedAt",
+					"notes",
+					"outcome",
+					"completed",
+					"dueDate",
+					"title",
+					"status",
+					"type",
+					"assignedTo",
+					"companyId",
+					"dealId",
+					"id"
+				],
+				"type": "object"
+			},
+			"DealsDetailsDto": {
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/DealsDealDto"
+					},
+					{
+						"properties": {
+							"tasks": {
+								"items": {
+									"$ref": "#/components/schemas/DealsTaskDto"
+								},
+								"type": "array"
+							},
+							"activities": {
+								"items": {
+									"$ref": "#/components/schemas/DealsActivityDto"
+								},
+								"type": "array"
+							},
+							"contact": {
+								"allOf": [
+									{
+										"$ref": "#/components/schemas/DealsContactDto"
+									}
+								],
+								"nullable": true
+							},
+							"company": {
+								"$ref": "#/components/schemas/DealsCompanyDto"
+							}
+						},
+						"required": [
+							"tasks",
+							"activities",
+							"contact",
+							"company"
+						],
+						"type": "object"
+					}
+				]
+			},
+			"DealsUpdateRequest": {
+				"properties": {
+					"contactId": {
+						"type": "string",
+						"nullable": true
+					},
+					"closeDate": {
+						"type": "string",
+						"nullable": true
+					},
+					"stage": {
+						"$ref": "#/components/schemas/DealsDealStageDto"
+					},
+					"value": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "number",
+								"format": "double"
+							}
+						]
+					},
+					"title": {
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"DealsMarkLostRequest": {
+				"properties": {
+					"reason": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"reason"
+				],
+				"type": "object"
+			},
+			"ContactDto": {
+				"properties": {
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"linkedinUrl": {
+						"type": "string",
+						"nullable": true
+					},
+					"jobTitle": {
+						"type": "string",
+						"nullable": true
+					},
+					"phone": {
+						"type": "string",
+						"nullable": true
+					},
+					"email": {
+						"type": "string",
+						"nullable": true
+					},
+					"lastName": {
+						"type": "string"
+					},
+					"firstName": {
+						"type": "string"
+					},
+					"companyId": {
+						"type": "string"
+					},
+					"id": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"updatedAt",
+					"createdAt",
+					"linkedinUrl",
+					"jobTitle",
+					"phone",
+					"email",
+					"lastName",
+					"firstName",
+					"companyId",
+					"id"
+				],
+				"type": "object"
+			},
+			"CreateContactRequest": {
+				"properties": {
+					"linkedinUrl": {
+						"type": "string",
+						"nullable": true
+					},
+					"jobTitle": {
+						"type": "string",
+						"nullable": true
+					},
+					"phone": {
+						"type": "string",
+						"nullable": true
+					},
+					"email": {
+						"type": "string",
+						"nullable": true
+					},
+					"lastName": {
+						"type": "string"
+					},
+					"firstName": {
+						"type": "string"
+					},
+					"companyId": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"firstName",
+					"companyId"
+				],
+				"type": "object"
+			},
+			"ContactCompanyDto": {
+				"properties": {
+					"website": {
+						"type": "string",
+						"nullable": true
+					},
+					"industry": {
+						"type": "string",
+						"nullable": true
+					},
+					"name": {
+						"type": "string"
+					},
+					"id": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"website",
+					"industry",
+					"name",
+					"id"
+				],
+				"type": "object"
+			},
+			"ContactListItemDto": {
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/ContactDto"
+					},
+					{
+						"properties": {
+							"company": {
+								"allOf": [
+									{
+										"$ref": "#/components/schemas/ContactCompanyDto"
+									}
+								],
+								"nullable": true
+							}
+						},
+						"required": [
+							"company"
+						],
+						"type": "object"
+					}
+				]
+			},
+			"PagedContactsResponse": {
+				"properties": {
+					"totalPages": {
+						"type": "number",
+						"format": "double"
+					},
+					"limit": {
+						"type": "number",
+						"format": "double"
+					},
+					"page": {
+						"type": "number",
+						"format": "double"
+					},
+					"total": {
+						"type": "number",
+						"format": "double"
+					},
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/ContactListItemDto"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"totalPages",
+					"limit",
+					"page",
+					"total",
+					"data"
+				],
+				"type": "object"
+			},
+			"Partial_CreateContactRequest_": {
+				"properties": {
+					"companyId": {
+						"type": "string"
+					},
+					"firstName": {
+						"type": "string"
+					},
+					"lastName": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"phone": {
+						"type": "string"
+					},
+					"jobTitle": {
+						"type": "string"
+					},
+					"linkedinUrl": {
+						"type": "string"
+					}
+				},
+				"type": "object",
+				"description": "Make all properties in T optional"
+			},
+			"UpdateContactRequest": {
+				"$ref": "#/components/schemas/Partial_CreateContactRequest_"
+			},
+			"CompanyDto": {
+				"properties": {
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"notes": {
+						"type": "string",
+						"nullable": true
+					},
+					"hasItTeam": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"status": {
+						"type": "string",
+						"enum": [
+							"NEW",
+							"TO_CALL",
+							"CALLED_NO_ANSWER",
+							"INTERESTED",
+							"NOT_INTERESTED",
+							"MEETING_REQUIRED",
+							"MEETING_SCHEDULED",
+							"DEAL_IN_PROGRESS",
+							"WON",
+							"LOST",
+							"FOLLOW_UP_LATER"
+						]
+					},
+					"ownerId": {
+						"type": "number",
+						"format": "double"
+					},
+					"industry": {
+						"type": "string",
+						"nullable": true
+					},
+					"website": {
+						"type": "string",
+						"nullable": true
+					},
+					"name": {
+						"type": "string"
+					},
+					"id": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"updatedAt",
+					"createdAt",
+					"notes",
+					"hasItTeam",
+					"status",
+					"ownerId",
+					"industry",
+					"website",
+					"name",
+					"id"
+				],
+				"type": "object"
+			},
+			"CreateCompanyRequest": {
+				"properties": {
+					"notes": {
+						"type": "string",
+						"nullable": true
+					},
+					"hasItTeam": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"status": {
+						"type": "string",
+						"enum": [
+							"NEW",
+							"TO_CALL",
+							"CALLED_NO_ANSWER",
+							"INTERESTED",
+							"NOT_INTERESTED",
+							"MEETING_REQUIRED",
+							"MEETING_SCHEDULED",
+							"DEAL_IN_PROGRESS",
+							"WON",
+							"LOST",
+							"FOLLOW_UP_LATER"
+						]
+					},
+					"industry": {
+						"type": "string",
+						"nullable": true
+					},
+					"website": {
+						"type": "string",
+						"nullable": true
+					},
+					"name": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"name"
+				],
+				"type": "object"
+			},
+			"CompanyListItemDto": {
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/CompanyDto"
+					},
+					{
+						"properties": {
+							"primaryContactJobTitle": {
+								"type": "string",
+								"nullable": true
+							},
+							"primaryContactPhone": {
+								"type": "string",
+								"nullable": true
+							},
+							"primaryContactEmail": {
+								"type": "string",
+								"nullable": true
+							},
+							"primaryContactName": {
+								"type": "string",
+								"nullable": true
+							},
+							"primaryContactId": {
+								"type": "string",
+								"nullable": true
+							}
+						},
+						"required": [
+							"primaryContactJobTitle",
+							"primaryContactPhone",
+							"primaryContactEmail",
+							"primaryContactName",
+							"primaryContactId"
+						],
+						"type": "object"
+					}
+				]
+			},
+			"PagedCompaniesResponse": {
+				"properties": {
+					"totalPages": {
+						"type": "number",
+						"format": "double"
+					},
+					"limit": {
+						"type": "number",
+						"format": "double"
+					},
+					"page": {
+						"type": "number",
+						"format": "double"
+					},
+					"total": {
+						"type": "number",
+						"format": "double"
+					},
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/CompanyListItemDto"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"totalPages",
+					"limit",
+					"page",
+					"total",
+					"data"
+				],
+				"type": "object"
+			},
+			"ImportedContactDto": {
+				"properties": {
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"linkedinUrl": {
+						"type": "string",
+						"nullable": true
+					},
+					"jobTitle": {
+						"type": "string",
+						"nullable": true
+					},
+					"phone": {
+						"type": "string",
+						"nullable": true
+					},
+					"email": {
+						"type": "string",
+						"nullable": true
+					},
+					"lastName": {
+						"type": "string"
+					},
+					"firstName": {
+						"type": "string"
+					},
+					"companyId": {
+						"type": "string"
+					},
+					"id": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"updatedAt",
+					"createdAt",
+					"linkedinUrl",
+					"jobTitle",
+					"phone",
+					"email",
+					"lastName",
+					"firstName",
+					"companyId",
+					"id"
+				],
+				"type": "object"
+			},
+			"ImportedLeadDto": {
+				"properties": {
+					"contact": {
+						"$ref": "#/components/schemas/ImportedContactDto"
+					},
+					"company": {
+						"$ref": "#/components/schemas/CompanyDto"
+					}
+				},
+				"required": [
+					"contact",
+					"company"
+				],
+				"type": "object"
+			},
+			"ImportLeadsResponse": {
+				"properties": {
+					"errors": {
+						"items": {
+							"properties": {
+								"message": {
+									"type": "string"
+								},
+								"index": {
+									"type": "number",
+									"format": "double"
+								}
+							},
+							"required": [
+								"message",
+								"index"
+							],
+							"type": "object"
+						},
+						"type": "array"
+					},
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/ImportedLeadDto"
+						},
+						"type": "array"
+					},
+					"skipped": {
+						"type": "number",
+						"format": "double"
+					},
+					"imported": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"errors",
+					"data",
+					"skipped",
+					"imported"
+				],
+				"type": "object"
+			},
+			"ImportLeadRow": {
+				"properties": {
+					"Status contact": {
+						"type": "string"
+					},
+					"Rând sursă": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "number",
+								"format": "double"
+							}
+						]
+					},
+					"Note": {
+						"type": "string"
+					},
+					"Website": {
+						"type": "string"
+					},
+					"Echipă IT": {
+						"type": "string"
+					},
+					"Pain point": {
+						"type": "string"
+					},
+					"LinkedIn": {
+						"type": "string"
+					},
+					"Email": {
+						"type": "string"
+					},
+					"Telefon": {
+						"type": "string"
+					},
+					"Companie": {
+						"type": "string"
+					},
+					"Functie": {
+						"type": "string"
+					},
+					"Funcție": {
+						"type": "string"
+					},
+					"Nume": {
+						"type": "string"
+					},
+					"Canal principal": {
+						"type": "string"
+					},
+					"Industrie": {
+						"type": "string"
+					},
+					"Pachet principal": {
+						"type": "string"
+					},
+					"Prioritate": {
+						"type": "string"
+					},
+					"contactStatus": {
+						"type": "string"
+					},
+					"sourceRow": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "number",
+								"format": "double"
+							}
+						],
+						"nullable": true
+					},
+					"notes": {
+						"type": "string"
+					},
+					"website": {
+						"type": "string"
+					},
+					"hasItTeam": {
+						"anyOf": [
+							{
+								"type": "boolean"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"nullable": true
+					},
+					"painPoint": {
+						"type": "string"
+					},
+					"linkedinUrl": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"phone": {
+						"type": "string"
+					},
+					"companyName": {
+						"type": "string"
+					},
+					"jobTitle": {
+						"type": "string"
+					},
+					"contactName": {
+						"type": "string"
+					},
+					"channel": {
+						"type": "string"
+					},
+					"industry": {
+						"type": "string"
+					},
+					"packageName": {
+						"type": "string"
+					},
+					"priority": {
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"ImportLeadsRequest": {
+				"properties": {
+					"rows": {
+						"items": {
+							"$ref": "#/components/schemas/ImportLeadRow"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"rows"
+				],
+				"type": "object"
+			},
+			"Partial_CreateCompanyRequest_": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"website": {
+						"type": "string"
+					},
+					"industry": {
+						"type": "string"
+					},
+					"status": {
+						"type": "string",
+						"enum": [
+							"NOT_INTERESTED",
+							"INTERESTED",
+							"MEETING_REQUIRED",
+							"FOLLOW_UP_LATER",
+							"NEW",
+							"TO_CALL",
+							"CALLED_NO_ANSWER",
+							"MEETING_SCHEDULED",
+							"DEAL_IN_PROGRESS",
+							"WON",
+							"LOST"
+						]
+					},
+					"hasItTeam": {
+						"type": "boolean"
+					},
+					"notes": {
+						"type": "string"
+					}
+				},
+				"type": "object",
+				"description": "Make all properties in T optional"
+			},
+			"UpdateCompanyRequest": {
+				"$ref": "#/components/schemas/Partial_CreateCompanyRequest_"
+			},
+			"AuthUserDto": {
+				"properties": {
+					"googleId": {
+						"type": "string",
+						"nullable": true
+					},
+					"isEmailVerified": {
+						"type": "boolean"
+					},
+					"role": {
+						"type": "string",
+						"enum": [
+							"USER",
+							"ADMIN"
+						]
+					},
+					"name": {
+						"type": "string",
+						"nullable": true
+					},
+					"email": {
+						"type": "string"
+					},
+					"id": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"googleId",
+					"isEmailVerified",
+					"role",
+					"name",
+					"email",
+					"id"
+				],
+				"type": "object"
+			},
+			"MeResponse": {
+				"properties": {
+					"user": {
+						"$ref": "#/components/schemas/AuthUserDto"
+					}
+				},
+				"required": [
+					"user"
+				],
+				"type": "object"
+			},
+			"AuthToken": {
+				"properties": {
+					"expires": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"token": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"expires",
+					"token"
+				],
+				"type": "object"
+			},
+			"AuthTokensResponse": {
+				"properties": {
+					"refresh": {
+						"$ref": "#/components/schemas/AuthToken"
+					},
+					"access": {
+						"$ref": "#/components/schemas/AuthToken"
+					}
+				},
+				"required": [
+					"refresh",
+					"access"
+				],
+				"type": "object"
+			},
+			"AuthResponse": {
+				"properties": {
+					"tokens": {
+						"$ref": "#/components/schemas/AuthTokensResponse"
+					},
+					"user": {
+						"$ref": "#/components/schemas/AuthUserDto"
+					}
+				},
+				"required": [
+					"tokens",
+					"user"
+				],
+				"type": "object"
+			},
+			"RefreshRequest": {
+				"properties": {
+					"refreshToken": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"refreshToken"
+				],
+				"type": "object"
+			},
+			"LogoutRequest": {
+				"properties": {
+					"refreshToken": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"refreshToken"
+				],
+				"type": "object"
+			},
+			"ActivitiesActivityTypeDto": {
+				"type": "string",
+				"enum": [
+					"CALL",
+					"EMAIL",
+					"MEETING",
+					"LINKEDIN",
+					"NOTE"
+				]
+			},
+			"ActivitiesActivityDto": {
+				"properties": {
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"notes": {
+						"type": "string",
+						"nullable": true
+					},
+					"type": {
+						"$ref": "#/components/schemas/ActivitiesActivityTypeDto"
+					},
+					"contactId": {
+						"type": "string",
+						"nullable": true
+					},
+					"dealId": {
+						"type": "string",
+						"nullable": true
+					},
+					"id": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"createdAt",
+					"notes",
+					"type",
+					"contactId",
+					"dealId",
+					"id"
+				],
+				"type": "object"
+			},
+			"ActivitiesCreateRequest": {
+				"properties": {
+					"notes": {
+						"type": "string"
+					},
+					"contactId": {
+						"type": "string",
+						"nullable": true
+					},
+					"type": {
+						"$ref": "#/components/schemas/ActivitiesActivityTypeDto"
+					},
+					"dealId": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"notes",
+					"type",
+					"dealId"
+				],
+				"type": "object"
+			}
+		},
+		"securitySchemes": {
+			"bearerAuth": {
+				"type": "http",
+				"scheme": "bearer",
+				"bearerFormat": "JWT"
+			}
+		}
+	},
+	"info": {
+		"title": "sales-crm",
+		"version": "1.0.0",
+		"license": {
+			"name": "ISC"
+		},
+		"contact": {
+			"name": "Mihu Ioan"
+		}
+	},
+	"paths": {
+		"/users": {
+			"post": {
+				"operationId": "CreateUser",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserDto"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Users"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateUserRequest"
+							}
+						}
+					}
+				}
+			},
+			"get": {
+				"operationId": "GetUsers",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PagedUsersResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Users"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_page",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "_limit",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "_sortBy",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"createdAt",
+								"email",
+								"role"
+							]
+						}
+					},
+					{
+						"in": "query",
+						"name": "_sortOrder",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"asc",
+								"desc"
+							]
+						}
+					}
+				]
+			}
+		},
+		"/users/{userId}": {
+			"get": {
+				"operationId": "GetUser",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserDto"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Users"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "userId",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"patch": {
+				"operationId": "UpdateUser",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserDto"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Users"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "userId",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdateUserRequest"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeleteUser",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"tags": [
+					"Users"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "userId",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/tasks": {
+			"get": {
+				"operationId": "GetTasks",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/TaskListItemDto"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Tasks"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "dueDate",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "status",
+						"required": false,
+						"schema": {
+							"$ref": "#/components/schemas/TaskStatusDto"
+						}
+					},
+					{
+						"in": "query",
+						"name": "type",
+						"required": false,
+						"schema": {
+							"$ref": "#/components/schemas/TaskTypeDto"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sortBy",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"dueDate",
+								"createdAt",
+								"updatedAt"
+							]
+						}
+					},
+					{
+						"in": "query",
+						"name": "sortOrder",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"asc",
+								"desc"
+							]
+						}
+					}
+				]
+			},
+			"post": {
+				"operationId": "CreateTask",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/TaskDto"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Tasks"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateTaskRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/tasks/today": {
+			"get": {
+				"operationId": "GetTodaysTasks",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/TaskListItemDto"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Tasks"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/tasks/daily-calls": {
+			"post": {
+				"operationId": "GenerateDailyCallTasks",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GenerateDailyCallTasksResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Tasks"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/GenerateDailyCallTasksRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/tasks/daily-calls/ensure": {
+			"post": {
+				"operationId": "EnsureDailyCallTasks",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/EnsureDailyCallTasksResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Tasks"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/GenerateDailyCallTasksRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/tasks/{taskId}/complete-call": {
+			"post": {
+				"operationId": "CompleteCallTask",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/CompleteCallTaskResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Tasks"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "taskId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CompleteCallTaskRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/tasks/{taskId}/notes": {
+			"patch": {
+				"operationId": "UpdateTaskNotes",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/TaskDto"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Tasks"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "taskId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdateTaskNotesRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/tasks/{taskId}": {
+			"patch": {
+				"operationId": "UpdateTask",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/TaskDto"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Tasks"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "taskId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdateTaskRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/deals": {
+			"get": {
+				"operationId": "GetDeals",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/DealsListItemDto"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Deals"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "stage",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "companyId",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "ownerId",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/deals/{id}": {
+			"get": {
+				"operationId": "GetDeal",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/DealsDetailsDto"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Deals"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"patch": {
+				"operationId": "UpdateDeal",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/DealsDealDto"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Deals"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/DealsUpdateRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/deals/{id}/lost": {
+			"patch": {
+				"operationId": "MarkLost",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/DealsDealDto"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Deals"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/DealsMarkLostRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/contacts": {
+			"post": {
+				"operationId": "CreateContact",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContactDto"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Contacts"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateContactRequest"
+							}
+						}
+					}
+				}
+			},
+			"get": {
+				"operationId": "GetContacts",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PagedContactsResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Contacts"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "search",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "searchCriterion",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "companyId",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sortBy",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"createdAt",
+								"firstName",
+								"lastName",
+								"email"
+							]
+						}
+					},
+					{
+						"in": "query",
+						"name": "sortOrder",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"asc",
+								"desc"
+							]
+						}
+					}
+				]
+			}
+		},
+		"/contacts/{contactId}": {
+			"get": {
+				"operationId": "GetContact",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContactDto"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Contacts"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "contactId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"patch": {
+				"operationId": "UpdateContact",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContactDto"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Contacts"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "contactId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdateContactRequest"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeleteContact",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContactDto"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Contacts"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "contactId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/companies": {
+			"post": {
+				"operationId": "CreateCompany",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/CompanyDto"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Companies"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateCompanyRequest"
+							}
+						}
+					}
+				}
+			},
+			"get": {
+				"operationId": "GetCompanies",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PagedCompaniesResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Companies"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "search",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "searchCriterion",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "industry",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "ownerId",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sortBy",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"createdAt",
+								"name",
+								"industry"
+							]
+						}
+					},
+					{
+						"in": "query",
+						"name": "sortOrder",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"asc",
+								"desc"
+							]
+						}
+					}
+				]
+			}
+		},
+		"/companies/import": {
+			"post": {
+				"operationId": "ImportLeads",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ImportLeadsResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Companies"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ImportLeadsRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/companies/{companyId}": {
+			"get": {
+				"operationId": "GetCompany",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/CompanyDto"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Companies"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "companyId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"patch": {
+				"operationId": "UpdateCompany",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/CompanyDto"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Companies"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "companyId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdateCompanyRequest"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeleteCompany",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/CompanyDto"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Companies"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "companyId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/auth/me": {
+			"get": {
+				"operationId": "Me",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MeResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Auth"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/auth/google": {
+			"get": {
+				"operationId": "Google",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"tags": [
+					"Auth"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/auth/google/callback": {
+			"get": {
+				"operationId": "GoogleCallback",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AuthResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Auth"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_code",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/auth/refresh": {
+			"post": {
+				"operationId": "Refresh",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AuthTokensResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Auth"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/RefreshRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/logout": {
+			"post": {
+				"operationId": "Logout",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"tags": [
+					"Auth"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/LogoutRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/activities": {
+			"post": {
+				"operationId": "CreateActivity",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ActivitiesActivityDto"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Activities"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ActivitiesCreateRequest"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "/v1"
+		}
+	]
+}

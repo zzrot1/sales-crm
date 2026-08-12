@@ -1,8 +1,11 @@
 import type { ReactNode } from "react";
 import { CheckCircle2, LoaderCircle } from "lucide-react";
 
-import type { TaskListItemDto } from "@/service-api/generated/models";
-import type { PartialCreateCompanyRequestStatus } from "@/service-api/generated/models";
+import type {
+  CallOutcomeDto,
+  PartialCreateCompanyRequestStatus,
+  TaskListItemDto,
+} from "@/service-api/generated/models";
 
 import styles from "../index.module.css";
 import { TaskRow } from "./task-row";
@@ -16,6 +19,7 @@ type TaskSectionProps = {
   onChangeCompanyStatus?: (
     task: TaskListItemDto,
     status: PartialCreateCompanyRequestStatus,
+    outcome: CallOutcomeDto,
   ) => void;
   onComplete?: (task: TaskListItemDto) => void;
   onOpenNotes?: (task: TaskListItemDto) => void;
@@ -37,6 +41,9 @@ export function TaskSection({
   tasks,
   title,
 }: TaskSectionProps) {
+  const hasOutcomeColumn = !onComplete;
+  const emptyColSpan = hasOutcomeColumn ? 6 : 5;
+
   return (
     <article className={styles.taskSectionCard}>
       <div className={styles.taskSectionHeader}>
@@ -54,12 +61,17 @@ export function TaskSection({
               <th>Contact</th>
               <th>Contactare</th>
               <th>Tip</th>
+              {hasOutcomeColumn ? <th>Outcome</th> : null}
               <th>{actionHeader}</th>
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
-              <EmptyRow icon={<LoaderCircle className={styles.spinner} />} message="Se incarca task-urile..." />
+              <EmptyRow
+                colSpan={emptyColSpan}
+                icon={<LoaderCircle className={styles.spinner} />}
+                message="Se incarca task-urile..."
+              />
             ) : tasks.length > 0 ? (
               tasks.map((task) => (
                 <TaskRow
@@ -71,7 +83,11 @@ export function TaskSection({
                 />
               ))
             ) : (
-              <EmptyRow icon={emptyIcon ?? <CheckCircle2 />} message={emptyMessage} />
+              <EmptyRow
+                colSpan={emptyColSpan}
+                icon={emptyIcon ?? <CheckCircle2 />}
+                message={emptyMessage}
+              />
             )}
           </tbody>
         </table>
@@ -80,10 +96,18 @@ export function TaskSection({
   );
 }
 
-function EmptyRow({ icon, message }: { icon: ReactNode; message: string }) {
+function EmptyRow({
+  colSpan,
+  icon,
+  message,
+}: {
+  colSpan: number;
+  icon: ReactNode;
+  message: string;
+}) {
   return (
     <tr>
-      <td className={styles.taskEmptyCell} colSpan={5}>
+      <td className={styles.taskEmptyCell} colSpan={colSpan}>
         <span className={styles.taskEmptyState}>
           {icon}
           {message}

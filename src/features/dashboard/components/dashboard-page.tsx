@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 
-import { CompaniesDataTable } from "@/features/crm-pages/components/companies-page";
+import { CompaniesDataTable } from "@/features/crm-pages/components/companies/companies-data-table";
 import { useGetCompanies } from "@/service-api/generated/endpoints/companies/companies";
 import {
   GetCompaniesSortBy,

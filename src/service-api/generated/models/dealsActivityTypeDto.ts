@@ -5,13 +5,14 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type TaskTypeDto = typeof TaskTypeDto[keyof typeof TaskTypeDto];
+export type DealsActivityTypeDto = typeof DealsActivityTypeDto[keyof typeof DealsActivityTypeDto];
 
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const TaskTypeDto = {
+export const DealsActivityTypeDto = {
   CALL: 'CALL',
   EMAIL: 'EMAIL',
   MEETING: 'MEETING',
-  TO_INVESTIGATE: 'TO_INVESTIGATE',
+  LINKEDIN: 'LINKEDIN',
+  NOTE: 'NOTE',
 } as const;

@@ -29,6 +29,7 @@ type TaskRowProps = {
   onChangeCompanyStatus?: (
     task: TaskListItemDto,
     status: PartialCreateCompanyRequestStatus,
+    outcome: CallOutcomeDto,
   ) => void;
   onComplete?: (task: TaskListItemDto) => void;
   onOpenNotes?: (task: TaskListItemDto) => void;
@@ -72,28 +73,32 @@ export function TaskRow({
       <td>
         <TaskTypeBadge type={task.type} />
       </td>
-      <td>
-        {onComplete ? (
+      {onComplete ? (
+        <td>
           <TaskActionsMenu
             task={task}
             onChangeCompanyStatus={onChangeCompanyStatus}
             onComplete={onComplete}
             onOpenNotes={onOpenNotes}
           />
-        ) : (
-          <div className={styles.taskOutcomeActions}>
+        </td>
+      ) : (
+        <>
+          <td>
             <OutcomeBadge
               companyStatus={task.companyStatus}
               outcome={task.outcome}
             />
+          </td>
+          <td>
             <TaskActionsMenu
               task={task}
               onChangeCompanyStatus={onChangeCompanyStatus}
               onOpenNotes={onOpenNotes}
             />
-          </div>
-        )}
-      </td>
+          </td>
+        </>
+      )}
     </tr>
   );
 }
@@ -108,6 +113,7 @@ function TaskActionsMenu({
   onChangeCompanyStatus?: (
     task: TaskListItemDto,
     status: PartialCreateCompanyRequestStatus,
+    outcome: CallOutcomeDto,
   ) => void;
   onComplete?: (task: TaskListItemDto) => void;
   onOpenNotes?: (task: TaskListItemDto) => void;
@@ -134,6 +140,16 @@ function TaskActionsMenu({
           </Link>
         ) : null}
 
+        {!onComplete && task.dealId ? (
+          <Link
+            className={`${styles.taskActionMenuItem} ${styles.taskActionMenuItemPrimary}`}
+            href={`${routes.deals.path}/${task.dealId}`}
+          >
+            <Building2 />
+            Vezi deal-ul
+          </Link>
+        ) : null}
+
         {onOpenNotes ? (
           <button
             className={`${styles.taskActionMenuItem} ${
@@ -147,7 +163,7 @@ function TaskActionsMenu({
           </button>
         ) : null}
 
-        {onChangeCompanyStatus && task.companyId ? (
+        {onChangeCompanyStatus && task.companyId && !onComplete ? (
           <>
             <span className={styles.taskActionMenuLabel}>Schimba status</span>
             {outcomeOptions.map((option) => (
@@ -160,7 +176,11 @@ function TaskActionsMenu({
                 key={option.value}
                 type="button"
                 onClick={() =>
-                  onChangeCompanyStatus(task, companyStatusByOutcome[option.value])
+                  onChangeCompanyStatus(
+                    task,
+                    companyStatusByOutcome[option.value],
+                    option.value,
+                  )
                 }
               >
                 {option.label}
