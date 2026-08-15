@@ -1,7 +1,8 @@
-import ky, { type Options, type SearchParamsOption } from "ky";
+import ky, { HTTPError, type Options, type SearchParamsOption } from "ky";
 
 import { getBackendUrl } from "@/common/config";
 import { routes } from "@/common/routes";
+import { getRefreshUrl } from "@/service-api/generated/endpoints/auth/auth";
 
 type ApiFetchOptions = Omit<RequestInit, "body"> & {
   params?: Record<string, unknown>;
@@ -16,28 +17,46 @@ const api = ky.create({
   prefix: getBackendUrl(),
   credentials: "include",
   timeout: 60000,
-  hooks: {
-    afterResponse: [
-      ({ response }) => {
-        if (response.status === 401) {
-          redirectToLogin();
-        }
-      },
-    ],
-  },
 });
+
+let refreshPromise: Promise<boolean> | undefined;
 
 export async function apiFetch<TResponse>(
   url: string,
   options: ApiFetchOptions = {},
 ): Promise<TResponse> {
-  const response = await api(url, {
-    method: options.method ?? "GET",
-    headers: options.headers,
-    searchParams: getSearchParams(options.params),
-    ...getBodyOptions(options),
-    signal: options.signal,
-  });
+  const requestOptions = getRequestOptions(options);
+  let response: Response;
+
+  try {
+    response = await api(url, requestOptions);
+  } catch (error) {
+    if (!(error instanceof HTTPError) || error.response.status !== 401) {
+      throw error;
+    }
+
+    if (isAuthRefreshRequest(url)) {
+      redirectToLogin();
+      throw error;
+    }
+
+    const tryRefresh = await refreshSession();
+
+    if (!tryRefresh) {
+      redirectToLogin();
+      throw error;
+    }
+
+    try {
+      response = await api(url, requestOptions);
+    } catch (retryError) {
+      if (retryError instanceof HTTPError && retryError.response.status === 401) {
+        redirectToLogin();
+      }
+
+      throw retryError;
+    }
+  }
 
   if (response.status === 204) {
     return {
@@ -52,6 +71,16 @@ export async function apiFetch<TResponse>(
     status: response.status,
     headers: response.headers,
   } as TResponse;
+}
+
+function getRequestOptions(options: ApiFetchOptions): Options {
+  return {
+    method: options.method ?? "GET",
+    headers: options.headers,
+    searchParams: getSearchParams(options.params),
+    ...getBodyOptions(options),
+    signal: options.signal,
+  };
 }
 
 function getSearchParams(
@@ -96,6 +125,34 @@ function getBodyOptions(options: ApiFetchOptions): Pick<Options, "body" | "json"
   }
 
   return { json: body };
+}
+
+function isAuthRefreshRequest(url: string) {
+  const refreshUrl = getRefreshUrl();
+  return url === refreshUrl || url.endsWith(refreshUrl);
+}
+
+async function refreshSession() {
+  if (!refreshPromise) {
+    refreshPromise = refreshSessionRequest();
+  }
+
+  return refreshPromise;
+}
+
+async function refreshSessionRequest() {
+  try {
+    await api.post(getRefreshUrl(), {
+        headers: { "Content-Type": "application/json" },
+        json: { refreshToken: "" },
+    });
+
+    return true;
+  } catch {
+    return false;
+  } finally {
+    refreshPromise = undefined;
+  }
 }
 
 function redirectToLogin() {
