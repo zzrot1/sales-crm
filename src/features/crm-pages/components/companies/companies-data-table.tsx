@@ -2,10 +2,14 @@ import { type ComponentProps, useMemo } from "react";
 import { Edit3 } from "lucide-react";
 
 import { DataTable, type DataTableColumn } from "@/components/data-table";
-import type { CompanyListItemDto } from "@/service-api/generated/models";
+import { CompanyStatusDto, type CompanyListItemDto } from "@/service-api/generated/models";
 
 import styles from "../index.module.css";
-import { fallback, formatItTeam } from "../../utils/company-helpers";
+import {
+  companyStatusLabels,
+  fallback,
+  formatItTeam,
+} from "../../utils/company-helpers";
 import { CompanyStatusBadge } from "./company-status-badge";
 
 type CompaniesDataTableProps = {
@@ -47,12 +51,24 @@ export function CompaniesDataTable({
         canCollapse: true,
         id: "industry",
         header: "Industrie",
+        filter: {
+          getValue: (company) => company.industry,
+          placeholder: "Toate industriile",
+          type: "select",
+        },
         cell: (company) => fallback(company.industry),
       },
       {
         canCollapse: true,
         id: "contact",
         header: "Contact",
+        filter: {
+          getValue: (company) =>
+            [company.primaryContactName, company.primaryContactJobTitle]
+              .filter(Boolean)
+              .join(" "),
+          placeholder: "Cauta contact...",
+        },
         cell: (company) => (
           <div className={styles.companyCell}>
             <span>{fallback(company.primaryContactName)}</span>
@@ -66,24 +82,51 @@ export function CompaniesDataTable({
         canCollapse: true,
         id: "email",
         header: "Email",
+        filter: {
+          getValue: (company) => company.primaryContactEmail,
+          placeholder: "Cauta email...",
+        },
         cell: (company) => fallback(company.primaryContactEmail),
       },
       {
         canCollapse: true,
         id: "phone",
         header: "Telefon",
+        filter: {
+          getValue: (company) => company.primaryContactPhone,
+          placeholder: "Cauta telefon...",
+        },
         cell: (company) => fallback(company.primaryContactPhone),
       },
       {
         canCollapse: true,
         id: "status",
         header: "Status",
+        filter: {
+          getValue: (company) => company.status,
+          options: Object.values(CompanyStatusDto).map((status) => ({
+            label: companyStatusLabels[status],
+            value: status,
+          })),
+          placeholder: "Toate statusurile",
+          type: "select",
+        },
         cell: (company) => <CompanyStatusBadge status={company.status} />,
       },
       {
         canCollapse: true,
         id: "itTeam",
         header: "Echipa IT",
+        filter: {
+          getValue: (company) => formatItTeam(company.hasItTeam),
+          options: [
+            { label: "Da", value: "Da" },
+            { label: "Nu", value: "Nu" },
+            { label: "Necunoscut", value: "Necunoscut" },
+          ],
+          placeholder: "Toate",
+          type: "select",
+        },
         cell: (company) => (
           <span className={styles.status}>{formatItTeam(company.hasItTeam)}</span>
         ),

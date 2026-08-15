@@ -2,6 +2,7 @@
 
 import {
   ChevronDown,
+  Filter,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
@@ -23,12 +24,28 @@ import {
 import { cn } from "@/lib/utils";
 import styles from "./index.module.css";
 
+type DataTableFilterValue = string | number | boolean | null | undefined;
+
+type DataTableColumnFilterOption = {
+  label: ReactNode;
+  value: string;
+};
+
+type DataTableColumnFilter<TData> = {
+  type?: "text" | "select";
+  placeholder?: string;
+  options?: DataTableColumnFilterOption[];
+  getValue?: (row: TData) => DataTableFilterValue;
+  match?: (cellValue: DataTableFilterValue, filterValue: string, row: TData) => boolean;
+};
+
 export type DataTableColumn<TData> = {
   id: string;
   header: ReactNode;
   cell: (row: TData) => ReactNode;
   canCollapse?: boolean;
   className?: string;
+  filter?: DataTableColumnFilter<TData>;
   isFixed?: boolean;
   minWidth?: number;
   width?: number;
@@ -78,6 +95,40 @@ const defaultFixedColumnWidth = 280;
 const defaultMinColumnWidth = 110;
 const defaultFixedMinColumnWidth = 180;
 
+function getFilterValue<TData>(row: TData, column: DataTableColumn<TData>) {
+  if (column.filter?.getValue) {
+    return column.filter.getValue(row);
+  }
+
+  if (row && typeof row === "object" && column.id in row) {
+    return (row as Record<string, DataTableFilterValue>)[column.id];
+  }
+
+  return undefined;
+}
+
+function getUniqueFilterOptions<TData>(
+  sourceData: TData[],
+  column: DataTableColumn<TData>,
+): DataTableColumnFilterOption[] {
+  const uniqueValues = new Map<string, string>();
+
+  sourceData.forEach((row) => {
+    const value = getFilterValue(row, column);
+
+    if (value === null || value === undefined || value === "") {
+      return;
+    }
+
+    const stringValue = String(value);
+    uniqueValues.set(stringValue, stringValue);
+  });
+
+  return [...uniqueValues.entries()]
+    .sort(([, left], [, right]) => left.localeCompare(right))
+    .map(([value, label]) => ({ label, value }));
+}
+
 export function DataTable<TData>({
   columns,
   data,
@@ -97,6 +148,7 @@ export function DataTable<TData>({
   search,
 }: DataTableProps<TData>) {
   const [isColumnPanelOpen, setIsColumnPanelOpen] = useState(false);
+  const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
   const [internalPage, setInternalPage] = useState(1);
   const [internalPageSize, setInternalPageSize] = useState(
     defaultPageSizeOptions[0],
@@ -105,27 +157,73 @@ export function DataTable<TData>({
     new Set(columns.map((column) => column.id)),
   );
   const [columnWidths, setColumnWidths] = useState<Record<string, number>>({});
+  const [columnFilters, setColumnFilters] = useState<Record<string, string>>({});
 
   const visibleColumns = columns.filter(
     (column) => !column.canCollapse || visibleColumnIds.has(column.id),
   );
   const collapsibleColumns = columns.filter((column) => column.canCollapse);
+  const filterableColumns = columns.filter((column) => column.filter);
+  const visibleFilterableColumns = visibleColumns.filter((column) => column.filter);
+  const activeFilterCount = Object.values(columnFilters).filter(Boolean).length;
   const usesExternalPagination = Boolean(pagination);
-  const totalRows = pagination?.total ?? data.length;
+
+  const filterOptions = useMemo(() => {
+    return Object.fromEntries(
+      filterableColumns.map((column) => [
+        column.id,
+        column.filter?.options ?? getUniqueFilterOptions(data, column),
+      ]),
+    );
+  }, [data, filterableColumns]);
+
+  const filteredData = useMemo(() => {
+    const activeFilters = Object.entries(columnFilters).filter(([, value]) => value);
+
+    if (!activeFilters.length) {
+      return data;
+    }
+
+    return data.filter((row) =>
+      activeFilters.every(([columnId, filterValue]) => {
+        const column = columns.find((item) => item.id === columnId);
+
+        if (!column?.filter) {
+          return true;
+        }
+
+        const cellValue = getFilterValue(row, column);
+
+        if (column.filter.match) {
+          return column.filter.match(cellValue, filterValue, row);
+        }
+
+        if ((column.filter.type ?? "text") === "select") {
+          return String(cellValue ?? "") === filterValue;
+        }
+
+        return String(cellValue ?? "")
+          .toLocaleLowerCase()
+          .includes(filterValue.toLocaleLowerCase());
+      }),
+    );
+  }, [columnFilters, columns, data]);
+
+  const totalRows = pagination?.total ?? filteredData.length;
   const pageSize = pagination?.pageSize ?? internalPageSize;
   const totalPages =
-    pagination?.totalPages ?? Math.max(Math.ceil(data.length / pageSize), 1);
+    pagination?.totalPages ?? Math.max(Math.ceil(filteredData.length / pageSize), 1);
   const page = pagination?.page ?? Math.min(internalPage, totalPages);
   const pageSizeOptions = pagination?.pageSizeOptions ?? defaultPageSizeOptions;
 
   const visibleData = useMemo(() => {
     if (!hasPagination || usesExternalPagination) {
-      return data;
+      return filteredData;
     }
 
     const startIndex = (page - 1) * pageSize;
-    return data.slice(startIndex, startIndex + pageSize);
-  }, [data, hasPagination, page, pageSize, usesExternalPagination]);
+    return filteredData.slice(startIndex, startIndex + pageSize);
+  }, [filteredData, hasPagination, page, pageSize, usesExternalPagination]);
 
   const goToPage = (nextPage: number) => {
     const boundedPage = Math.min(Math.max(nextPage, 1), totalPages);
@@ -162,9 +260,30 @@ export function DataTable<TData>({
     });
   };
 
+  const updateColumnFilter = (columnId: string, value: string) => {
+    setColumnFilters((current) => ({
+      ...current,
+      [columnId]: value,
+    }));
+
+    if (!pagination) {
+      setInternalPage(1);
+    }
+  };
+
+  const clearColumnFilters = () => {
+    setColumnFilters({});
+
+    if (!pagination) {
+      setInternalPage(1);
+    }
+  };
+
   return (
     <>
-      {search || (hasCollapsedColumns && collapsibleColumns.length) ? (
+      {search ||
+      filterableColumns.length ||
+      (hasCollapsedColumns && collapsibleColumns.length) ? (
         <div className={styles.toolbar}>
           {search ? (
             <label className={styles.searchBox}>
@@ -180,7 +299,69 @@ export function DataTable<TData>({
             <span />
           )}
 
-          {hasCollapsedColumns && collapsibleColumns.length ? (
+          <div className={styles.toolbarActions}>
+            {filterableColumns.length ? (
+              <div className={styles.columnMenu}>
+                <button
+                  aria-expanded={isFilterPanelOpen}
+                  className={styles.columnsButton}
+                  onClick={() => setIsFilterPanelOpen((open) => !open)}
+                  type="button"
+                >
+                  <Filter size={15} />
+                  Filtre
+                  {activeFilterCount ? (
+                    <span className={styles.countBadge}>{activeFilterCount}</span>
+                  ) : null}
+                  <ChevronDown size={14} />
+                </button>
+                {isFilterPanelOpen ? (
+                  <div className={styles.filtersPanel}>
+                    <div className={styles.filtersPanelHeader}>
+                      <span>Filtre coloane</span>
+                      {activeFilterCount ? (
+                        <button onClick={clearColumnFilters} type="button">
+                          Reseteaza
+                        </button>
+                      ) : null}
+                    </div>
+                    {visibleFilterableColumns.map((column) => (
+                      <label className={styles.filterField} key={column.id}>
+                        <span>{column.header}</span>
+                        {(column.filter?.type ?? "text") === "select" ? (
+                          <select
+                            onChange={(event) =>
+                              updateColumnFilter(column.id, event.target.value)
+                            }
+                            value={columnFilters[column.id] ?? ""}
+                          >
+                            <option value="">
+                              {column.filter?.placeholder ?? "Toate"}
+                            </option>
+                            {(filterOptions[column.id] ?? []).map((option) => (
+                              <option key={option.value} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          <input
+                            onChange={(event) =>
+                              updateColumnFilter(column.id, event.target.value)
+                            }
+                            placeholder={column.filter?.placeholder ?? "Filtreaza..."}
+                            type="search"
+                            value={columnFilters[column.id] ?? ""}
+                          />
+                        )}
+                      </label>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+
+            {hasCollapsedColumns && collapsibleColumns.length ? (
             <div className={styles.columnMenu}>
               <button
                 aria-expanded={isColumnPanelOpen}
@@ -207,7 +388,8 @@ export function DataTable<TData>({
                 </div>
               ) : null}
             </div>
-          ) : null}
+            ) : null}
+          </div>
         </div>
       ) : null}
 
@@ -434,4 +616,5 @@ export function DataTable<TData>({
     window.addEventListener("pointermove", handlePointerMove);
     window.addEventListener("pointerup", handlePointerUp);
   }
+
 }

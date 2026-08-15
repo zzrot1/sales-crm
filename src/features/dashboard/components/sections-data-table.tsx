@@ -155,18 +155,29 @@ export function SectionsDataTable() {
       {
         id: "header",
         header: "Header",
+        filter: {
+          placeholder: "Filter header...",
+        },
         cell: (section) => <span className={styles.headerCell}>{section.header}</span>,
       },
       {
         canCollapse: true,
         id: "type",
         header: "Section Type",
+        filter: {
+          placeholder: "All types",
+          type: "select",
+        },
         cell: (section) => <span className={styles.typeBadge}>{section.type}</span>,
       },
       {
         canCollapse: true,
         id: "status",
         header: "Status",
+        filter: {
+          placeholder: "All statuses",
+          type: "select",
+        },
         cell: (section) => {
           const isDone = section.status === "Done";
           return (
@@ -197,6 +208,10 @@ export function SectionsDataTable() {
         canCollapse: true,
         id: "reviewer",
         header: "Reviewer",
+        filter: {
+          placeholder: "All reviewers",
+          type: "select",
+        },
         cell: (section) =>
           section.reviewer === "Assign reviewer" ? (
             <button className={styles.reviewerSelect} type="button">
