@@ -10,7 +10,6 @@ import {
   LogOut,
   PanelLeftClose,
   PanelLeftOpen,
-  Settings,
   Upload,
 } from "lucide-react";
 import Link from "next/link";
@@ -43,7 +42,6 @@ const navGroups = [
       { name: routes.tasks.name, href: routes.tasks.path, icon: ClipboardList },
       { name: routes.import.name, href: routes.import.path, icon: Upload },
       { name: routes.reports.name, href: routes.reports.path, icon: FileBarChart },
-      { name: routes.settings.name, href: routes.settings.path, icon: Settings },
     ],
   },
 ];

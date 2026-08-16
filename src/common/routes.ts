@@ -47,14 +47,6 @@ export const routes = {
       roles: [AuthUserDtoRole.USER, AuthUserDtoRole.ADMIN],
     },
   },
-  settings: {
-    name: "Setari",
-    path: "/settings",
-    access: {
-      type: RouteAccessType.Authenticated,
-      roles: [AuthUserDtoRole.USER, AuthUserDtoRole.ADMIN],
-    },
-  },
   reports: {
     name: "Rapoarte",
     path: "/reports",
