@@ -34,6 +34,12 @@ type DealMove = {
   reason?: string;
 };
 
+export type DealFilters = {
+  companyId: string;
+  dateFrom: string;
+  dateTo: string;
+};
+
 type DealsQuerySnapshot = Array<[readonly unknown[], getDealsResponse | undefined]>;
 
 type MoveDealContext = {
@@ -62,13 +68,17 @@ function updateDealStageInList(
   };
 }
 
-export function useDeals() {
+export function useDeals(filters?: DealFilters) {
   const queryClient = useQueryClient();
   const [moveError, setMoveError] = useState<string | null>(null);
   const dealsQuery = useGetDeals();
+  const filteredDeals = useMemo(
+    () => filterDeals(dealsQuery.data?.data ?? [], filters),
+    [dealsQuery.data?.data, filters],
+  );
   const groupedDeals = useMemo(
-    () => groupDealsByStage(dealsQuery.data?.data ?? []),
-    [dealsQuery.data?.data],
+    () => groupDealsByStage(filteredDeals),
+    [filteredDeals],
   );
 
   const updateDealMutation = useUpdateDeal<unknown, MoveDealContext>({
@@ -172,12 +182,37 @@ export function useDeals() {
 
   return {
     dealsQuery,
+    filteredDeals,
     groupedDeals,
     isMoving: updateDealMutation.isPending || markLostMutation.isPending,
     moveDeal,
     moveError,
     setMoveError,
   };
+}
+
+function filterDeals(deals: DealsListItemDto[], filters?: DealFilters) {
+  if (!filters) {
+    return deals;
+  }
+
+  return deals.filter((deal) => {
+    if (filters.companyId && deal.company.id !== filters.companyId) {
+      return false;
+    }
+
+    const closeDate = deal.closeDate?.slice(0, 10);
+
+    if (filters.dateFrom && (!closeDate || closeDate < filters.dateFrom)) {
+      return false;
+    }
+
+    if (filters.dateTo && (!closeDate || closeDate > filters.dateTo)) {
+      return false;
+    }
+
+    return true;
+  });
 }
 
 export function useDealDetail(dealId: string) {

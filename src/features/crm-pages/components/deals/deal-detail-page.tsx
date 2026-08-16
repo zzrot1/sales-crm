@@ -1,5 +1,6 @@
 "use client";
 
+import { X } from "lucide-react";
 import Link from "next/link";
 
 import { useDealDetail } from "../../hooks/useDeals";
@@ -36,7 +37,7 @@ export function DealDetailPage({ dealId }: { dealId: string }) {
           <div className={styles.dealModalHeader}>
             <p className={styles.formError}>Nu am putut incarca deal-ul.</p>
             <Link className={styles.iconButton} href="/deals">
-              x
+              <X size={18} />
             </Link>
           </div>
         </section>
@@ -53,7 +54,7 @@ export function DealDetailPage({ dealId }: { dealId: string }) {
             <h2 className={styles.cardTitle}>{deal.title}</h2>
           </div>
           <Link aria-label="Inchide detaliul" className={styles.iconButton} href="/deals">
-            x
+            <X size={18} />
           </Link>
         </div>
         <DealDetailDrawer

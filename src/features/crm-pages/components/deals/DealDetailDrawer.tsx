@@ -69,81 +69,83 @@ export function DealDetailDrawer({
 
   return (
     <div className={styles.dealDetail}>
-      <section className={styles.dealDetailHeader}>
-        <div className={styles.dealDetailTitleGroup}>
-          <label className={styles.dealInlineField}>
-            <span>Titlu</span>
-            <input
-              value={title}
-              onBlur={() => {
-                if (title.trim() && title !== deal.title) {
-                  onUpdateDeal({ title: title.trim() });
-                }
-              }}
-              onChange={(event) => setTitle(event.target.value)}
-            />
-          </label>
-          <div className={styles.dealLinks}>
-            <Link href={`/companies?search=${encodeURIComponent(deal.company.name)}`}>
-              {deal.company.name}
-            </Link>
-            {contactName ? (
-              <Link href={`/companies?search=${encodeURIComponent(contactName)}`}>
-                {contactName}
+      <section className={styles.dealSummaryCard}>
+        <div className={styles.dealDetailHeader}>
+          <div className={styles.dealDetailTitleGroup}>
+            <label className={styles.dealInlineField}>
+              <span>Titlu</span>
+              <input
+                value={title}
+                onBlur={() => {
+                  if (title.trim() && title !== deal.title) {
+                    onUpdateDeal({ title: title.trim() });
+                  }
+                }}
+                onChange={(event) => setTitle(event.target.value)}
+              />
+            </label>
+            <div className={styles.dealLinks}>
+              <Link href={`/companies?search=${encodeURIComponent(deal.company.name)}`}>
+                {deal.company.name}
               </Link>
-            ) : null}
+              {contactName ? (
+                <Link href={`/companies?search=${encodeURIComponent(contactName)}`}>
+                  {contactName}
+                </Link>
+              ) : null}
+            </div>
           </div>
+
+          <MarkDealLostButton isSaving={isSaving} onConfirm={onMarkLost} />
         </div>
 
-        <MarkDealLostButton isSaving={isSaving} onConfirm={onMarkLost} />
-      </section>
-
-      <section className={styles.dealDetailGrid}>
-        <label className={styles.dealInlineField}>
-          <span>Stage</span>
-          <select
-            value={deal.stage}
-            onChange={(event) =>
-              onUpdateDeal({ stage: event.target.value as typeof deal.stage })
-            }
-          >
-            {dealStages.map((stage) => (
-              <option key={stage} value={stage}>
-                {dealStageLabels[stage]}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className={styles.dealInlineField}>
-          <span>Valoare</span>
-          <input
-            inputMode="decimal"
-            value={value}
-            onBlur={() => {
-              if (value !== deal.value) {
-                onUpdateDeal({ value });
+        <div className={styles.dealDetailGrid}>
+          <label className={styles.dealInlineField}>
+            <span>Stage</span>
+            <select
+              value={deal.stage}
+              onChange={(event) =>
+                onUpdateDeal({ stage: event.target.value as typeof deal.stage })
               }
-            }}
-            onChange={(event) => setValue(event.target.value)}
-          />
-          <small>{formatDealValue(value) ?? "Fara valoare"}</small>
-        </label>
+            >
+              {dealStages.map((stage) => (
+                <option key={stage} value={stage}>
+                  {dealStageLabels[stage]}
+                </option>
+              ))}
+            </select>
+          </label>
 
-        <label className={styles.dealInlineField}>
-          <span>Close date</span>
-          <input
-            type="date"
-            value={closeDate}
-            onBlur={() => {
-              const nextValue = closeDate || null;
-              if (nextValue !== toDateInputValue(deal.closeDate)) {
-                onUpdateDeal({ closeDate: nextValue });
-              }
-            }}
-            onChange={(event) => setCloseDate(event.target.value)}
-          />
-        </label>
+          <label className={styles.dealInlineField}>
+            <span>Valoare</span>
+            <input
+              inputMode="decimal"
+              value={value}
+              onBlur={() => {
+                if (value !== deal.value) {
+                  onUpdateDeal({ value });
+                }
+              }}
+              onChange={(event) => setValue(event.target.value)}
+            />
+            <small>{formatDealValue(value) ?? "Fara valoare"}</small>
+          </label>
+
+          <label className={styles.dealInlineField}>
+            <span>Close date</span>
+            <input
+              type="date"
+              value={closeDate}
+              onBlur={() => {
+                const nextValue = closeDate || null;
+                if (nextValue !== toDateInputValue(deal.closeDate)) {
+                  onUpdateDeal({ closeDate: nextValue });
+                }
+              }}
+              onChange={(event) => setCloseDate(event.target.value)}
+            />
+          </label>
+        </div>
       </section>
 
       <section className={styles.dealDetailColumns}>

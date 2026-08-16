@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { X } from "lucide-react";
 
 import styles from "../index.module.css";
 
@@ -15,7 +16,7 @@ export function MarkDealLostButton({
   return (
     <>
       <button
-        className={styles.ghostButton}
+        className={`${styles.ghostButton} ${styles.dealLostButton}`}
         disabled={isSaving}
         type="button"
         onClick={() => setIsOpen(true)}
@@ -52,7 +53,7 @@ export function MarkDealLostButton({
                 type="button"
                 onClick={() => setIsOpen(false)}
               >
-                x
+                <X size={18} />
               </button>
             </div>
             <label className={styles.dialogField}>
