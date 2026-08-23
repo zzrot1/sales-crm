@@ -1,6 +1,7 @@
 import ky, { HTTPError, type Options, type SearchParamsOption } from "ky";
 
 import { getBackendUrl } from "@/common/config";
+import { ApiError, toApiError } from "@/core/api-error";
 import { routes } from "@/common/routes";
 import { getRefreshUrl } from "@/service-api/generated/endpoints/auth/auth";
 
@@ -10,7 +11,8 @@ type ApiFetchOptions = Omit<RequestInit, "body"> & {
   body?: BodyInit | null;
 };
 
-export type ErrorType<ErrorData = unknown> = ErrorData;
+/** `apiFetch` garanteaza ca orice reject e un `ApiError` normalizat. */
+export type ErrorType<ErrorData = unknown> = ApiError & { body?: ErrorData };
 export type BodyType<BodyData = unknown> = BodyData;
 
 const api = ky.create({
@@ -32,19 +34,19 @@ export async function apiFetch<TResponse>(
     response = await api(url, requestOptions);
   } catch (error) {
     if (!(error instanceof HTTPError) || error.response.status !== 401) {
-      throw error;
+      throw await toApiError(error);
     }
 
     if (isAuthRefreshRequest(url)) {
       redirectToLogin();
-      throw error;
+      throw await toApiError(error);
     }
 
     const tryRefresh = await refreshSession();
 
     if (!tryRefresh) {
       redirectToLogin();
-      throw error;
+      throw await toApiError(error);
     }
 
     try {
@@ -54,7 +56,7 @@ export async function apiFetch<TResponse>(
         redirectToLogin();
       }
 
-      throw retryError;
+      throw await toApiError(retryError);
     }
   }
 

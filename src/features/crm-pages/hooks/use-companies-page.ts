@@ -1,19 +1,11 @@
-import { useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
-import { useQueryClient } from "@tanstack/react-query";
+"use client";
 
-import {
-  getGetCompaniesQueryKey,
-  useGetCompanies,
-} from "@/service-api/generated/endpoints/companies/companies";
-import {
-  getGetContactsQueryKey,
-  useUpdateContact,
-} from "@/service-api/generated/endpoints/contacts/contacts";
-import {
-  getGetTasksQueryKey,
-  getGetTodaysTasksQueryKey,
-} from "@/service-api/generated/endpoints/tasks/tasks";
+import { useState } from "react";
+
+import { useListState } from "@/core/list-state";
+import { useMutationSetup } from "@/core/mutation-setup";
+import { useGetCompanies } from "@/service-api/generated/endpoints/companies/companies";
+import { useUpdateContact } from "@/service-api/generated/endpoints/contacts/contacts";
 import {
   GetCompaniesSortBy,
   GetCompaniesSortOrder,
@@ -23,15 +15,7 @@ import {
 import type { ContactForm } from "../components/companies/edit-contact-dialog";
 
 export function useCompaniesPage() {
-  const queryClient = useQueryClient();
-  const searchParams = useSearchParams();
-  const companySearchParam = searchParams.get("search") ?? "";
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(100);
-  const [searchState, setSearchState] = useState({
-    source: companySearchParam,
-    value: companySearchParam,
-  });
+  const list = useListState({ limit: 100, searchParam: "search" });
   const [selectedCompany, setSelectedCompany] =
     useState<CompanyListItemDto | null>(null);
   const [editingCompany, setEditingCompany] =
@@ -41,51 +25,25 @@ export function useCompaniesPage() {
     jobTitle: "",
     phone: "",
   });
-  const search =
-    searchState.source === companySearchParam
-      ? searchState.value
-      : companySearchParam;
-
-  if (searchState.source !== companySearchParam) {
-    setSearchState({
-      source: companySearchParam,
-      value: companySearchParam,
-    });
-
-    if (page !== 1) {
-      setPage(1);
-    }
-  }
 
   const companiesQuery = useGetCompanies({
-    page,
-    limit,
-    search: search.trim() || undefined,
+    limit: list.limit,
+    page: list.page,
+    search: list.searchParamValue,
     sortBy: GetCompaniesSortBy.createdAt,
     sortOrder: GetCompaniesSortOrder.desc,
   });
 
-  const pageData = companiesQuery.data?.data;
-  const companies = useMemo(() => pageData?.data ?? [], [pageData?.data]);
-  const total = pageData?.total ?? 0;
-  const totalPages = Math.max(pageData?.totalPages ?? 1, 1);
+  const companies = companiesQuery.data?.data.data ?? [];
+  const total = companiesQuery.data?.data.total ?? 0;
+  const totalPages = Math.max(companiesQuery.data?.data.totalPages ?? 1, 1);
 
-  const goToPage = (nextPage: number) => {
-    setPage(Math.min(Math.max(nextPage, 1), totalPages));
-  };
-
-  const handleLimitChange = (nextLimit: number) => {
-    setLimit(nextLimit);
-    setPage(1);
-  };
-
-  const handleSearchChange = (value: string) => {
-    setSearchState({
-      source: companySearchParam,
-      value,
-    });
-    setPage(1);
-  };
+  const updateContactSetup = useMutationSetup({
+    invalidates: ["/companies", "/contacts", "/tasks"],
+    onSuccess: () => setEditingCompany(null),
+    success: "Contactul a fost salvat.",
+  });
+  const updateContactMutation = useUpdateContact(updateContactSetup);
 
   const openContactEditor = (company: CompanyListItemDto) => {
     setEditingCompany(company);
@@ -94,27 +52,6 @@ export function useCompaniesPage() {
       jobTitle: company.primaryContactJobTitle ?? "",
       phone: company.primaryContactPhone ?? "",
     });
-  };
-
-  const updateContactMutation = useUpdateContact({
-    mutation: {
-      onSuccess: async () => {
-        await Promise.all([
-          queryClient.invalidateQueries({ queryKey: getGetCompaniesQueryKey() }),
-          queryClient.invalidateQueries({ queryKey: getGetContactsQueryKey() }),
-          queryClient.invalidateQueries({ queryKey: getGetTodaysTasksQueryKey() }),
-          queryClient.invalidateQueries({ queryKey: getGetTasksQueryKey() }),
-        ]);
-
-        setEditingCompany(null);
-      },
-    },
-  });
-
-  const closeContactEditor = () => {
-    if (!updateContactMutation.isPending) {
-      setEditingCompany(null);
-    }
   };
 
   const saveContact = () => {
@@ -133,19 +70,24 @@ export function useCompaniesPage() {
   };
 
   return {
-    closeContactEditor,
+    closeContactEditor: () => {
+      if (!updateContactMutation.isPending) {
+        setEditingCompany(null);
+      }
+    },
     companies,
     companiesQuery,
     contactForm,
     editingCompany,
-    goToPage,
-    handleLimitChange,
-    handleSearchChange,
-    limit,
+    goToPage: (page: number) =>
+      list.setPage(Math.min(Math.max(page, 1), totalPages)),
+    handleLimitChange: list.setLimit,
+    handleSearchChange: list.setSearch,
+    limit: list.limit,
     openContactEditor,
-    page,
+    page: list.page,
     saveContact,
-    search,
+    search: list.search,
     selectedCompany,
     setContactForm,
     setSelectedCompany,

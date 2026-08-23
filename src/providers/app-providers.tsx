@@ -1,5 +1,6 @@
 "use client";
 
+import { NotificationsProvider } from "@/core/notifications";
 import { QueryProvider } from "@/providers/query-provider";
 
 type AppProvidersProps = {
@@ -7,5 +8,9 @@ type AppProvidersProps = {
 };
 
 export function AppProviders({ children }: AppProvidersProps) {
-  return <QueryProvider>{children}</QueryProvider>;
+  return (
+    <QueryProvider>
+      <NotificationsProvider>{children}</NotificationsProvider>
+    </QueryProvider>
+  );
 }

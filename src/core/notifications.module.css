@@ -1,0 +1,69 @@
+.viewport {
+  position: fixed;
+  z-index: 100;
+  right: 1rem;
+  bottom: 1rem;
+  display: grid;
+  gap: 0.6rem;
+  width: min(24rem, calc(100vw - 2rem));
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  border: 1px solid #e5e5e2;
+  border-left-width: 3px;
+  border-radius: 0.65rem;
+  background: #ffffff;
+  padding: 0.75rem 0.85rem;
+  box-shadow: 0 8px 24px rgb(28 51 58 / 12%);
+  pointer-events: auto;
+}
+
+.success {
+  border-left-color: #1f9d55;
+}
+
+.success .icon {
+  color: #1f9d55;
+}
+
+.error {
+  border-left-color: var(--destructive, #c0392b);
+}
+
+.error .icon {
+  color: var(--destructive, #c0392b);
+}
+
+.icon {
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.message {
+  flex: 1;
+  min-width: 0;
+  color: var(--foreground);
+  font-size: 0.88rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.close {
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 0.4rem;
+  background: transparent;
+  color: #666666;
+  cursor: pointer;
+  padding: 0.15rem;
+  line-height: 0;
+}
+
+.close:hover {
+  background: #f2f2f0;
+  color: var(--foreground);
+}

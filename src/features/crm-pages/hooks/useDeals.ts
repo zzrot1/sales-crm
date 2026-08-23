@@ -1,20 +1,16 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 
+import { useMutationSetup } from "@/core/mutation-setup";
+import { useCreateActivity } from "@/service-api/generated/endpoints/activities/activities";
 import {
-  type getDealsResponse,
-  getGetDealQueryKey,
-  getGetDealsQueryKey,
   useGetDeal,
   useGetDeals,
   useMarkLost,
   useUpdateDeal,
 } from "@/service-api/generated/endpoints/deals/deals";
-import { useCreateActivity } from "@/service-api/generated/endpoints/activities/activities";
 import {
-  getGetTasksQueryKey,
   useCreateTask,
   useUpdateTask,
 } from "@/service-api/generated/endpoints/tasks/tasks";
@@ -23,6 +19,7 @@ import type {
   CreateTaskRequest,
   DealsDealStageDto,
   DealsListItemDto,
+  DealsUpdateRequest,
   UpdateTaskRequest,
 } from "@/service-api/generated/models";
 
@@ -40,38 +37,12 @@ export type DealFilters = {
   dateTo: string;
 };
 
-type DealsQuerySnapshot = Array<[readonly unknown[], getDealsResponse | undefined]>;
-
-type MoveDealContext = {
-  previousDeals?: DealsQuerySnapshot;
-};
-
-function updateDealStageInList(
-  data: getDealsResponse | undefined,
-  dealId: string,
-  stage: DealsDealStageDto,
-) {
-  if (!data) {
-    return data;
-  }
-
-  return {
-    ...data,
-    data: data.data.map((deal) =>
-      deal.id === dealId
-        ? {
-            ...deal,
-            stage,
-          }
-        : deal,
-    ),
-  };
-}
+const dealInvalidates = ["/deals", "/companies", "/tasks"];
 
 export function useDeals(filters?: DealFilters) {
-  const queryClient = useQueryClient();
   const [moveError, setMoveError] = useState<string | null>(null);
   const dealsQuery = useGetDeals();
+
   const filteredDeals = useMemo(
     () => filterDeals(dealsQuery.data?.data ?? [], filters),
     [dealsQuery.data?.data, filters],
@@ -81,90 +52,38 @@ export function useDeals(filters?: DealFilters) {
     [filteredDeals],
   );
 
-  const updateDealMutation = useUpdateDeal<unknown, MoveDealContext>({
-    mutation: {
-      onError: (_error, _variables, context) => {
-        if (context?.previousDeals) {
-          context.previousDeals.forEach(([queryKey, data]) => {
-            queryClient.setQueryData(queryKey, data);
-          });
-        }
-
-        setMoveError("Nu am putut muta deal-ul. Incearca din nou.");
-      },
-      onMutate: async ({ id, data }) => {
-        const nextStage = data.stage;
-
-        if (!nextStage) {
-          return {};
-        }
-
-        await queryClient.cancelQueries({ queryKey: getGetDealsQueryKey() });
-        const previousDeals =
-          queryClient.getQueriesData<getDealsResponse>({
-            queryKey: getGetDealsQueryKey(),
-          }) as DealsQuerySnapshot;
-
-        queryClient.setQueriesData<getDealsResponse>(
-          { queryKey: getGetDealsQueryKey() },
-          (current) => updateDealStageInList(current, id, nextStage),
-        );
-
-        setMoveError(null);
-        return { previousDeals };
-      },
-      onSettled: async (_data, _error, variables) => {
-        await Promise.all([
-          queryClient.invalidateQueries({ queryKey: getGetDealsQueryKey() }),
-          queryClient.invalidateQueries({
-            queryKey: getGetDealQueryKey(variables.id),
-          }),
-        ]);
-      },
+  const updateDealSetup = useMutationSetup<
+    { id: string; data: DealsUpdateRequest },
+    DealsListItemDto
+  >({
+    error: "Nu am putut muta deal-ul. Incearca din nou.",
+    invalidates: dealInvalidates,
+    optimistic: {
+      id: ({ id }) => id,
+      patch: (deal, { data }) => ({ ...deal, stage: data.stage ?? deal.stage }),
+      path: "/deals",
     },
   });
 
-  const markLostMutation = useMarkLost<unknown, MoveDealContext>({
-    mutation: {
-      onError: (_error, _variables, context) => {
-        if (context?.previousDeals) {
-          context.previousDeals.forEach(([queryKey, data]) => {
-            queryClient.setQueryData(queryKey, data);
-          });
-        }
-
-        setMoveError("Nu am putut marca deal-ul ca pierdut.");
-      },
-      onMutate: async ({ id }) => {
-        await queryClient.cancelQueries({ queryKey: getGetDealsQueryKey() });
-        const previousDeals =
-          queryClient.getQueriesData<getDealsResponse>({
-            queryKey: getGetDealsQueryKey(),
-          }) as DealsQuerySnapshot;
-
-        queryClient.setQueriesData<getDealsResponse>(
-          { queryKey: getGetDealsQueryKey() },
-          (current) => updateDealStageInList(current, id, "LOST"),
-        );
-
-        setMoveError(null);
-        return { previousDeals };
-      },
-      onSettled: async (_data, _error, variables) => {
-        await Promise.all([
-          queryClient.invalidateQueries({ queryKey: getGetDealsQueryKey() }),
-          queryClient.invalidateQueries({
-            queryKey: getGetDealQueryKey(variables.id),
-          }),
-        ]);
-      },
+  const markLostSetup = useMutationSetup<{ id: string }, DealsListItemDto>({
+    error: "Nu am putut marca deal-ul ca pierdut.",
+    invalidates: dealInvalidates,
+    optimistic: {
+      id: ({ id }) => id,
+      patch: (deal) => ({ ...deal, stage: "LOST" }),
+      path: "/deals",
     },
   });
+
+  const updateDealMutation = useUpdateDeal(updateDealSetup);
+  const markLostMutation = useMarkLost(markLostSetup);
 
   const moveDeal = ({ deal, nextStage, reason }: DealMove) => {
     if (deal.stage === nextStage) {
       return;
     }
+
+    setMoveError(null);
 
     if (nextStage === "LOST") {
       markLostMutation.mutate({
@@ -174,10 +93,7 @@ export function useDeals(filters?: DealFilters) {
       return;
     }
 
-    updateDealMutation.mutate({
-      data: { stage: nextStage },
-      id: deal.id,
-    });
+    updateDealMutation.mutate({ data: { stage: nextStage }, id: deal.id });
   };
 
   return {
@@ -216,67 +132,21 @@ function filterDeals(deals: DealsListItemDto[], filters?: DealFilters) {
 }
 
 export function useDealDetail(dealId: string) {
-  const queryClient = useQueryClient();
   const dealQuery = useGetDeal(dealId);
+  const setup = useMutationSetup({ invalidates: dealInvalidates });
 
-  const refreshDeal = async () => {
-    await Promise.all([
-      queryClient.invalidateQueries({ queryKey: getGetDealsQueryKey() }),
-      queryClient.invalidateQueries({ queryKey: getGetDealQueryKey(dealId) }),
-      queryClient.invalidateQueries({ queryKey: getGetTasksQueryKey() }),
-    ]);
-  };
-
-  const updateDealMutation = useUpdateDeal({
-    mutation: {
-      onSuccess: refreshDeal,
-    },
-  });
-  const markLostMutation = useMarkLost({
-    mutation: {
-      onSuccess: refreshDeal,
-    },
-  });
-  const createActivityMutation = useCreateActivity({
-    mutation: {
-      onSuccess: refreshDeal,
-    },
-  });
-  const createTaskMutation = useCreateTask({
-    mutation: {
-      onSuccess: refreshDeal,
-    },
-  });
-  const updateTaskMutation = useUpdateTask({
-    mutation: {
-      onSuccess: refreshDeal,
-    },
-  });
-
-  const updateDeal = (data: Parameters<typeof updateDealMutation.mutate>[0]["data"]) => {
-    updateDealMutation.mutate({ data, id: dealId });
-  };
-
-  const markLost = (reason: string) => {
-    markLostMutation.mutate({ data: { reason }, id: dealId });
-  };
-
-  const createActivity = (data: Omit<ActivitiesCreateRequest, "dealId">) => {
-    createActivityMutation.mutate({ data: { ...data, dealId } });
-  };
-
-  const createTask = (data: Omit<CreateTaskRequest, "dealId">) => {
-    createTaskMutation.mutate({ data: { ...data, dealId } });
-  };
-
-  const updateTask = (taskId: string, data: UpdateTaskRequest) => {
-    updateTaskMutation.mutate({ data, taskId });
-  };
+  const updateDealMutation = useUpdateDeal(setup);
+  const markLostMutation = useMarkLost(setup);
+  const createActivityMutation = useCreateActivity(setup);
+  const createTaskMutation = useCreateTask(setup);
+  const updateTaskMutation = useUpdateTask(setup);
 
   return {
-    createActivity,
+    createActivity: (data: Omit<ActivitiesCreateRequest, "dealId">) =>
+      createActivityMutation.mutate({ data: { ...data, dealId } }),
     createActivityMutation,
-    createTask,
+    createTask: (data: Omit<CreateTaskRequest, "dealId">) =>
+      createTaskMutation.mutate({ data: { ...data, dealId } }),
     createTaskMutation,
     dealQuery,
     isSaving:
@@ -285,11 +155,14 @@ export function useDealDetail(dealId: string) {
       createActivityMutation.isPending ||
       createTaskMutation.isPending ||
       updateTaskMutation.isPending,
-    markLost,
+    markLost: (reason: string) =>
+      markLostMutation.mutate({ data: { reason }, id: dealId }),
     markLostMutation,
-    updateDeal,
+    updateDeal: (data: DealsUpdateRequest) =>
+      updateDealMutation.mutate({ data, id: dealId }),
     updateDealMutation,
-    updateTask,
+    updateTask: (taskId: string, data: UpdateTaskRequest) =>
+      updateTaskMutation.mutate({ data, taskId }),
     updateTaskMutation,
   };
 }
