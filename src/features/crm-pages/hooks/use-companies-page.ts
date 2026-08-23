@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { useListState } from "@/core/list-state";
+import { usePermissions } from "@/core/permissions";
 import { useMutationSetup } from "@/core/mutation-setup";
 import { useGetCompanies } from "@/service-api/generated/endpoints/companies/companies";
 import { useUpdateContact } from "@/service-api/generated/endpoints/contacts/contacts";
@@ -16,6 +17,7 @@ import type { ContactForm } from "../components/companies/edit-contact-dialog";
 
 export function useCompaniesPage() {
   const list = useListState({ limit: 100, searchParam: "search" });
+  const { can } = usePermissions();
   const [selectedCompany, setSelectedCompany] =
     useState<CompanyListItemDto | null>(null);
   const [editingCompany, setEditingCompany] =
@@ -39,7 +41,7 @@ export function useCompaniesPage() {
   const totalPages = Math.max(companiesQuery.data?.data.totalPages ?? 1, 1);
 
   const updateContactSetup = useMutationSetup({
-    invalidates: ["/companies", "/contacts", "/tasks"],
+    invalidates: ["companies", "contacts", "tasks"],
     onSuccess: () => setEditingCompany(null),
     success: "Contactul a fost salvat.",
   });
@@ -84,7 +86,7 @@ export function useCompaniesPage() {
     handleLimitChange: list.setLimit,
     handleSearchChange: list.setSearch,
     limit: list.limit,
-    openContactEditor,
+    openContactEditor: can("update", "contacts") ? openContactEditor : undefined,
     page: list.page,
     saveContact,
     search: list.search,

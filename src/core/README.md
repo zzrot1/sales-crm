@@ -1,6 +1,6 @@
 # core
 
-Patru piese mici peste hook-urile generate de orval. Nu ascund orval —
+Cateva piese mici peste hook-urile generate de orval. Nu ascund orval —
 hook-ul generat ramane la vedere in fiecare pagina, cu tipurile lui native.
 
 ## `useMutationSetup`
@@ -11,7 +11,7 @@ accepta deja.
 
 ```ts
 const setup = useMutationSetup({
-  invalidates: ["/companies", "/contacts", "/tasks"],
+  invalidates: ["companies", "contacts", "tasks"],
   success: "Contactul a fost salvat.",
   onSuccess: () => setEditingCompany(null),
 });
@@ -20,9 +20,10 @@ const updateContact = useUpdateContact(setup);
 updateContact.mutate({ contactId, data });
 ```
 
-`invalidates` sunt prefixe de path. Query key-urile orval incep cu path-ul
-endpoint-ului (`["/companies", params]`, `["/companies/123"]`), deci un prefix
-acopera lista, detaliile si sub-rutele resursei.
+`invalidates` sunt nume de resurse din [`resources.ts`](./resources.ts).
+Query key-urile orval incep cu path-ul endpoint-ului (`["/companies", params]`,
+`["/companies/123"]`), deci path-ul resursei acopera lista, detaliile si
+sub-rutele ei.
 
 Fara `success`, nu apare toast la succes. Erorile afiseaza automat mesajul
 venit de la API, prin [`ApiError`](./api-error.ts).
@@ -37,9 +38,9 @@ const setup = useMutationSetup<
   { id: string; data: DealsUpdateRequest },
   DealsListItemDto
 >({
-  invalidates: ["/deals", "/companies", "/tasks"],
+  invalidates: ["deals", "companies", "tasks"],
   optimistic: {
-    path: "/deals",
+    resource: "deals",
     id: ({ id }) => id,
     patch: (deal, { data }) => ({ ...deal, stage: data.stage ?? deal.stage }),
   },
@@ -76,3 +77,41 @@ goToPage: (page: number) => list.setPage(Math.min(Math.max(page, 1), totalPages)
 `service-api/mutator/api-fetch.ts`, ca `error.message` sa fie mereu un text
 afisabil. [`notifications.tsx`](./notifications.tsx) e toast-ul folosit de
 `useMutationSetup`; provider-ul e montat in `providers/app-providers.tsx`.
+
+## `resources.ts`
+
+Tabelul nume ↔ path al resurselor CRM. Nu ambaleaza nimic din orval — exista
+ca `invalidates` si verificarile de permisiuni sa foloseasca acelasi vocabular,
+cu autocomplete si fara siruri scrise gresit.
+
+```ts
+export const resourcePaths = {
+  companies: "/companies",
+  contacts: "/contacts",
+  // ...
+} as const;
+```
+
+## `usePermissions`
+
+```tsx
+const { can } = usePermissions();
+
+<button disabled={!can("update", "companies")}>Editeaza</button>
+```
+
+Citeste `GET /permissions/me`, care intoarce rolul si lista de permisiuni ale
+utilizatorului curent. Nu are nevoie de provider: react-query deduplica cererea,
+deci hook-ul poate fi apelat in oricate componente cu un singur request pe
+sesiune. Cat timp se incarca, `can` intoarce `false`.
+
+Spec-ul declara permisiunile doar ca `string[]`, deci formatul lor sta intr-un
+singur loc, in `toPermissionKey` — daca backend-ul foloseste alt separator sau
+alta ordine, se schimba doar acolo.
+
+`GET /permissions` (matricea completa: roluri x actiuni x resurse) nu e folosit
+aici — e pentru un eventual ecran de administrare a rolurilor.
+
+Gating-ul din UI e doar pentru confort — autoritatea ramane backend-ul. Un 403
+e deja tratat: [`api-error.ts`](./api-error.ts) il transforma in mesajul
+"Nu ai permisiunea pentru aceasta actiune.", afisat automat de `useMutationSetup`.

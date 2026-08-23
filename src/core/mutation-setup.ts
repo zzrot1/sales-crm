@@ -3,9 +3,10 @@
 import { useQueryClient, type QueryClient, type QueryKey } from "@tanstack/react-query";
 
 import { getErrorMessage } from "@/core/api-error";
+import { resourcePaths, type ResourceName } from "@/core/resources";
 import { useNotifications } from "@/core/notifications";
 
-function matchesPaths(queryKey: QueryKey, paths: string[]) {
+function matchesPaths(queryKey: QueryKey, paths: readonly string[]) {
   const [first] = queryKey;
 
   if (typeof first !== "string") {
@@ -18,9 +19,7 @@ function matchesPaths(queryKey: QueryKey, paths: string[]) {
 type Snapshot = [QueryKey, unknown][];
 
 type Optimistic<TVariables, TItem> = {
-  /** Prefixul listelor modificate local, ex. "/deals". */
-  path: string;
-  /** Id-ul inregistrarii vizate, citit din variabilele mutatiei. */
+  resource: ResourceName;
   id: (variables: TVariables) => string;
   /** Cum arata inregistrarea dupa modificare. */
   patch: (item: TItem, variables: TVariables) => TItem;
@@ -28,15 +27,13 @@ type Optimistic<TVariables, TItem> = {
 
 export type MutationSetup<TVariables, TItem> = {
   /**
-   * Prefixe de path invalidate dupa mutatie, ex. `["/companies", "/tasks"]`.
+   * Resursele invalidate dupa mutatie, ex. `["companies", "tasks"]`.
    * Query key-urile orval incep cu path-ul endpoint-ului
-   * (`["/companies", params]`, `["/companies/123"]`), deci un prefix acopera
-   * lista, detaliile si sub-rutele.
+   * (`["/companies", params]`, `["/companies/123"]`), deci path-ul resursei
+   * acopera lista, detaliile si sub-rutele.
    */
-  invalidates?: string[];
-  /** Mesajul din toast la succes. Lipsa lui inseamna fara toast. */
+  invalidates?: readonly ResourceName[];
   success?: string;
-  /** Mesajul din toast la eroare. Implicit, cel venit de la API. */
   error?: string;
   onSuccess?: (variables: TVariables) => void;
   /** Modifica listele din cache inainte de raspuns; rollback automat pe eroare. */
@@ -46,7 +43,7 @@ export type MutationSetup<TVariables, TItem> = {
 function patchCachedLists<TItem>(
   queryClient: QueryClient,
   { id, patch }: { id: string; patch: (item: TItem) => TItem },
-  paths: string[],
+  paths: readonly string[],
 ) {
   const filter = { predicate: (query: { queryKey: QueryKey }) => matchesPaths(query.queryKey, paths) };
   const snapshot = queryClient.getQueriesData(filter) as Snapshot;
@@ -74,7 +71,7 @@ function patchCachedLists<TItem>(
   return snapshot;
 }
 
-function warnAboutUnusedPaths(queryClient: QueryClient, paths: string[]) {
+function warnAboutEmptyCache(queryClient: QueryClient, paths: readonly string[]) {
   if (process.env.NODE_ENV === "production") {
     return;
   }
@@ -86,8 +83,7 @@ function warnAboutUnusedPaths(queryClient: QueryClient, paths: string[]) {
 
   if (unused.length > 0) {
     console.warn(
-      `[useMutationSetup] Niciun query in cache nu incepe cu: ${unused.join(", ")}. ` +
-        "Verifica prefixul din `invalidates` fata de path-ul endpoint-ului.",
+      `[useMutationSetup] Nu exista niciun query in cache pentru: ${unused.join(", ")}.`,
     );
   }
 }
@@ -98,7 +94,7 @@ function warnAboutUnusedPaths(queryClient: QueryClient, paths: string[]) {
  *
  * ```ts
  * const setup = useMutationSetup({
- *   invalidates: ["/companies", "/contacts"],
+ *   invalidates: ["companies", "contacts"],
  *   success: "Contactul a fost salvat.",
  * });
  * const updateContact = useUpdateContact(setup);
@@ -113,6 +109,7 @@ export function useMutationSetup<TVariables = unknown, TItem = unknown>(
   const queryClient = useQueryClient();
   const { notify } = useNotifications();
   const { error, invalidates = [], optimistic, success } = setup;
+  const invalidatePaths = invalidates.map((name) => resourcePaths[name]);
 
   return {
     mutation: {
@@ -125,7 +122,7 @@ export function useMutationSetup<TVariables = unknown, TItem = unknown>(
           return [];
         }
 
-        const paths = [optimistic.path];
+        const paths = [resourcePaths[optimistic.resource]];
 
         await queryClient.cancelQueries({
           predicate: (query) => matchesPaths(query.queryKey, paths),
@@ -141,10 +138,10 @@ export function useMutationSetup<TVariables = unknown, TItem = unknown>(
         );
       },
       onSettled: () => {
-        warnAboutUnusedPaths(queryClient, invalidates);
+        warnAboutEmptyCache(queryClient, invalidatePaths);
 
         return queryClient.invalidateQueries({
-          predicate: (query) => matchesPaths(query.queryKey, invalidates),
+          predicate: (query) => matchesPaths(query.queryKey, invalidatePaths),
         });
       },
       onSuccess: (_data: unknown, variables: TVariables) => {

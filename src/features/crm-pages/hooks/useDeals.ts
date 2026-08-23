@@ -37,7 +37,7 @@ export type DealFilters = {
   dateTo: string;
 };
 
-const dealInvalidates = ["/deals", "/companies", "/tasks"];
+const dealInvalidates = ["deals", "companies", "tasks"] as const;
 
 export function useDeals(filters?: DealFilters) {
   const [moveError, setMoveError] = useState<string | null>(null);
@@ -61,7 +61,7 @@ export function useDeals(filters?: DealFilters) {
     optimistic: {
       id: ({ id }) => id,
       patch: (deal, { data }) => ({ ...deal, stage: data.stage ?? deal.stage }),
-      path: "/deals",
+      resource: "deals",
     },
   });
 
@@ -71,7 +71,7 @@ export function useDeals(filters?: DealFilters) {
     optimistic: {
       id: ({ id }) => id,
       patch: (deal) => ({ ...deal, stage: "LOST" }),
-      path: "/deals",
+      resource: "deals",
     },
   });
 
