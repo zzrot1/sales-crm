@@ -147,7 +147,7 @@ export function RegisteredLayout({ children }: RegisteredLayoutProps) {
         )}
       >
         <Link className={styles.brand} href={routes.dashboard.path}>
-          <span className={styles.brandMark} />
+          <span className={styles.brandMark}>S</span>
           <span className={styles.brandName}>sales-crm</span>
         </Link>
 

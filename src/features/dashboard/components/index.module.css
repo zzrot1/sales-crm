@@ -11,9 +11,9 @@
 .statCard,
 .chartCard,
 .dataGrid {
-  border: 1px solid #2f2f2f;
-  background: #171717;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  border: 1px solid #e5e5e2;
+  background: #ffffff;
+  box-shadow: 0 8px 28px rgba(28, 51, 58, 0.06);
 }
 
 .statCard {
@@ -27,7 +27,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  color: #b8c0cc;
+  color: #666666;
   font-size: 0.9rem;
 }
 
@@ -35,9 +35,9 @@
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  border: 1px solid #303030;
+  border: 1px solid #e5e5e2;
   border-radius: 999px;
-  color: #fff;
+  color: var(--foreground);
   font-size: 0.78rem;
   font-weight: 700;
   padding: 0.22rem 0.55rem;
@@ -45,7 +45,7 @@
 
 .statValue {
   margin-top: 0.7rem;
-  color: #fff;
+  color: var(--foreground);
   font-size: clamp(2rem, 3vw, 2.4rem);
   line-height: 1;
   font-weight: 800;
@@ -57,14 +57,14 @@
   align-items: center;
   gap: 0.4rem;
   margin-top: 1.75rem;
-  color: #fff;
+  color: var(--foreground);
   font-size: 0.92rem;
   font-weight: 700;
 }
 
 .statDetail {
   margin-top: 0.5rem;
-  color: #a8b0bd;
+  color: #666666;
   font-size: 0.92rem;
 }
 
@@ -82,37 +82,37 @@
 }
 
 .sectionTitle {
-  color: #fff;
+  color: var(--foreground);
   font-size: 1.05rem;
   font-weight: 800;
 }
 
 .sectionHint {
   margin-top: 0.5rem;
-  color: #aab2bf;
+  color: #666666;
   font-size: 0.92rem;
 }
 
 .segmented {
   display: inline-flex;
   overflow: hidden;
-  border: 1px solid #333;
+  border: 1px solid #e5e5e2;
   border-radius: 0.5rem;
-  background: #111;
+  background: #ffffff;
 }
 
 .segmented button,
 .pill,
 .action {
   border: 0;
-  color: #fff;
+  color: var(--foreground);
   font: inherit;
   font-weight: 700;
 }
 
 .segmented button {
   background: transparent;
-  border-right: 1px solid #303030;
+  border-right: 1px solid #e5e5e2;
   padding: 0.7rem 1rem;
 }
 
@@ -121,17 +121,17 @@
 }
 
 .segmented .activeSegment {
-  background: #3a3a3a;
+  background: #d5d5d1;
 }
 
 .chart {
   position: relative;
   height: 16rem;
   margin-top: 3rem;
-  border-top: 1px solid #242424;
+  border-top: 1px solid #f6f6f4;
   background:
-    linear-gradient(#222 1px, transparent 1px) 0 33% / 100% 33%,
-    linear-gradient(#222 1px, transparent 1px) 0 66% / 100% 33%;
+    linear-gradient(#e9e9e5 1px, transparent 1px) 0 33% / 100% 33%,
+    linear-gradient(#e9e9e5 1px, transparent 1px) 0 66% / 100% 33%;
 }
 
 .chart svg {
@@ -163,16 +163,16 @@
 
 .pill,
 .action {
-  border: 1px solid #333;
+  border: 1px solid #e5e5e2;
   border-radius: 0.5rem;
-  background: #1b1b1b;
+  background: #ffffff;
   padding: 0.48rem 0.72rem;
   font-size: 0.88rem;
 }
 
 .pillActive {
-  background: #343434;
-  box-shadow: inset 0 0 0 1px #707070;
+  background: #e5e5e2;
+  box-shadow: inset 0 0 0 1px #0891b2;
 }
 
 .counter {
@@ -182,8 +182,8 @@
   place-items: center;
   margin-left: 0.28rem;
   border-radius: 999px;
-  background: #555;
-  color: #fff;
+  background: #def7f9;
+  color: var(--foreground);
   font-size: 0.75rem;
 }
 
@@ -195,7 +195,7 @@
 .dataGrid {
   overflow: hidden;
   border-radius: 0.75rem;
-  background: #090909;
+  background: #ffffff;
 }
 
 .dashboardCompaniesTable {
@@ -216,9 +216,9 @@
 
 .table th {
   height: 2.55rem;
-  border-bottom: 1px solid #232323;
-  background: #282828;
-  color: #fff;
+  border-bottom: 1px solid #e5e5e2;
+  background: #f6f6f4;
+  color: var(--foreground);
   padding: 0 0.75rem;
   font-size: 0.84rem;
   font-weight: 850;
@@ -256,8 +256,8 @@
 
 .table td {
   height: 3.3rem;
-  border-bottom: 1px solid #242424;
-  color: #d8dee8;
+  border-bottom: 1px solid #f6f6f4;
+  color: #374151;
   padding: 0 0.75rem;
   font-size: 0.88rem;
 }
@@ -267,16 +267,16 @@
 }
 
 .table tr:hover td {
-  background: #111;
+  background: #ffffff;
 }
 
 .table tr[data-state="selected"] td {
-  background: #202020;
-  color: #eef2f7;
+  background: #def7f9;
+  color: var(--foreground);
 }
 
 .table tr[data-state="selected"]:hover td {
-  background: #252525;
+  background: #dff3f6;
 }
 
 .checkboxInput {
@@ -284,15 +284,15 @@
   width: 1rem;
   height: 1rem;
   margin: 0;
-  border: 1px solid #454545;
+  border: 1px solid #d5d5d1;
   border-radius: 0.25rem;
-  accent-color: #f5f5f5;
+  accent-color: var(--primary-color);
 }
 
 .headerCell,
 .numberCell,
 .reviewer {
-  color: #fff;
+  color: var(--foreground);
   font-weight: 800;
 }
 
@@ -302,17 +302,24 @@
   align-items: center;
   gap: 0.28rem;
   width: fit-content;
-  border: 1px solid #313131;
+  border: 1px solid #e5e5e2;
   border-radius: 999px;
-  background: #0d0d0d;
-  color: #cbd3df;
+  background: #ffffff;
+  color: #374151;
   padding: 0.18rem 0.46rem;
   font-size: 0.76rem;
   line-height: 1.2;
 }
 
+.typeBadge {
+  border-color: rgba(8, 145, 178, 0.24);
+  background: #def7f9;
+  color: var(--primary-color);
+  font-weight: 750;
+}
+
 .doneStatus svg {
-  color: #00e088;
+  color: #2d9461;
 }
 
 .processStatus svg {
@@ -326,9 +333,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #343434;
+  border: 1px solid #e5e5e2;
   border-radius: 0.5rem;
-  background: #151515;
+  background: #ffffff;
   color: #d7dee9;
   font: inherit;
   font-size: 0.86rem;
@@ -346,7 +353,7 @@
   height: 1.9rem;
   border-color: transparent;
   background: transparent;
-  color: #aab2bf;
+  color: #666666;
 }
 
 .pagination {
@@ -358,7 +365,7 @@
 }
 
 .selectionCount {
-  color: #b3bdcc;
+  color: #666666;
   font-size: 0.88rem;
 }
 
@@ -375,7 +382,7 @@
 
 .rowsPerPage {
   gap: 0.65rem;
-  color: #fff;
+  color: var(--foreground);
   font-size: 0.86rem;
   font-weight: 800;
 }
@@ -392,18 +399,18 @@
 }
 
 .pageSize:hover {
-  border-color: #515151;
-  background: #1f1f1f;
+  border-color: #d5d5d1;
+  background: #f6f6f4;
 }
 
 .pageSize:focus-visible {
-  border-color: #d7dde8;
+  border-color: var(--button-primary-color-hover);
   box-shadow: 0 0 0 3px rgba(215, 221, 232, 0.16);
   outline: none;
 }
 
 .pageCount {
-  color: #fff;
+  color: var(--foreground);
   font-size: 0.86rem;
   font-weight: 800;
 }
@@ -423,9 +430,9 @@
 }
 
 .pageButtons button:not(:disabled):hover {
-  border-color: #515151;
-  background: #242424;
-  color: #fff;
+  border-color: #d5d5d1;
+  background: #f6f6f4;
+  color: var(--foreground);
 }
 
 .pageButtons button:disabled {
