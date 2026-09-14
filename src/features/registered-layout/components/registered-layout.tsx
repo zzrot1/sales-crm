@@ -19,12 +19,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import { routes } from "@/common/routes";
 import { cn } from "@/lib/utils";
-import {
-  getGetTasksQueryKey,
-  getGetTodaysTasksQueryKey,
-  useEnsureDailyCallTasks,
-} from "@/service-api/generated/endpoints/tasks/tasks";
-import { getGetCompaniesQueryKey } from "@/service-api/generated/endpoints/companies/companies";
+import { useEnsureDailyCallTasks } from "@/service-api/generated/endpoints/tasks/tasks";
 import { useLogout, useMe } from "@/service-api/generated/endpoints/auth/auth";
 import styles from "./index.module.css";
 
@@ -87,27 +82,22 @@ export function RegisteredLayout({ children }: RegisteredLayoutProps) {
   const [ensureModalMessage, setEnsureModalMessage] = useState<string | null>(null);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const meQuery = useMe();
-  const authUser = meQuery.data?.data.user;
+  const authUser = meQuery.data?.user;
   const userDisplayName = authUser?.name?.trim() || authUser?.email || "User";
   const userInitials = getUserInitials(userDisplayName);
   const activeItem = navGroups
     .flatMap((group) => group.items)
     .find((item) => pathname === item.href || pathname.startsWith(`${item.href}/`));
+  // Task-urile si companiile se re-cer prin politica globala (core/cache).
   const ensureDailyCallsMutation = useEnsureDailyCallTasks({
     mutation: {
-      onSuccess: async (response) => {
-        await Promise.all([
-          queryClient.invalidateQueries({ queryKey: getGetTodaysTasksQueryKey() }),
-          queryClient.invalidateQueries({ queryKey: getGetTasksQueryKey() }),
-          queryClient.invalidateQueries({ queryKey: getGetCompaniesQueryKey() }),
-        ]);
-
+      onSuccess: (response) => {
         if (
-          response.data.action === "HAS_PENDING_TASKS" &&
-          response.data.message &&
-          hasOverduePendingTasks(response.data.data)
+          response.action === "HAS_PENDING_TASKS" &&
+          response.message &&
+          hasOverduePendingTasks(response.data)
         ) {
-          setEnsureModalMessage(response.data.message);
+          setEnsureModalMessage(response.message);
         }
       },
     },

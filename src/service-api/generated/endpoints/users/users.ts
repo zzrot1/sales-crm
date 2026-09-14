@@ -33,23 +33,12 @@ import type {
 
 import { apiFetch } from '../../../mutator/api-fetch';
 import type { ErrorType , BodyType } from '../../../mutator/api-fetch';
+import { useApiMutationOptions } from '../../../../core/cache/mutation-options';
 
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
-
-export type createUserResponse200 = {
-  data: UserDto
-  status: 200
-}
-    
-export type createUserResponseSuccess = (createUserResponse200) & {
-  headers: Headers;
-};
-;
-
-export type createUserResponse = (createUserResponseSuccess)
 
 export const getCreateUserUrl = () => {
 
@@ -59,9 +48,9 @@ export const getCreateUserUrl = () => {
   return `/users`
 }
 
-export const createUser = async (createUserRequest: CreateUserRequest, options?: RequestInit): Promise<createUserResponse> => {
+export const createUser = async (createUserRequest: CreateUserRequest, options?: RequestInit): Promise<UserDto> => {
   
-  return apiFetch<createUserResponse>(getCreateUserUrl(),
+  return apiFetch<UserDto>(getCreateUserUrl(),
   {      
     ...options,
     method: 'POST',
@@ -74,7 +63,7 @@ export const createUser = async (createUserRequest: CreateUserRequest, options?:
 
 
 
-export const getCreateUserMutationOptions = <TError = ErrorType<unknown>,
+export const useCreateUserMutationOptions = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,{data: BodyType<CreateUserRequest>}, TContext>, request?: SecondParameter<typeof apiFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,{data: BodyType<CreateUserRequest>}, TContext> => {
 
@@ -94,10 +83,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
           return  createUser(data,requestOptions)
         }
 
-        
+        const customOptions = useApiMutationOptions({...mutationOptions, mutationFn}, { url: `/users` }, { operationId: 'CreateUser', operationName: 'createUser' });
 
 
-  return  { mutationFn, ...mutationOptions }}
+  return  customOptions}
 
     export type CreateUserMutationResult = NonNullable<Awaited<ReturnType<typeof createUser>>>
     export type CreateUserMutationBody = BodyType<CreateUserRequest>
@@ -112,23 +101,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
 
-      const mutationOptions = getCreateUserMutationOptions(options);
+      const mutationOptions = useCreateUserMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
-    export type getUsersResponse200 = {
-  data: PagedUsersResponse
-  status: 200
-}
-    
-export type getUsersResponseSuccess = (getUsersResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getUsersResponse = (getUsersResponseSuccess)
-
-export const getGetUsersUrl = (params?: GetUsersParams,) => {
+    export const getGetUsersUrl = (params?: GetUsersParams,) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -143,9 +120,9 @@ export const getGetUsersUrl = (params?: GetUsersParams,) => {
   return stringifiedParams.length > 0 ? `/users?${stringifiedParams}` : `/users`
 }
 
-export const getUsers = async (params?: GetUsersParams, options?: RequestInit): Promise<getUsersResponse> => {
+export const getUsers = async (params?: GetUsersParams, options?: RequestInit): Promise<PagedUsersResponse> => {
   
-  return apiFetch<getUsersResponse>(getGetUsersUrl(params),
+  return apiFetch<PagedUsersResponse>(getGetUsersUrl(params),
   {      
     ...options,
     method: 'GET'
@@ -160,7 +137,7 @@ export const getUsers = async (params?: GetUsersParams, options?: RequestInit): 
 
 export const getGetUsersQueryKey = (params?: GetUsersParams,) => {
     return [
-    `/users`, ...(params ? [params]: [])
+    'users', ...(params ? [params]: [])
     ] as const;
     }
 
@@ -228,18 +205,6 @@ export function useGetUsers<TData = Awaited<ReturnType<typeof getUsers>>, TError
 
 
 
-export type getUserResponse200 = {
-  data: UserDto
-  status: 200
-}
-    
-export type getUserResponseSuccess = (getUserResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getUserResponse = (getUserResponseSuccess)
-
 export const getGetUserUrl = (userId: number,) => {
 
 
@@ -248,9 +213,9 @@ export const getGetUserUrl = (userId: number,) => {
   return `/users/${userId}`
 }
 
-export const getUser = async (userId: number, options?: RequestInit): Promise<getUserResponse> => {
+export const getUser = async (userId: number, options?: RequestInit): Promise<UserDto> => {
   
-  return apiFetch<getUserResponse>(getGetUserUrl(userId),
+  return apiFetch<UserDto>(getGetUserUrl(userId),
   {      
     ...options,
     method: 'GET'
@@ -265,7 +230,7 @@ export const getUser = async (userId: number, options?: RequestInit): Promise<ge
 
 export const getGetUserQueryKey = (userId?: number,) => {
     return [
-    `/users/${userId}`
+    'users',userId
     ] as const;
     }
 
@@ -333,18 +298,6 @@ export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError =
 
 
 
-export type updateUserResponse200 = {
-  data: UserDto
-  status: 200
-}
-    
-export type updateUserResponseSuccess = (updateUserResponse200) & {
-  headers: Headers;
-};
-;
-
-export type updateUserResponse = (updateUserResponseSuccess)
-
 export const getUpdateUserUrl = (userId: number,) => {
 
 
@@ -354,9 +307,9 @@ export const getUpdateUserUrl = (userId: number,) => {
 }
 
 export const updateUser = async (userId: number,
-    updateUserRequest: UpdateUserRequest, options?: RequestInit): Promise<updateUserResponse> => {
+    updateUserRequest: UpdateUserRequest, options?: RequestInit): Promise<UserDto> => {
   
-  return apiFetch<updateUserResponse>(getUpdateUserUrl(userId),
+  return apiFetch<UserDto>(getUpdateUserUrl(userId),
   {      
     ...options,
     method: 'PATCH',
@@ -369,7 +322,7 @@ export const updateUser = async (userId: number,
 
 
 
-export const getUpdateUserMutationOptions = <TError = ErrorType<unknown>,
+export const useUpdateUserMutationOptions = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateUser>>, TError,{userId: number;data: BodyType<UpdateUserRequest>}, TContext>, request?: SecondParameter<typeof apiFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof updateUser>>, TError,{userId: number;data: BodyType<UpdateUserRequest>}, TContext> => {
 
@@ -389,10 +342,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
           return  updateUser(userId,data,requestOptions)
         }
 
-        
+        const customOptions = useApiMutationOptions({...mutationOptions, mutationFn}, { url: `/users/{userId}` }, { operationId: 'UpdateUser', operationName: 'updateUser' });
 
 
-  return  { mutationFn, ...mutationOptions }}
+  return  customOptions}
 
     export type UpdateUserMutationResult = NonNullable<Awaited<ReturnType<typeof updateUser>>>
     export type UpdateUserMutationBody = BodyType<UpdateUserRequest>
@@ -407,23 +360,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
 
-      const mutationOptions = getUpdateUserMutationOptions(options);
+      const mutationOptions = useUpdateUserMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
-    export type deleteUserResponse204 = {
-  data: void
-  status: 204
-}
-    
-export type deleteUserResponseSuccess = (deleteUserResponse204) & {
-  headers: Headers;
-};
-;
-
-export type deleteUserResponse = (deleteUserResponseSuccess)
-
-export const getDeleteUserUrl = (userId: number,) => {
+    export const getDeleteUserUrl = (userId: number,) => {
 
 
   
@@ -431,9 +372,9 @@ export const getDeleteUserUrl = (userId: number,) => {
   return `/users/${userId}`
 }
 
-export const deleteUser = async (userId: number, options?: RequestInit): Promise<deleteUserResponse> => {
+export const deleteUser = async (userId: number, options?: RequestInit): Promise<void> => {
   
-  return apiFetch<deleteUserResponse>(getDeleteUserUrl(userId),
+  return apiFetch<void>(getDeleteUserUrl(userId),
   {      
     ...options,
     method: 'DELETE'
@@ -445,7 +386,7 @@ export const deleteUser = async (userId: number, options?: RequestInit): Promise
 
 
 
-export const getDeleteUserMutationOptions = <TError = ErrorType<unknown>,
+export const useDeleteUserMutationOptions = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteUser>>, TError,{userId: number}, TContext>, request?: SecondParameter<typeof apiFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof deleteUser>>, TError,{userId: number}, TContext> => {
 
@@ -465,10 +406,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
           return  deleteUser(userId,requestOptions)
         }
 
-        
+        const customOptions = useApiMutationOptions({...mutationOptions, mutationFn}, { url: `/users/{userId}` }, { operationId: 'DeleteUser', operationName: 'deleteUser' });
 
 
-  return  { mutationFn, ...mutationOptions }}
+  return  customOptions}
 
     export type DeleteUserMutationResult = NonNullable<Awaited<ReturnType<typeof deleteUser>>>
     
@@ -483,7 +424,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
 
-      const mutationOptions = getDeleteUserMutationOptions(options);
+      const mutationOptions = useDeleteUserMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

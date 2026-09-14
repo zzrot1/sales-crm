@@ -34,23 +34,12 @@ import type {
 
 import { apiFetch } from '../../../mutator/api-fetch';
 import type { ErrorType , BodyType } from '../../../mutator/api-fetch';
+import { useApiMutationOptions } from '../../../../core/cache/mutation-options';
 
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
-
-export type getDealsResponse200 = {
-  data: DealsListItemDto[]
-  status: 200
-}
-    
-export type getDealsResponseSuccess = (getDealsResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getDealsResponse = (getDealsResponseSuccess)
 
 export const getGetDealsUrl = (params?: GetDealsParams,) => {
   const normalizedParams = new URLSearchParams();
@@ -67,9 +56,9 @@ export const getGetDealsUrl = (params?: GetDealsParams,) => {
   return stringifiedParams.length > 0 ? `/deals?${stringifiedParams}` : `/deals`
 }
 
-export const getDeals = async (params?: GetDealsParams, options?: RequestInit): Promise<getDealsResponse> => {
+export const getDeals = async (params?: GetDealsParams, options?: RequestInit): Promise<DealsListItemDto[]> => {
   
-  return apiFetch<getDealsResponse>(getGetDealsUrl(params),
+  return apiFetch<DealsListItemDto[]>(getGetDealsUrl(params),
   {      
     ...options,
     method: 'GET'
@@ -84,7 +73,7 @@ export const getDeals = async (params?: GetDealsParams, options?: RequestInit): 
 
 export const getGetDealsQueryKey = (params?: GetDealsParams,) => {
     return [
-    `/deals`, ...(params ? [params]: [])
+    'deals', ...(params ? [params]: [])
     ] as const;
     }
 
@@ -152,18 +141,6 @@ export function useGetDeals<TData = Awaited<ReturnType<typeof getDeals>>, TError
 
 
 
-export type getDealResponse200 = {
-  data: DealsDetailsDto
-  status: 200
-}
-    
-export type getDealResponseSuccess = (getDealResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getDealResponse = (getDealResponseSuccess)
-
 export const getGetDealUrl = (id: string,) => {
 
 
@@ -172,9 +149,9 @@ export const getGetDealUrl = (id: string,) => {
   return `/deals/${id}`
 }
 
-export const getDeal = async (id: string, options?: RequestInit): Promise<getDealResponse> => {
+export const getDeal = async (id: string, options?: RequestInit): Promise<DealsDetailsDto> => {
   
-  return apiFetch<getDealResponse>(getGetDealUrl(id),
+  return apiFetch<DealsDetailsDto>(getGetDealUrl(id),
   {      
     ...options,
     method: 'GET'
@@ -189,7 +166,7 @@ export const getDeal = async (id: string, options?: RequestInit): Promise<getDea
 
 export const getGetDealQueryKey = (id?: string,) => {
     return [
-    `/deals/${id}`
+    'deals',id
     ] as const;
     }
 
@@ -257,18 +234,6 @@ export function useGetDeal<TData = Awaited<ReturnType<typeof getDeal>>, TError =
 
 
 
-export type updateDealResponse200 = {
-  data: DealsDealDto
-  status: 200
-}
-    
-export type updateDealResponseSuccess = (updateDealResponse200) & {
-  headers: Headers;
-};
-;
-
-export type updateDealResponse = (updateDealResponseSuccess)
-
 export const getUpdateDealUrl = (id: string,) => {
 
 
@@ -278,9 +243,9 @@ export const getUpdateDealUrl = (id: string,) => {
 }
 
 export const updateDeal = async (id: string,
-    dealsUpdateRequest: DealsUpdateRequest, options?: RequestInit): Promise<updateDealResponse> => {
+    dealsUpdateRequest: DealsUpdateRequest, options?: RequestInit): Promise<DealsDealDto> => {
   
-  return apiFetch<updateDealResponse>(getUpdateDealUrl(id),
+  return apiFetch<DealsDealDto>(getUpdateDealUrl(id),
   {      
     ...options,
     method: 'PATCH',
@@ -293,7 +258,7 @@ export const updateDeal = async (id: string,
 
 
 
-export const getUpdateDealMutationOptions = <TError = ErrorType<unknown>,
+export const useUpdateDealMutationOptions = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateDeal>>, TError,{id: string;data: BodyType<DealsUpdateRequest>}, TContext>, request?: SecondParameter<typeof apiFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof updateDeal>>, TError,{id: string;data: BodyType<DealsUpdateRequest>}, TContext> => {
 
@@ -313,10 +278,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
           return  updateDeal(id,data,requestOptions)
         }
 
-        
+        const customOptions = useApiMutationOptions({...mutationOptions, mutationFn}, { url: `/deals/{id}` }, { operationId: 'UpdateDeal', operationName: 'updateDeal' });
 
 
-  return  { mutationFn, ...mutationOptions }}
+  return  customOptions}
 
     export type UpdateDealMutationResult = NonNullable<Awaited<ReturnType<typeof updateDeal>>>
     export type UpdateDealMutationBody = BodyType<DealsUpdateRequest>
@@ -331,23 +296,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
 
-      const mutationOptions = getUpdateDealMutationOptions(options);
+      const mutationOptions = useUpdateDealMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
-    export type markLostResponse200 = {
-  data: DealsDealDto
-  status: 200
-}
-    
-export type markLostResponseSuccess = (markLostResponse200) & {
-  headers: Headers;
-};
-;
-
-export type markLostResponse = (markLostResponseSuccess)
-
-export const getMarkLostUrl = (id: string,) => {
+    export const getMarkLostUrl = (id: string,) => {
 
 
   
@@ -356,9 +309,9 @@ export const getMarkLostUrl = (id: string,) => {
 }
 
 export const markLost = async (id: string,
-    dealsMarkLostRequest: DealsMarkLostRequest, options?: RequestInit): Promise<markLostResponse> => {
+    dealsMarkLostRequest: DealsMarkLostRequest, options?: RequestInit): Promise<DealsDealDto> => {
   
-  return apiFetch<markLostResponse>(getMarkLostUrl(id),
+  return apiFetch<DealsDealDto>(getMarkLostUrl(id),
   {      
     ...options,
     method: 'PATCH',
@@ -371,7 +324,7 @@ export const markLost = async (id: string,
 
 
 
-export const getMarkLostMutationOptions = <TError = ErrorType<unknown>,
+export const useMarkLostMutationOptions = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof markLost>>, TError,{id: string;data: BodyType<DealsMarkLostRequest>}, TContext>, request?: SecondParameter<typeof apiFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof markLost>>, TError,{id: string;data: BodyType<DealsMarkLostRequest>}, TContext> => {
 
@@ -391,10 +344,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
           return  markLost(id,data,requestOptions)
         }
 
-        
+        const customOptions = useApiMutationOptions({...mutationOptions, mutationFn}, { url: `/deals/{id}/lost` }, { operationId: 'MarkLost', operationName: 'markLost' });
 
 
-  return  { mutationFn, ...mutationOptions }}
+  return  customOptions}
 
     export type MarkLostMutationResult = NonNullable<Awaited<ReturnType<typeof markLost>>>
     export type MarkLostMutationBody = BodyType<DealsMarkLostRequest>
@@ -409,7 +362,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
 
-      const mutationOptions = getMarkLostMutationOptions(options);
+      const mutationOptions = useMarkLostMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

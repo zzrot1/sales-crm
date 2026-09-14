@@ -11,7 +11,13 @@ type ApiFetchOptions = Omit<RequestInit, "body"> & {
   body?: BodyInit | null;
 };
 
-/** `apiFetch` garanteaza ca orice reject e un `ApiError` normalizat. */
+/**
+ * `apiFetch` intoarce direct corpul raspunsului, nu un invelis
+ * `{ data, status, headers }` — asta cere `fetch.includeHttpResponseReturnType: false`
+ * din `orval.config.ts`, si de aceea `query.data` e chiar DTO-ul.
+ *
+ * Si garanteaza ca orice reject e un `ApiError` normalizat.
+ */
 export type ErrorType<ErrorData = unknown> = ApiError & { body?: ErrorData };
 export type BodyType<BodyData = unknown> = BodyData;
 
@@ -61,18 +67,10 @@ export async function apiFetch<TResponse>(
   }
 
   if (response.status === 204) {
-    return {
-      data: undefined,
-      status: response.status,
-      headers: response.headers,
-    } as TResponse;
+    return undefined as TResponse;
   }
 
-  return {
-    data: await response.json(),
-    status: response.status,
-    headers: response.headers,
-  } as TResponse;
+  return (await response.json()) as TResponse;
 }
 
 function getRequestOptions(options: ApiFetchOptions): Options {

@@ -6,7 +6,6 @@ import styles from "../index.module.css";
 
 type TasksProgressHeaderProps = {
   completedCount: number;
-  generateErrorMessage: string | null;
   hasPendingTasks: boolean;
   isGenerating: boolean;
   isLoading: boolean;
@@ -17,7 +16,6 @@ type TasksProgressHeaderProps = {
 
 export function TasksProgressHeader({
   completedCount,
-  generateErrorMessage,
   hasPendingTasks,
   isGenerating,
   isLoading,
@@ -65,9 +63,6 @@ export function TasksProgressHeader({
           <p className={styles.muted}>
             Butonul devine disponibil dupa ce termini task-urile pending de azi.
           </p>
-        ) : null}
-        {generateErrorMessage ? (
-          <p className={styles.formError}>{generateErrorMessage}</p>
         ) : null}
       </div>
     </section>

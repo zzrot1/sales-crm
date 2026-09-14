@@ -7,12 +7,14 @@ import {
 } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
+import { applyResourceQueryDefaults } from "@/core/cache/query-defaults";
+
 type QueryProviderProps = {
   children: React.ReactNode;
 };
 
 function makeQueryClient() {
-  return new QueryClient({
+  const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
         staleTime: 60_000,
@@ -20,6 +22,10 @@ function makeQueryClient() {
       },
     },
   });
+
+  applyResourceQueryDefaults(queryClient);
+
+  return queryClient;
 }
 
 let browserQueryClient: QueryClient | undefined;

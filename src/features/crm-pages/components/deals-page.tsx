@@ -17,20 +17,19 @@ export function DealsPage() {
     () => ({ companyId, dateFrom, dateTo }),
     [companyId, dateFrom, dateTo],
   );
-  const { dealsQuery, groupedDeals, isMoving, moveDeal, moveError, setMoveError } =
-    useDeals(filters);
+  const { dealsQuery, groupedDeals, isMoving, moveDeal } = useDeals(filters);
   const [lostDeal, setLostDeal] = useState<DealsListItemDto | null>(null);
   const companyOptions = useMemo(() => {
     const companies = new Map<string, string>();
 
-    dealsQuery.data?.data.forEach((deal) => {
+    dealsQuery.data?.forEach((deal) => {
       companies.set(deal.company.id, deal.company.name);
     });
 
     return Array.from(companies, ([id, name]) => ({ id, name })).sort((first, second) =>
       first.name.localeCompare(second.name),
     );
-  }, [dealsQuery.data?.data]);
+  }, [dealsQuery.data]);
   const hasActiveFilters = Boolean(companyId || dateFrom || dateTo);
 
   const handleMoveDeal = (
@@ -42,19 +41,8 @@ export function DealsPage() {
 
   return (
     <div className={styles.page}>
-      {dealsQuery.isError || moveError ? (
-        <p className={styles.formError}>
-          {moveError ?? "Nu am putut incarca deal-urile."}
-          {moveError ? (
-            <button
-              className={styles.inlineTextButton}
-              type="button"
-              onClick={() => setMoveError(null)}
-            >
-              Inchide
-            </button>
-          ) : null}
-        </p>
+      {dealsQuery.isError ? (
+        <p className={styles.formError}>Nu am putut incarca deal-urile.</p>
       ) : null}
 
       <section className={styles.dealFilters} aria-label="Filtre deal-uri">

@@ -97,24 +97,3 @@ export function getContactLine(task: TaskListItemDto) {
     .filter(Boolean)
     .join(" · ");
 }
-
-export async function getApiErrorMessage(error: unknown) {
-  if (
-    typeof error === "object" &&
-    error !== null &&
-    "response" in error &&
-    error.response instanceof Response
-  ) {
-    try {
-      const body = await error.response.json();
-
-      if (typeof body?.message === "string") {
-        return body.message;
-      }
-    } catch {
-      return "Nu am putut crea urmatoarele task-uri. Incearca din nou.";
-    }
-  }
-
-  return "Nu am putut crea urmatoarele task-uri. Incearca din nou.";
-}

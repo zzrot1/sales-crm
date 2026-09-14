@@ -39,23 +39,12 @@ import type {
 
 import { apiFetch } from '../../../mutator/api-fetch';
 import type { ErrorType , BodyType } from '../../../mutator/api-fetch';
+import { useApiMutationOptions } from '../../../../core/cache/mutation-options';
 
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
-
-export type getTasksResponse200 = {
-  data: TaskListItemDto[]
-  status: 200
-}
-    
-export type getTasksResponseSuccess = (getTasksResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getTasksResponse = (getTasksResponseSuccess)
 
 export const getGetTasksUrl = (params?: GetTasksParams,) => {
   const normalizedParams = new URLSearchParams();
@@ -72,9 +61,9 @@ export const getGetTasksUrl = (params?: GetTasksParams,) => {
   return stringifiedParams.length > 0 ? `/tasks?${stringifiedParams}` : `/tasks`
 }
 
-export const getTasks = async (params?: GetTasksParams, options?: RequestInit): Promise<getTasksResponse> => {
+export const getTasks = async (params?: GetTasksParams, options?: RequestInit): Promise<TaskListItemDto[]> => {
   
-  return apiFetch<getTasksResponse>(getGetTasksUrl(params),
+  return apiFetch<TaskListItemDto[]>(getGetTasksUrl(params),
   {      
     ...options,
     method: 'GET'
@@ -89,7 +78,7 @@ export const getTasks = async (params?: GetTasksParams, options?: RequestInit): 
 
 export const getGetTasksQueryKey = (params?: GetTasksParams,) => {
     return [
-    `/tasks`, ...(params ? [params]: [])
+    'tasks', ...(params ? [params]: [])
     ] as const;
     }
 
@@ -157,18 +146,6 @@ export function useGetTasks<TData = Awaited<ReturnType<typeof getTasks>>, TError
 
 
 
-export type createTaskResponse200 = {
-  data: TaskDto
-  status: 200
-}
-    
-export type createTaskResponseSuccess = (createTaskResponse200) & {
-  headers: Headers;
-};
-;
-
-export type createTaskResponse = (createTaskResponseSuccess)
-
 export const getCreateTaskUrl = () => {
 
 
@@ -177,9 +154,9 @@ export const getCreateTaskUrl = () => {
   return `/tasks`
 }
 
-export const createTask = async (createTaskRequest: CreateTaskRequest, options?: RequestInit): Promise<createTaskResponse> => {
+export const createTask = async (createTaskRequest: CreateTaskRequest, options?: RequestInit): Promise<TaskDto> => {
   
-  return apiFetch<createTaskResponse>(getCreateTaskUrl(),
+  return apiFetch<TaskDto>(getCreateTaskUrl(),
   {      
     ...options,
     method: 'POST',
@@ -192,7 +169,7 @@ export const createTask = async (createTaskRequest: CreateTaskRequest, options?:
 
 
 
-export const getCreateTaskMutationOptions = <TError = ErrorType<unknown>,
+export const useCreateTaskMutationOptions = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTask>>, TError,{data: BodyType<CreateTaskRequest>}, TContext>, request?: SecondParameter<typeof apiFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createTask>>, TError,{data: BodyType<CreateTaskRequest>}, TContext> => {
 
@@ -212,10 +189,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
           return  createTask(data,requestOptions)
         }
 
-        
+        const customOptions = useApiMutationOptions({...mutationOptions, mutationFn}, { url: `/tasks` }, { operationId: 'CreateTask', operationName: 'createTask' });
 
 
-  return  { mutationFn, ...mutationOptions }}
+  return  customOptions}
 
     export type CreateTaskMutationResult = NonNullable<Awaited<ReturnType<typeof createTask>>>
     export type CreateTaskMutationBody = BodyType<CreateTaskRequest>
@@ -230,23 +207,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
 
-      const mutationOptions = getCreateTaskMutationOptions(options);
+      const mutationOptions = useCreateTaskMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
-    export type getTodaysTasksResponse200 = {
-  data: TaskListItemDto[]
-  status: 200
-}
-    
-export type getTodaysTasksResponseSuccess = (getTodaysTasksResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getTodaysTasksResponse = (getTodaysTasksResponseSuccess)
-
-export const getGetTodaysTasksUrl = () => {
+    export const getGetTodaysTasksUrl = () => {
 
 
   
@@ -254,9 +219,9 @@ export const getGetTodaysTasksUrl = () => {
   return `/tasks/today`
 }
 
-export const getTodaysTasks = async ( options?: RequestInit): Promise<getTodaysTasksResponse> => {
+export const getTodaysTasks = async ( options?: RequestInit): Promise<TaskListItemDto[]> => {
   
-  return apiFetch<getTodaysTasksResponse>(getGetTodaysTasksUrl(),
+  return apiFetch<TaskListItemDto[]>(getGetTodaysTasksUrl(),
   {      
     ...options,
     method: 'GET'
@@ -271,7 +236,7 @@ export const getTodaysTasks = async ( options?: RequestInit): Promise<getTodaysT
 
 export const getGetTodaysTasksQueryKey = () => {
     return [
-    `/tasks/today`
+    'tasks','today'
     ] as const;
     }
 
@@ -339,18 +304,6 @@ export function useGetTodaysTasks<TData = Awaited<ReturnType<typeof getTodaysTas
 
 
 
-export type generateDailyCallTasksResponse200 = {
-  data: GenerateDailyCallTasksResponse
-  status: 200
-}
-    
-export type generateDailyCallTasksResponseSuccess = (generateDailyCallTasksResponse200) & {
-  headers: Headers;
-};
-;
-
-export type generateDailyCallTasksResponse = (generateDailyCallTasksResponseSuccess)
-
 export const getGenerateDailyCallTasksUrl = () => {
 
 
@@ -359,9 +312,9 @@ export const getGenerateDailyCallTasksUrl = () => {
   return `/tasks/daily-calls`
 }
 
-export const generateDailyCallTasks = async (generateDailyCallTasksRequest: GenerateDailyCallTasksRequest, options?: RequestInit): Promise<generateDailyCallTasksResponse> => {
+export const generateDailyCallTasks = async (generateDailyCallTasksRequest: GenerateDailyCallTasksRequest, options?: RequestInit): Promise<GenerateDailyCallTasksResponse> => {
   
-  return apiFetch<generateDailyCallTasksResponse>(getGenerateDailyCallTasksUrl(),
+  return apiFetch<GenerateDailyCallTasksResponse>(getGenerateDailyCallTasksUrl(),
   {      
     ...options,
     method: 'POST',
@@ -374,7 +327,7 @@ export const generateDailyCallTasks = async (generateDailyCallTasksRequest: Gene
 
 
 
-export const getGenerateDailyCallTasksMutationOptions = <TError = ErrorType<unknown>,
+export const useGenerateDailyCallTasksMutationOptions = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof generateDailyCallTasks>>, TError,{data: BodyType<GenerateDailyCallTasksRequest>}, TContext>, request?: SecondParameter<typeof apiFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof generateDailyCallTasks>>, TError,{data: BodyType<GenerateDailyCallTasksRequest>}, TContext> => {
 
@@ -394,10 +347,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
           return  generateDailyCallTasks(data,requestOptions)
         }
 
-        
+        const customOptions = useApiMutationOptions({...mutationOptions, mutationFn}, { url: `/tasks/daily-calls` }, { operationId: 'GenerateDailyCallTasks', operationName: 'generateDailyCallTasks' });
 
 
-  return  { mutationFn, ...mutationOptions }}
+  return  customOptions}
 
     export type GenerateDailyCallTasksMutationResult = NonNullable<Awaited<ReturnType<typeof generateDailyCallTasks>>>
     export type GenerateDailyCallTasksMutationBody = BodyType<GenerateDailyCallTasksRequest>
@@ -412,23 +365,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
 
-      const mutationOptions = getGenerateDailyCallTasksMutationOptions(options);
+      const mutationOptions = useGenerateDailyCallTasksMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
-    export type ensureDailyCallTasksResponse200 = {
-  data: EnsureDailyCallTasksResponse
-  status: 200
-}
-    
-export type ensureDailyCallTasksResponseSuccess = (ensureDailyCallTasksResponse200) & {
-  headers: Headers;
-};
-;
-
-export type ensureDailyCallTasksResponse = (ensureDailyCallTasksResponseSuccess)
-
-export const getEnsureDailyCallTasksUrl = () => {
+    export const getEnsureDailyCallTasksUrl = () => {
 
 
   
@@ -436,9 +377,9 @@ export const getEnsureDailyCallTasksUrl = () => {
   return `/tasks/daily-calls/ensure`
 }
 
-export const ensureDailyCallTasks = async (generateDailyCallTasksRequest: GenerateDailyCallTasksRequest, options?: RequestInit): Promise<ensureDailyCallTasksResponse> => {
+export const ensureDailyCallTasks = async (generateDailyCallTasksRequest: GenerateDailyCallTasksRequest, options?: RequestInit): Promise<EnsureDailyCallTasksResponse> => {
   
-  return apiFetch<ensureDailyCallTasksResponse>(getEnsureDailyCallTasksUrl(),
+  return apiFetch<EnsureDailyCallTasksResponse>(getEnsureDailyCallTasksUrl(),
   {      
     ...options,
     method: 'POST',
@@ -451,7 +392,7 @@ export const ensureDailyCallTasks = async (generateDailyCallTasksRequest: Genera
 
 
 
-export const getEnsureDailyCallTasksMutationOptions = <TError = ErrorType<unknown>,
+export const useEnsureDailyCallTasksMutationOptions = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ensureDailyCallTasks>>, TError,{data: BodyType<GenerateDailyCallTasksRequest>}, TContext>, request?: SecondParameter<typeof apiFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof ensureDailyCallTasks>>, TError,{data: BodyType<GenerateDailyCallTasksRequest>}, TContext> => {
 
@@ -471,10 +412,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
           return  ensureDailyCallTasks(data,requestOptions)
         }
 
-        
+        const customOptions = useApiMutationOptions({...mutationOptions, mutationFn}, { url: `/tasks/daily-calls/ensure` }, { operationId: 'EnsureDailyCallTasks', operationName: 'ensureDailyCallTasks' });
 
 
-  return  { mutationFn, ...mutationOptions }}
+  return  customOptions}
 
     export type EnsureDailyCallTasksMutationResult = NonNullable<Awaited<ReturnType<typeof ensureDailyCallTasks>>>
     export type EnsureDailyCallTasksMutationBody = BodyType<GenerateDailyCallTasksRequest>
@@ -489,23 +430,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
 
-      const mutationOptions = getEnsureDailyCallTasksMutationOptions(options);
+      const mutationOptions = useEnsureDailyCallTasksMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
-    export type completeCallTaskResponse200 = {
-  data: CompleteCallTaskResponse
-  status: 200
-}
-    
-export type completeCallTaskResponseSuccess = (completeCallTaskResponse200) & {
-  headers: Headers;
-};
-;
-
-export type completeCallTaskResponse = (completeCallTaskResponseSuccess)
-
-export const getCompleteCallTaskUrl = (taskId: string,) => {
+    export const getCompleteCallTaskUrl = (taskId: string,) => {
 
 
   
@@ -514,9 +443,9 @@ export const getCompleteCallTaskUrl = (taskId: string,) => {
 }
 
 export const completeCallTask = async (taskId: string,
-    completeCallTaskRequest: CompleteCallTaskRequest, options?: RequestInit): Promise<completeCallTaskResponse> => {
+    completeCallTaskRequest: CompleteCallTaskRequest, options?: RequestInit): Promise<CompleteCallTaskResponse> => {
   
-  return apiFetch<completeCallTaskResponse>(getCompleteCallTaskUrl(taskId),
+  return apiFetch<CompleteCallTaskResponse>(getCompleteCallTaskUrl(taskId),
   {      
     ...options,
     method: 'POST',
@@ -529,7 +458,7 @@ export const completeCallTask = async (taskId: string,
 
 
 
-export const getCompleteCallTaskMutationOptions = <TError = ErrorType<unknown>,
+export const useCompleteCallTaskMutationOptions = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof completeCallTask>>, TError,{taskId: string;data: BodyType<CompleteCallTaskRequest>}, TContext>, request?: SecondParameter<typeof apiFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof completeCallTask>>, TError,{taskId: string;data: BodyType<CompleteCallTaskRequest>}, TContext> => {
 
@@ -549,10 +478,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
           return  completeCallTask(taskId,data,requestOptions)
         }
 
-        
+        const customOptions = useApiMutationOptions({...mutationOptions, mutationFn}, { url: `/tasks/{taskId}/complete-call` }, { operationId: 'CompleteCallTask', operationName: 'completeCallTask' });
 
 
-  return  { mutationFn, ...mutationOptions }}
+  return  customOptions}
 
     export type CompleteCallTaskMutationResult = NonNullable<Awaited<ReturnType<typeof completeCallTask>>>
     export type CompleteCallTaskMutationBody = BodyType<CompleteCallTaskRequest>
@@ -567,23 +496,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
 
-      const mutationOptions = getCompleteCallTaskMutationOptions(options);
+      const mutationOptions = useCompleteCallTaskMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
-    export type updateTaskNotesResponse200 = {
-  data: TaskDto
-  status: 200
-}
-    
-export type updateTaskNotesResponseSuccess = (updateTaskNotesResponse200) & {
-  headers: Headers;
-};
-;
-
-export type updateTaskNotesResponse = (updateTaskNotesResponseSuccess)
-
-export const getUpdateTaskNotesUrl = (taskId: string,) => {
+    export const getUpdateTaskNotesUrl = (taskId: string,) => {
 
 
   
@@ -592,9 +509,9 @@ export const getUpdateTaskNotesUrl = (taskId: string,) => {
 }
 
 export const updateTaskNotes = async (taskId: string,
-    updateTaskNotesRequest: UpdateTaskNotesRequest, options?: RequestInit): Promise<updateTaskNotesResponse> => {
+    updateTaskNotesRequest: UpdateTaskNotesRequest, options?: RequestInit): Promise<TaskDto> => {
   
-  return apiFetch<updateTaskNotesResponse>(getUpdateTaskNotesUrl(taskId),
+  return apiFetch<TaskDto>(getUpdateTaskNotesUrl(taskId),
   {      
     ...options,
     method: 'PATCH',
@@ -607,7 +524,7 @@ export const updateTaskNotes = async (taskId: string,
 
 
 
-export const getUpdateTaskNotesMutationOptions = <TError = ErrorType<unknown>,
+export const useUpdateTaskNotesMutationOptions = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTaskNotes>>, TError,{taskId: string;data: BodyType<UpdateTaskNotesRequest>}, TContext>, request?: SecondParameter<typeof apiFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof updateTaskNotes>>, TError,{taskId: string;data: BodyType<UpdateTaskNotesRequest>}, TContext> => {
 
@@ -627,10 +544,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
           return  updateTaskNotes(taskId,data,requestOptions)
         }
 
-        
+        const customOptions = useApiMutationOptions({...mutationOptions, mutationFn}, { url: `/tasks/{taskId}/notes` }, { operationId: 'UpdateTaskNotes', operationName: 'updateTaskNotes' });
 
 
-  return  { mutationFn, ...mutationOptions }}
+  return  customOptions}
 
     export type UpdateTaskNotesMutationResult = NonNullable<Awaited<ReturnType<typeof updateTaskNotes>>>
     export type UpdateTaskNotesMutationBody = BodyType<UpdateTaskNotesRequest>
@@ -645,23 +562,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
 
-      const mutationOptions = getUpdateTaskNotesMutationOptions(options);
+      const mutationOptions = useUpdateTaskNotesMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
-    export type updateTaskResponse200 = {
-  data: TaskDto
-  status: 200
-}
-    
-export type updateTaskResponseSuccess = (updateTaskResponse200) & {
-  headers: Headers;
-};
-;
-
-export type updateTaskResponse = (updateTaskResponseSuccess)
-
-export const getUpdateTaskUrl = (taskId: string,) => {
+    export const getUpdateTaskUrl = (taskId: string,) => {
 
 
   
@@ -670,9 +575,9 @@ export const getUpdateTaskUrl = (taskId: string,) => {
 }
 
 export const updateTask = async (taskId: string,
-    updateTaskRequest: UpdateTaskRequest, options?: RequestInit): Promise<updateTaskResponse> => {
+    updateTaskRequest: UpdateTaskRequest, options?: RequestInit): Promise<TaskDto> => {
   
-  return apiFetch<updateTaskResponse>(getUpdateTaskUrl(taskId),
+  return apiFetch<TaskDto>(getUpdateTaskUrl(taskId),
   {      
     ...options,
     method: 'PATCH',
@@ -685,7 +590,7 @@ export const updateTask = async (taskId: string,
 
 
 
-export const getUpdateTaskMutationOptions = <TError = ErrorType<unknown>,
+export const useUpdateTaskMutationOptions = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTask>>, TError,{taskId: string;data: BodyType<UpdateTaskRequest>}, TContext>, request?: SecondParameter<typeof apiFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof updateTask>>, TError,{taskId: string;data: BodyType<UpdateTaskRequest>}, TContext> => {
 
@@ -705,10 +610,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
           return  updateTask(taskId,data,requestOptions)
         }
 
-        
+        const customOptions = useApiMutationOptions({...mutationOptions, mutationFn}, { url: `/tasks/{taskId}` }, { operationId: 'UpdateTask', operationName: 'updateTask' });
 
 
-  return  { mutationFn, ...mutationOptions }}
+  return  customOptions}
 
     export type UpdateTaskMutationResult = NonNullable<Awaited<ReturnType<typeof updateTask>>>
     export type UpdateTaskMutationBody = BodyType<UpdateTaskRequest>
@@ -723,7 +628,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
 
-      const mutationOptions = getUpdateTaskMutationOptions(options);
+      const mutationOptions = useUpdateTaskMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

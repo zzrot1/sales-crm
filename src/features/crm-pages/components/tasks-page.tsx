@@ -2,16 +2,10 @@
 
 import { useMemo, useState } from "react";
 import { CalendarClock, PhoneCall } from "lucide-react";
-import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
+import { useUpdateCompany } from "@/service-api/generated/endpoints/companies/companies";
 import {
-  getGetCompaniesQueryKey,
-  useUpdateCompany,
-} from "@/service-api/generated/endpoints/companies/companies";
-import {
-  getGetTasksQueryKey,
-  getGetTodaysTasksQueryKey,
   useCompleteCallTask,
   useGenerateDailyCallTasks,
   useGetTasks,
@@ -28,7 +22,6 @@ import styles from "./index.module.css";
 import { CompleteTaskDialog } from "./tasks/complete-task-dialog";
 import {
   emptyTasks,
-  getApiErrorMessage,
   isCompletedTodayTask,
   isTaskCompleted,
 } from "./tasks/task-helpers";
@@ -37,7 +30,6 @@ import { TaskNotesDialog } from "./tasks/task-notes-dialog";
 import { TasksProgressHeader } from "./tasks/tasks-progress-header";
 
 export function TasksPage() {
-  const queryClient = useQueryClient();
   const router = useRouter();
   const [selectedTask, setSelectedTask] = useState<TaskListItemDto | null>(null);
   const [selectedNotesTask, setSelectedNotesTask] =
@@ -45,14 +37,13 @@ export function TasksPage() {
   const [outcome, setOutcome] = useState<CallOutcomeDto>("NO_ANSWER");
   const [notes, setNotes] = useState("");
   const [taskNotes, setTaskNotes] = useState("");
-  const [generateErrorMessage, setGenerateErrorMessage] = useState<string | null>(null);
 
   const todaysTasksQuery = useGetTodaysTasks();
   const pendingTasksQuery = useGetTasks({ status: "PENDING" });
   const completedTasksQuery = useGetTasks({ status: "COMPLETED" });
-  const todayTasks = todaysTasksQuery.data?.data ?? emptyTasks;
-  const pendingTasks = pendingTasksQuery.data?.data ?? emptyTasks;
-  const completedTasks = completedTasksQuery.data?.data ?? emptyTasks;
+  const todayTasks = todaysTasksQuery.data ?? emptyTasks;
+  const pendingTasks = pendingTasksQuery.data ?? emptyTasks;
+  const completedTasks = completedTasksQuery.data ?? emptyTasks;
   const tasks = useMemo(() => {
     const taskById = new Map<string, TaskListItemDto>();
 
@@ -86,42 +77,25 @@ export function TasksPage() {
     };
   }, [tasks, todayTasks]);
 
-  const refreshTasks = async () => {
-    await Promise.all([
-      queryClient.invalidateQueries({ queryKey: getGetTodaysTasksQueryKey() }),
-      queryClient.invalidateQueries({ queryKey: getGetTasksQueryKey() }),
-      queryClient.invalidateQueries({ queryKey: getGetCompaniesQueryKey() }),
-    ]);
-  };
-
+  // Reimprospatarea task-urilor, a companiilor si a deal-urilor vine din
+  // politica globala (core/cache/api-resources.ts). Aici raman doar reactiile
+  // proprii paginii: inchiderea dialogului si navigarea.
   const generateTasksMutation = useGenerateDailyCallTasks({
-    mutation: {
-      onError: (error) => {
-        void getApiErrorMessage(error).then((message) => setGenerateErrorMessage(message));
-      },
-      onSuccess: async () => {
-        setGenerateErrorMessage(null);
-        await refreshTasks();
-      },
-    },
+    mutation: { meta: { successMessage: "Am generat task-urile de azi." } },
   });
 
   const completeTaskMutation = useCompleteCallTask({
     mutation: {
-      onSuccess: async () => {
-        await refreshTasks();
-        resetCompleteDialog();
-      },
+      meta: { successMessage: "Task-ul a fost inchis." },
+      onSuccess: () => resetCompleteDialog(),
     },
   });
 
   const quickDealOutcomeMutation = useCompleteCallTask({
     mutation: {
-      onSuccess: async (response) => {
-        await refreshTasks();
-
-        if (response.data.deal?.id) {
-          router.push(`/deals/${response.data.deal.id}`);
+      onSuccess: (response) => {
+        if (response.deal?.id) {
+          router.push(`/deals/${response.deal.id}`);
         }
       },
     },
@@ -129,17 +103,13 @@ export function TasksPage() {
 
   const updateTaskNotesMutation = useUpdateTaskNotes({
     mutation: {
-      onSuccess: async () => {
-        await refreshTasks();
-        resetNotesDialog();
-      },
+      meta: { successMessage: "Notitele au fost salvate." },
+      onSuccess: () => resetNotesDialog(),
     },
   });
 
   const updateCompanyMutation = useUpdateCompany({
-    mutation: {
-      onSuccess: refreshTasks,
-    },
+    mutation: { meta: { successMessage: "Statusul companiei a fost actualizat." } },
   });
 
   const openCompleteDialog = (task: TaskListItemDto) => {
@@ -239,7 +209,6 @@ export function TasksPage() {
     <div className={styles.page}>
       <TasksProgressHeader
         completedCount={taskStats.completedCount}
-        generateErrorMessage={generateErrorMessage}
         hasPendingTasks={taskStats.pendingTasks.length > 0}
         isGenerating={generateTasksMutation.isPending}
         isLoading={isLoadingTasks}

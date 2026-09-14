@@ -66,7 +66,7 @@ export function DashboardPage() {
     sortOrder: GetCompaniesSortOrder.desc,
   });
 
-  const pageData = companiesQuery.data?.data;
+  const pageData = companiesQuery.data;
   const companies = useMemo(() => pageData?.data ?? [], [pageData?.data]);
   const total = pageData?.total ?? 0;
   const totalPages = Math.max(pageData?.totalPages ?? 1, 1);

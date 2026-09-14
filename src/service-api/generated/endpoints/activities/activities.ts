@@ -21,23 +21,12 @@ import type {
 
 import { apiFetch } from '../../../mutator/api-fetch';
 import type { ErrorType , BodyType } from '../../../mutator/api-fetch';
+import { useApiMutationOptions } from '../../../../core/cache/mutation-options';
 
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
-
-export type createActivityResponse200 = {
-  data: ActivitiesActivityDto
-  status: 200
-}
-    
-export type createActivityResponseSuccess = (createActivityResponse200) & {
-  headers: Headers;
-};
-;
-
-export type createActivityResponse = (createActivityResponseSuccess)
 
 export const getCreateActivityUrl = () => {
 
@@ -47,9 +36,9 @@ export const getCreateActivityUrl = () => {
   return `/activities`
 }
 
-export const createActivity = async (activitiesCreateRequest: ActivitiesCreateRequest, options?: RequestInit): Promise<createActivityResponse> => {
+export const createActivity = async (activitiesCreateRequest: ActivitiesCreateRequest, options?: RequestInit): Promise<ActivitiesActivityDto> => {
   
-  return apiFetch<createActivityResponse>(getCreateActivityUrl(),
+  return apiFetch<ActivitiesActivityDto>(getCreateActivityUrl(),
   {      
     ...options,
     method: 'POST',
@@ -62,7 +51,7 @@ export const createActivity = async (activitiesCreateRequest: ActivitiesCreateRe
 
 
 
-export const getCreateActivityMutationOptions = <TError = ErrorType<unknown>,
+export const useCreateActivityMutationOptions = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createActivity>>, TError,{data: BodyType<ActivitiesCreateRequest>}, TContext>, request?: SecondParameter<typeof apiFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createActivity>>, TError,{data: BodyType<ActivitiesCreateRequest>}, TContext> => {
 
@@ -82,10 +71,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
           return  createActivity(data,requestOptions)
         }
 
-        
+        const customOptions = useApiMutationOptions({...mutationOptions, mutationFn}, { url: `/activities` }, { operationId: 'CreateActivity', operationName: 'createActivity' });
 
 
-  return  { mutationFn, ...mutationOptions }}
+  return  customOptions}
 
     export type CreateActivityMutationResult = NonNullable<Awaited<ReturnType<typeof createActivity>>>
     export type CreateActivityMutationBody = BodyType<ActivitiesCreateRequest>
@@ -100,7 +89,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
 
-      const mutationOptions = getCreateActivityMutationOptions(options);
+      const mutationOptions = useCreateActivityMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

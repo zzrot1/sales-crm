@@ -1,5 +1,7 @@
 import { useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
+import { refreshResource } from "@/core/cache/resource-cache";
 import { importLeads } from "@/service-api/generated/endpoints/companies/companies";
 import type { ImportLeadRow } from "@/service-api/generated/models";
 
@@ -15,6 +17,7 @@ import {
 } from "../utils/import-helpers";
 
 export function useImportPage() {
+  const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
@@ -85,10 +88,10 @@ export function useImportPage() {
         });
 
         const response = await importLeads({ rows: batch });
-        imported += response.data.imported;
-        skipped += response.data.skipped;
+        imported += response.imported;
+        skipped += response.skipped;
 
-        response.data.errors?.forEach((error) => {
+        response.errors?.forEach((error) => {
           const sourceRow = batch[error.index]?.sourceRow;
           errors.push({
             index:
@@ -99,6 +102,10 @@ export function useImportPage() {
           });
         });
       }
+
+      // Importul ruleaza in batch-uri, deci nu trece prin politica de mutatii.
+      // Companiile se re-cer o singura data, la final.
+      refreshResource(queryClient, "companies");
 
       if (errors.length) {
         setStatus({
@@ -118,7 +125,7 @@ export function useImportPage() {
     } catch (error) {
       setStatus({
         tone: "error",
-        message: await getImportErrorMessage(error),
+        message: getImportErrorMessage(error),
       });
     } finally {
       setIsImporting(false);

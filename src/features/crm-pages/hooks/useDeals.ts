@@ -1,8 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 
-import { useMutationSetup } from "@/core/mutation-setup";
 import { useCreateActivity } from "@/service-api/generated/endpoints/activities/activities";
 import {
   useGetDeal,
@@ -37,53 +36,29 @@ export type DealFilters = {
   dateTo: string;
 };
 
-const dealInvalidates = ["deals", "companies", "tasks"] as const;
-
 export function useDeals(filters?: DealFilters) {
-  const [moveError, setMoveError] = useState<string | null>(null);
   const dealsQuery = useGetDeals();
 
   const filteredDeals = useMemo(
-    () => filterDeals(dealsQuery.data?.data ?? [], filters),
-    [dealsQuery.data?.data, filters],
+    () => filterDeals(dealsQuery.data ?? [], filters),
+    [dealsQuery.data, filters],
   );
   const groupedDeals = useMemo(
     () => groupDealsByStage(filteredDeals),
     [filteredDeals],
   );
 
-  const updateDealSetup = useMutationSetup<
-    { id: string; data: DealsUpdateRequest },
-    DealsListItemDto
-  >({
-    error: "Nu am putut muta deal-ul. Incearca din nou.",
-    invalidates: dealInvalidates,
-    optimistic: {
-      id: ({ id }) => id,
-      patch: (deal, { data }) => ({ ...deal, stage: data.stage ?? deal.stage }),
-      resource: "deals",
-    },
+  const updateDealMutation = useUpdateDeal({
+    mutation: { meta: { errorMessage: "Nu am putut muta deal-ul. Incearca din nou." } },
   });
-
-  const markLostSetup = useMutationSetup<{ id: string }, DealsListItemDto>({
-    error: "Nu am putut marca deal-ul ca pierdut.",
-    invalidates: dealInvalidates,
-    optimistic: {
-      id: ({ id }) => id,
-      patch: (deal) => ({ ...deal, stage: "LOST" }),
-      resource: "deals",
-    },
+  const markLostMutation = useMarkLost({
+    mutation: { meta: { errorMessage: "Nu am putut marca deal-ul ca pierdut." } },
   });
-
-  const updateDealMutation = useUpdateDeal(updateDealSetup);
-  const markLostMutation = useMarkLost(markLostSetup);
 
   const moveDeal = ({ deal, nextStage, reason }: DealMove) => {
     if (deal.stage === nextStage) {
       return;
     }
-
-    setMoveError(null);
 
     if (nextStage === "LOST") {
       markLostMutation.mutate({
@@ -102,8 +77,6 @@ export function useDeals(filters?: DealFilters) {
     groupedDeals,
     isMoving: updateDealMutation.isPending || markLostMutation.isPending,
     moveDeal,
-    moveError,
-    setMoveError,
   };
 }
 
@@ -133,13 +106,11 @@ function filterDeals(deals: DealsListItemDto[], filters?: DealFilters) {
 
 export function useDealDetail(dealId: string) {
   const dealQuery = useGetDeal(dealId);
-  const setup = useMutationSetup({ invalidates: dealInvalidates });
-
-  const updateDealMutation = useUpdateDeal(setup);
-  const markLostMutation = useMarkLost(setup);
-  const createActivityMutation = useCreateActivity(setup);
-  const createTaskMutation = useCreateTask(setup);
-  const updateTaskMutation = useUpdateTask(setup);
+  const updateDealMutation = useUpdateDeal();
+  const markLostMutation = useMarkLost();
+  const createActivityMutation = useCreateActivity();
+  const createTaskMutation = useCreateTask();
+  const updateTaskMutation = useUpdateTask();
 
   return {
     createActivity: (data: Omit<ActivitiesCreateRequest, "dealId">) =>

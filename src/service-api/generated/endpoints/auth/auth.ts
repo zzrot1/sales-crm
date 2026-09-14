@@ -34,23 +34,12 @@ import type {
 
 import { apiFetch } from '../../../mutator/api-fetch';
 import type { ErrorType , BodyType } from '../../../mutator/api-fetch';
+import { useApiMutationOptions } from '../../../../core/cache/mutation-options';
 
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
-
-export type meResponse200 = {
-  data: MeResponse
-  status: 200
-}
-    
-export type meResponseSuccess = (meResponse200) & {
-  headers: Headers;
-};
-;
-
-export type meResponse = (meResponseSuccess)
 
 export const getMeUrl = () => {
 
@@ -60,9 +49,9 @@ export const getMeUrl = () => {
   return `/auth/me`
 }
 
-export const me = async ( options?: RequestInit): Promise<meResponse> => {
+export const me = async ( options?: RequestInit): Promise<MeResponse> => {
   
-  return apiFetch<meResponse>(getMeUrl(),
+  return apiFetch<MeResponse>(getMeUrl(),
   {      
     ...options,
     method: 'GET'
@@ -77,7 +66,7 @@ export const me = async ( options?: RequestInit): Promise<meResponse> => {
 
 export const getMeQueryKey = () => {
     return [
-    `/auth/me`
+    'auth','me'
     ] as const;
     }
 
@@ -145,18 +134,6 @@ export function useMe<TData = Awaited<ReturnType<typeof me>>, TError = ErrorType
 
 
 
-export type googleResponse204 = {
-  data: void
-  status: 204
-}
-    
-export type googleResponseSuccess = (googleResponse204) & {
-  headers: Headers;
-};
-;
-
-export type googleResponse = (googleResponseSuccess)
-
 export const getGoogleUrl = () => {
 
 
@@ -165,9 +142,9 @@ export const getGoogleUrl = () => {
   return `/auth/google`
 }
 
-export const google = async ( options?: RequestInit): Promise<googleResponse> => {
+export const google = async ( options?: RequestInit): Promise<void> => {
   
-  return apiFetch<googleResponse>(getGoogleUrl(),
+  return apiFetch<void>(getGoogleUrl(),
   {      
     ...options,
     method: 'GET'
@@ -182,7 +159,7 @@ export const google = async ( options?: RequestInit): Promise<googleResponse> =>
 
 export const getGoogleQueryKey = () => {
     return [
-    `/auth/google`
+    'auth','google'
     ] as const;
     }
 
@@ -250,18 +227,6 @@ export function useGoogle<TData = Awaited<ReturnType<typeof google>>, TError = E
 
 
 
-export type googleCallbackResponse200 = {
-  data: AuthResponse
-  status: 200
-}
-    
-export type googleCallbackResponseSuccess = (googleCallbackResponse200) & {
-  headers: Headers;
-};
-;
-
-export type googleCallbackResponse = (googleCallbackResponseSuccess)
-
 export const getGoogleCallbackUrl = (params: GoogleCallbackParams,) => {
   const normalizedParams = new URLSearchParams();
 
@@ -277,9 +242,9 @@ export const getGoogleCallbackUrl = (params: GoogleCallbackParams,) => {
   return stringifiedParams.length > 0 ? `/auth/google/callback?${stringifiedParams}` : `/auth/google/callback`
 }
 
-export const googleCallback = async (params: GoogleCallbackParams, options?: RequestInit): Promise<googleCallbackResponse> => {
+export const googleCallback = async (params: GoogleCallbackParams, options?: RequestInit): Promise<AuthResponse> => {
   
-  return apiFetch<googleCallbackResponse>(getGoogleCallbackUrl(params),
+  return apiFetch<AuthResponse>(getGoogleCallbackUrl(params),
   {      
     ...options,
     method: 'GET'
@@ -294,7 +259,7 @@ export const googleCallback = async (params: GoogleCallbackParams, options?: Req
 
 export const getGoogleCallbackQueryKey = (params?: GoogleCallbackParams,) => {
     return [
-    `/auth/google/callback`, ...(params ? [params]: [])
+    'auth','google','callback', ...(params ? [params]: [])
     ] as const;
     }
 
@@ -362,18 +327,6 @@ export function useGoogleCallback<TData = Awaited<ReturnType<typeof googleCallba
 
 
 
-export type refreshResponse200 = {
-  data: AuthTokensResponse
-  status: 200
-}
-    
-export type refreshResponseSuccess = (refreshResponse200) & {
-  headers: Headers;
-};
-;
-
-export type refreshResponse = (refreshResponseSuccess)
-
 export const getRefreshUrl = () => {
 
 
@@ -382,9 +335,9 @@ export const getRefreshUrl = () => {
   return `/auth/refresh`
 }
 
-export const refresh = async (refreshRequest: RefreshRequest, options?: RequestInit): Promise<refreshResponse> => {
+export const refresh = async (refreshRequest: RefreshRequest, options?: RequestInit): Promise<AuthTokensResponse> => {
   
-  return apiFetch<refreshResponse>(getRefreshUrl(),
+  return apiFetch<AuthTokensResponse>(getRefreshUrl(),
   {      
     ...options,
     method: 'POST',
@@ -397,7 +350,7 @@ export const refresh = async (refreshRequest: RefreshRequest, options?: RequestI
 
 
 
-export const getRefreshMutationOptions = <TError = ErrorType<unknown>,
+export const useRefreshMutationOptions = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof refresh>>, TError,{data: BodyType<RefreshRequest>}, TContext>, request?: SecondParameter<typeof apiFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof refresh>>, TError,{data: BodyType<RefreshRequest>}, TContext> => {
 
@@ -417,10 +370,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
           return  refresh(data,requestOptions)
         }
 
-        
+        const customOptions = useApiMutationOptions({...mutationOptions, mutationFn}, { url: `/auth/refresh` }, { operationId: 'Refresh', operationName: 'refresh' });
 
 
-  return  { mutationFn, ...mutationOptions }}
+  return  customOptions}
 
     export type RefreshMutationResult = NonNullable<Awaited<ReturnType<typeof refresh>>>
     export type RefreshMutationBody = BodyType<RefreshRequest>
@@ -435,23 +388,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
 
-      const mutationOptions = getRefreshMutationOptions(options);
+      const mutationOptions = useRefreshMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
-    export type logoutResponse204 = {
-  data: void
-  status: 204
-}
-    
-export type logoutResponseSuccess = (logoutResponse204) & {
-  headers: Headers;
-};
-;
-
-export type logoutResponse = (logoutResponseSuccess)
-
-export const getLogoutUrl = () => {
+    export const getLogoutUrl = () => {
 
 
   
@@ -459,9 +400,9 @@ export const getLogoutUrl = () => {
   return `/auth/logout`
 }
 
-export const logout = async (logoutRequest: LogoutRequest, options?: RequestInit): Promise<logoutResponse> => {
+export const logout = async (logoutRequest: LogoutRequest, options?: RequestInit): Promise<void> => {
   
-  return apiFetch<logoutResponse>(getLogoutUrl(),
+  return apiFetch<void>(getLogoutUrl(),
   {      
     ...options,
     method: 'POST',
@@ -474,7 +415,7 @@ export const logout = async (logoutRequest: LogoutRequest, options?: RequestInit
 
 
 
-export const getLogoutMutationOptions = <TError = ErrorType<unknown>,
+export const useLogoutMutationOptions = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logout>>, TError,{data: BodyType<LogoutRequest>}, TContext>, request?: SecondParameter<typeof apiFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof logout>>, TError,{data: BodyType<LogoutRequest>}, TContext> => {
 
@@ -494,10 +435,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
           return  logout(data,requestOptions)
         }
 
-        
+        const customOptions = useApiMutationOptions({...mutationOptions, mutationFn}, { url: `/auth/logout` }, { operationId: 'Logout', operationName: 'logout' });
 
 
-  return  { mutationFn, ...mutationOptions }}
+  return  customOptions}
 
     export type LogoutMutationResult = NonNullable<Awaited<ReturnType<typeof logout>>>
     export type LogoutMutationBody = BodyType<LogoutRequest>
@@ -512,7 +453,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
 
-      const mutationOptions = getLogoutMutationOptions(options);
+      const mutationOptions = useLogoutMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

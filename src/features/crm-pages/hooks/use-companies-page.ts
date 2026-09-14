@@ -4,7 +4,6 @@ import { useState } from "react";
 
 import { useListState } from "@/core/list-state";
 import { usePermissions } from "@/core/permissions";
-import { useMutationSetup } from "@/core/mutation-setup";
 import { useGetCompanies } from "@/service-api/generated/endpoints/companies/companies";
 import { useUpdateContact } from "@/service-api/generated/endpoints/contacts/contacts";
 import {
@@ -36,16 +35,18 @@ export function useCompaniesPage() {
     sortOrder: GetCompaniesSortOrder.desc,
   });
 
-  const companies = companiesQuery.data?.data.data ?? [];
-  const total = companiesQuery.data?.data.total ?? 0;
-  const totalPages = Math.max(companiesQuery.data?.data.totalPages ?? 1, 1);
+  const companies = companiesQuery.data?.data ?? [];
+  const total = companiesQuery.data?.total ?? 0;
+  const totalPages = Math.max(companiesQuery.data?.totalPages ?? 1, 1);
 
-  const updateContactSetup = useMutationSetup({
-    invalidates: ["companies", "contacts", "tasks"],
-    onSuccess: () => setEditingCompany(null),
-    success: "Contactul a fost salvat.",
+  // Cache-ul si toast-ul de eroare vin din politica globala (core/cache).
+  // Aici raman doar lucrurile specifice paginii.
+  const updateContactMutation = useUpdateContact({
+    mutation: {
+      meta: { successMessage: "Contactul a fost salvat." },
+      onSuccess: () => setEditingCompany(null),
+    },
   });
-  const updateContactMutation = useUpdateContact(updateContactSetup);
 
   const openContactEditor = (company: CompanyListItemDto) => {
     setEditingCompany(company);

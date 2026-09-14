@@ -33,23 +33,12 @@ import type {
 
 import { apiFetch } from '../../../mutator/api-fetch';
 import type { ErrorType , BodyType } from '../../../mutator/api-fetch';
+import { useApiMutationOptions } from '../../../../core/cache/mutation-options';
 
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
-
-export type createContactResponse200 = {
-  data: ContactDto
-  status: 200
-}
-    
-export type createContactResponseSuccess = (createContactResponse200) & {
-  headers: Headers;
-};
-;
-
-export type createContactResponse = (createContactResponseSuccess)
 
 export const getCreateContactUrl = () => {
 
@@ -59,9 +48,9 @@ export const getCreateContactUrl = () => {
   return `/contacts`
 }
 
-export const createContact = async (createContactRequest: CreateContactRequest, options?: RequestInit): Promise<createContactResponse> => {
+export const createContact = async (createContactRequest: CreateContactRequest, options?: RequestInit): Promise<ContactDto> => {
   
-  return apiFetch<createContactResponse>(getCreateContactUrl(),
+  return apiFetch<ContactDto>(getCreateContactUrl(),
   {      
     ...options,
     method: 'POST',
@@ -74,7 +63,7 @@ export const createContact = async (createContactRequest: CreateContactRequest, 
 
 
 
-export const getCreateContactMutationOptions = <TError = ErrorType<unknown>,
+export const useCreateContactMutationOptions = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createContact>>, TError,{data: BodyType<CreateContactRequest>}, TContext>, request?: SecondParameter<typeof apiFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createContact>>, TError,{data: BodyType<CreateContactRequest>}, TContext> => {
 
@@ -94,10 +83,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
           return  createContact(data,requestOptions)
         }
 
-        
+        const customOptions = useApiMutationOptions({...mutationOptions, mutationFn}, { url: `/contacts` }, { operationId: 'CreateContact', operationName: 'createContact' });
 
 
-  return  { mutationFn, ...mutationOptions }}
+  return  customOptions}
 
     export type CreateContactMutationResult = NonNullable<Awaited<ReturnType<typeof createContact>>>
     export type CreateContactMutationBody = BodyType<CreateContactRequest>
@@ -112,23 +101,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
 
-      const mutationOptions = getCreateContactMutationOptions(options);
+      const mutationOptions = useCreateContactMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
-    export type getContactsResponse200 = {
-  data: PagedContactsResponse
-  status: 200
-}
-    
-export type getContactsResponseSuccess = (getContactsResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getContactsResponse = (getContactsResponseSuccess)
-
-export const getGetContactsUrl = (params?: GetContactsParams,) => {
+    export const getGetContactsUrl = (params?: GetContactsParams,) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -143,9 +120,9 @@ export const getGetContactsUrl = (params?: GetContactsParams,) => {
   return stringifiedParams.length > 0 ? `/contacts?${stringifiedParams}` : `/contacts`
 }
 
-export const getContacts = async (params?: GetContactsParams, options?: RequestInit): Promise<getContactsResponse> => {
+export const getContacts = async (params?: GetContactsParams, options?: RequestInit): Promise<PagedContactsResponse> => {
   
-  return apiFetch<getContactsResponse>(getGetContactsUrl(params),
+  return apiFetch<PagedContactsResponse>(getGetContactsUrl(params),
   {      
     ...options,
     method: 'GET'
@@ -160,7 +137,7 @@ export const getContacts = async (params?: GetContactsParams, options?: RequestI
 
 export const getGetContactsQueryKey = (params?: GetContactsParams,) => {
     return [
-    `/contacts`, ...(params ? [params]: [])
+    'contacts', ...(params ? [params]: [])
     ] as const;
     }
 
@@ -228,18 +205,6 @@ export function useGetContacts<TData = Awaited<ReturnType<typeof getContacts>>, 
 
 
 
-export type getContactResponse200 = {
-  data: ContactDto
-  status: 200
-}
-    
-export type getContactResponseSuccess = (getContactResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getContactResponse = (getContactResponseSuccess)
-
 export const getGetContactUrl = (contactId: string,) => {
 
 
@@ -248,9 +213,9 @@ export const getGetContactUrl = (contactId: string,) => {
   return `/contacts/${contactId}`
 }
 
-export const getContact = async (contactId: string, options?: RequestInit): Promise<getContactResponse> => {
+export const getContact = async (contactId: string, options?: RequestInit): Promise<ContactDto> => {
   
-  return apiFetch<getContactResponse>(getGetContactUrl(contactId),
+  return apiFetch<ContactDto>(getGetContactUrl(contactId),
   {      
     ...options,
     method: 'GET'
@@ -265,7 +230,7 @@ export const getContact = async (contactId: string, options?: RequestInit): Prom
 
 export const getGetContactQueryKey = (contactId?: string,) => {
     return [
-    `/contacts/${contactId}`
+    'contacts',contactId
     ] as const;
     }
 
@@ -333,18 +298,6 @@ export function useGetContact<TData = Awaited<ReturnType<typeof getContact>>, TE
 
 
 
-export type updateContactResponse200 = {
-  data: ContactDto
-  status: 200
-}
-    
-export type updateContactResponseSuccess = (updateContactResponse200) & {
-  headers: Headers;
-};
-;
-
-export type updateContactResponse = (updateContactResponseSuccess)
-
 export const getUpdateContactUrl = (contactId: string,) => {
 
 
@@ -354,9 +307,9 @@ export const getUpdateContactUrl = (contactId: string,) => {
 }
 
 export const updateContact = async (contactId: string,
-    partialCreateContactRequest: PartialCreateContactRequest, options?: RequestInit): Promise<updateContactResponse> => {
+    partialCreateContactRequest: PartialCreateContactRequest, options?: RequestInit): Promise<ContactDto> => {
   
-  return apiFetch<updateContactResponse>(getUpdateContactUrl(contactId),
+  return apiFetch<ContactDto>(getUpdateContactUrl(contactId),
   {      
     ...options,
     method: 'PATCH',
@@ -369,7 +322,7 @@ export const updateContact = async (contactId: string,
 
 
 
-export const getUpdateContactMutationOptions = <TError = ErrorType<unknown>,
+export const useUpdateContactMutationOptions = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateContact>>, TError,{contactId: string;data: BodyType<PartialCreateContactRequest>}, TContext>, request?: SecondParameter<typeof apiFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof updateContact>>, TError,{contactId: string;data: BodyType<PartialCreateContactRequest>}, TContext> => {
 
@@ -389,10 +342,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
           return  updateContact(contactId,data,requestOptions)
         }
 
-        
+        const customOptions = useApiMutationOptions({...mutationOptions, mutationFn}, { url: `/contacts/{contactId}` }, { operationId: 'UpdateContact', operationName: 'updateContact' });
 
 
-  return  { mutationFn, ...mutationOptions }}
+  return  customOptions}
 
     export type UpdateContactMutationResult = NonNullable<Awaited<ReturnType<typeof updateContact>>>
     export type UpdateContactMutationBody = BodyType<PartialCreateContactRequest>
@@ -407,23 +360,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
 
-      const mutationOptions = getUpdateContactMutationOptions(options);
+      const mutationOptions = useUpdateContactMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
-    export type deleteContactResponse200 = {
-  data: ContactDto
-  status: 200
-}
-    
-export type deleteContactResponseSuccess = (deleteContactResponse200) & {
-  headers: Headers;
-};
-;
-
-export type deleteContactResponse = (deleteContactResponseSuccess)
-
-export const getDeleteContactUrl = (contactId: string,) => {
+    export const getDeleteContactUrl = (contactId: string,) => {
 
 
   
@@ -431,9 +372,9 @@ export const getDeleteContactUrl = (contactId: string,) => {
   return `/contacts/${contactId}`
 }
 
-export const deleteContact = async (contactId: string, options?: RequestInit): Promise<deleteContactResponse> => {
+export const deleteContact = async (contactId: string, options?: RequestInit): Promise<ContactDto> => {
   
-  return apiFetch<deleteContactResponse>(getDeleteContactUrl(contactId),
+  return apiFetch<ContactDto>(getDeleteContactUrl(contactId),
   {      
     ...options,
     method: 'DELETE'
@@ -445,7 +386,7 @@ export const deleteContact = async (contactId: string, options?: RequestInit): P
 
 
 
-export const getDeleteContactMutationOptions = <TError = ErrorType<unknown>,
+export const useDeleteContactMutationOptions = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteContact>>, TError,{contactId: string}, TContext>, request?: SecondParameter<typeof apiFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof deleteContact>>, TError,{contactId: string}, TContext> => {
 
@@ -465,10 +406,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
           return  deleteContact(contactId,requestOptions)
         }
 
-        
+        const customOptions = useApiMutationOptions({...mutationOptions, mutationFn}, { url: `/contacts/{contactId}` }, { operationId: 'DeleteContact', operationName: 'deleteContact' });
 
 
-  return  { mutationFn, ...mutationOptions }}
+  return  customOptions}
 
     export type DeleteContactMutationResult = NonNullable<Awaited<ReturnType<typeof deleteContact>>>
     
@@ -483,7 +424,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
 
-      const mutationOptions = getDeleteContactMutationOptions(options);
+      const mutationOptions = useDeleteContactMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

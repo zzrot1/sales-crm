@@ -35,23 +35,12 @@ import type {
 
 import { apiFetch } from '../../../mutator/api-fetch';
 import type { ErrorType , BodyType } from '../../../mutator/api-fetch';
+import { useApiMutationOptions } from '../../../../core/cache/mutation-options';
 
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
-
-export type createCompanyResponse200 = {
-  data: CompanyDto
-  status: 200
-}
-    
-export type createCompanyResponseSuccess = (createCompanyResponse200) & {
-  headers: Headers;
-};
-;
-
-export type createCompanyResponse = (createCompanyResponseSuccess)
 
 export const getCreateCompanyUrl = () => {
 
@@ -61,9 +50,9 @@ export const getCreateCompanyUrl = () => {
   return `/companies`
 }
 
-export const createCompany = async (createCompanyRequest: CreateCompanyRequest, options?: RequestInit): Promise<createCompanyResponse> => {
+export const createCompany = async (createCompanyRequest: CreateCompanyRequest, options?: RequestInit): Promise<CompanyDto> => {
   
-  return apiFetch<createCompanyResponse>(getCreateCompanyUrl(),
+  return apiFetch<CompanyDto>(getCreateCompanyUrl(),
   {      
     ...options,
     method: 'POST',
@@ -76,7 +65,7 @@ export const createCompany = async (createCompanyRequest: CreateCompanyRequest, 
 
 
 
-export const getCreateCompanyMutationOptions = <TError = ErrorType<unknown>,
+export const useCreateCompanyMutationOptions = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createCompany>>, TError,{data: BodyType<CreateCompanyRequest>}, TContext>, request?: SecondParameter<typeof apiFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createCompany>>, TError,{data: BodyType<CreateCompanyRequest>}, TContext> => {
 
@@ -96,10 +85,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
           return  createCompany(data,requestOptions)
         }
 
-        
+        const customOptions = useApiMutationOptions({...mutationOptions, mutationFn}, { url: `/companies` }, { operationId: 'CreateCompany', operationName: 'createCompany' });
 
 
-  return  { mutationFn, ...mutationOptions }}
+  return  customOptions}
 
     export type CreateCompanyMutationResult = NonNullable<Awaited<ReturnType<typeof createCompany>>>
     export type CreateCompanyMutationBody = BodyType<CreateCompanyRequest>
@@ -114,23 +103,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
 
-      const mutationOptions = getCreateCompanyMutationOptions(options);
+      const mutationOptions = useCreateCompanyMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
-    export type getCompaniesResponse200 = {
-  data: PagedCompaniesResponse
-  status: 200
-}
-    
-export type getCompaniesResponseSuccess = (getCompaniesResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getCompaniesResponse = (getCompaniesResponseSuccess)
-
-export const getGetCompaniesUrl = (params?: GetCompaniesParams,) => {
+    export const getGetCompaniesUrl = (params?: GetCompaniesParams,) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -145,9 +122,9 @@ export const getGetCompaniesUrl = (params?: GetCompaniesParams,) => {
   return stringifiedParams.length > 0 ? `/companies?${stringifiedParams}` : `/companies`
 }
 
-export const getCompanies = async (params?: GetCompaniesParams, options?: RequestInit): Promise<getCompaniesResponse> => {
+export const getCompanies = async (params?: GetCompaniesParams, options?: RequestInit): Promise<PagedCompaniesResponse> => {
   
-  return apiFetch<getCompaniesResponse>(getGetCompaniesUrl(params),
+  return apiFetch<PagedCompaniesResponse>(getGetCompaniesUrl(params),
   {      
     ...options,
     method: 'GET'
@@ -162,7 +139,7 @@ export const getCompanies = async (params?: GetCompaniesParams, options?: Reques
 
 export const getGetCompaniesQueryKey = (params?: GetCompaniesParams,) => {
     return [
-    `/companies`, ...(params ? [params]: [])
+    'companies', ...(params ? [params]: [])
     ] as const;
     }
 
@@ -230,18 +207,6 @@ export function useGetCompanies<TData = Awaited<ReturnType<typeof getCompanies>>
 
 
 
-export type importLeadsResponse200 = {
-  data: ImportLeadsResponse
-  status: 200
-}
-    
-export type importLeadsResponseSuccess = (importLeadsResponse200) & {
-  headers: Headers;
-};
-;
-
-export type importLeadsResponse = (importLeadsResponseSuccess)
-
 export const getImportLeadsUrl = () => {
 
 
@@ -250,9 +215,9 @@ export const getImportLeadsUrl = () => {
   return `/companies/import`
 }
 
-export const importLeads = async (importLeadsRequest: ImportLeadsRequest, options?: RequestInit): Promise<importLeadsResponse> => {
+export const importLeads = async (importLeadsRequest: ImportLeadsRequest, options?: RequestInit): Promise<ImportLeadsResponse> => {
   
-  return apiFetch<importLeadsResponse>(getImportLeadsUrl(),
+  return apiFetch<ImportLeadsResponse>(getImportLeadsUrl(),
   {      
     ...options,
     method: 'POST',
@@ -265,7 +230,7 @@ export const importLeads = async (importLeadsRequest: ImportLeadsRequest, option
 
 
 
-export const getImportLeadsMutationOptions = <TError = ErrorType<unknown>,
+export const useImportLeadsMutationOptions = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof importLeads>>, TError,{data: BodyType<ImportLeadsRequest>}, TContext>, request?: SecondParameter<typeof apiFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof importLeads>>, TError,{data: BodyType<ImportLeadsRequest>}, TContext> => {
 
@@ -285,10 +250,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
           return  importLeads(data,requestOptions)
         }
 
-        
+        const customOptions = useApiMutationOptions({...mutationOptions, mutationFn}, { url: `/companies/import` }, { operationId: 'ImportLeads', operationName: 'importLeads' });
 
 
-  return  { mutationFn, ...mutationOptions }}
+  return  customOptions}
 
     export type ImportLeadsMutationResult = NonNullable<Awaited<ReturnType<typeof importLeads>>>
     export type ImportLeadsMutationBody = BodyType<ImportLeadsRequest>
@@ -303,23 +268,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
 
-      const mutationOptions = getImportLeadsMutationOptions(options);
+      const mutationOptions = useImportLeadsMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
-    export type getCompanyResponse200 = {
-  data: CompanyDto
-  status: 200
-}
-    
-export type getCompanyResponseSuccess = (getCompanyResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getCompanyResponse = (getCompanyResponseSuccess)
-
-export const getGetCompanyUrl = (companyId: string,) => {
+    export const getGetCompanyUrl = (companyId: string,) => {
 
 
   
@@ -327,9 +280,9 @@ export const getGetCompanyUrl = (companyId: string,) => {
   return `/companies/${companyId}`
 }
 
-export const getCompany = async (companyId: string, options?: RequestInit): Promise<getCompanyResponse> => {
+export const getCompany = async (companyId: string, options?: RequestInit): Promise<CompanyDto> => {
   
-  return apiFetch<getCompanyResponse>(getGetCompanyUrl(companyId),
+  return apiFetch<CompanyDto>(getGetCompanyUrl(companyId),
   {      
     ...options,
     method: 'GET'
@@ -344,7 +297,7 @@ export const getCompany = async (companyId: string, options?: RequestInit): Prom
 
 export const getGetCompanyQueryKey = (companyId?: string,) => {
     return [
-    `/companies/${companyId}`
+    'companies',companyId
     ] as const;
     }
 
@@ -412,18 +365,6 @@ export function useGetCompany<TData = Awaited<ReturnType<typeof getCompany>>, TE
 
 
 
-export type updateCompanyResponse200 = {
-  data: CompanyDto
-  status: 200
-}
-    
-export type updateCompanyResponseSuccess = (updateCompanyResponse200) & {
-  headers: Headers;
-};
-;
-
-export type updateCompanyResponse = (updateCompanyResponseSuccess)
-
 export const getUpdateCompanyUrl = (companyId: string,) => {
 
 
@@ -433,9 +374,9 @@ export const getUpdateCompanyUrl = (companyId: string,) => {
 }
 
 export const updateCompany = async (companyId: string,
-    partialCreateCompanyRequest: PartialCreateCompanyRequest, options?: RequestInit): Promise<updateCompanyResponse> => {
+    partialCreateCompanyRequest: PartialCreateCompanyRequest, options?: RequestInit): Promise<CompanyDto> => {
   
-  return apiFetch<updateCompanyResponse>(getUpdateCompanyUrl(companyId),
+  return apiFetch<CompanyDto>(getUpdateCompanyUrl(companyId),
   {      
     ...options,
     method: 'PATCH',
@@ -448,7 +389,7 @@ export const updateCompany = async (companyId: string,
 
 
 
-export const getUpdateCompanyMutationOptions = <TError = ErrorType<unknown>,
+export const useUpdateCompanyMutationOptions = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCompany>>, TError,{companyId: string;data: BodyType<PartialCreateCompanyRequest>}, TContext>, request?: SecondParameter<typeof apiFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof updateCompany>>, TError,{companyId: string;data: BodyType<PartialCreateCompanyRequest>}, TContext> => {
 
@@ -468,10 +409,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
           return  updateCompany(companyId,data,requestOptions)
         }
 
-        
+        const customOptions = useApiMutationOptions({...mutationOptions, mutationFn}, { url: `/companies/{companyId}` }, { operationId: 'UpdateCompany', operationName: 'updateCompany' });
 
 
-  return  { mutationFn, ...mutationOptions }}
+  return  customOptions}
 
     export type UpdateCompanyMutationResult = NonNullable<Awaited<ReturnType<typeof updateCompany>>>
     export type UpdateCompanyMutationBody = BodyType<PartialCreateCompanyRequest>
@@ -486,23 +427,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
 
-      const mutationOptions = getUpdateCompanyMutationOptions(options);
+      const mutationOptions = useUpdateCompanyMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
-    export type deleteCompanyResponse200 = {
-  data: CompanyDto
-  status: 200
-}
-    
-export type deleteCompanyResponseSuccess = (deleteCompanyResponse200) & {
-  headers: Headers;
-};
-;
-
-export type deleteCompanyResponse = (deleteCompanyResponseSuccess)
-
-export const getDeleteCompanyUrl = (companyId: string,) => {
+    export const getDeleteCompanyUrl = (companyId: string,) => {
 
 
   
@@ -510,9 +439,9 @@ export const getDeleteCompanyUrl = (companyId: string,) => {
   return `/companies/${companyId}`
 }
 
-export const deleteCompany = async (companyId: string, options?: RequestInit): Promise<deleteCompanyResponse> => {
+export const deleteCompany = async (companyId: string, options?: RequestInit): Promise<CompanyDto> => {
   
-  return apiFetch<deleteCompanyResponse>(getDeleteCompanyUrl(companyId),
+  return apiFetch<CompanyDto>(getDeleteCompanyUrl(companyId),
   {      
     ...options,
     method: 'DELETE'
@@ -524,7 +453,7 @@ export const deleteCompany = async (companyId: string, options?: RequestInit): P
 
 
 
-export const getDeleteCompanyMutationOptions = <TError = ErrorType<unknown>,
+export const useDeleteCompanyMutationOptions = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteCompany>>, TError,{companyId: string}, TContext>, request?: SecondParameter<typeof apiFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof deleteCompany>>, TError,{companyId: string}, TContext> => {
 
@@ -544,10 +473,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
           return  deleteCompany(companyId,requestOptions)
         }
 
-        
+        const customOptions = useApiMutationOptions({...mutationOptions, mutationFn}, { url: `/companies/{companyId}` }, { operationId: 'DeleteCompany', operationName: 'deleteCompany' });
 
 
-  return  { mutationFn, ...mutationOptions }}
+  return  customOptions}
 
     export type DeleteCompanyMutationResult = NonNullable<Awaited<ReturnType<typeof deleteCompany>>>
     
@@ -562,7 +491,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
 
-      const mutationOptions = getDeleteCompanyMutationOptions(options);
+      const mutationOptions = useDeleteCompanyMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

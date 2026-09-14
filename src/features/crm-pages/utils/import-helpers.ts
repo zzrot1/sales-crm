@@ -1,5 +1,6 @@
 import * as XLSX from "xlsx";
 
+import { ApiError, getErrorMessage } from "@/core/api-error";
 import type { ImportLeadRow } from "@/service-api/generated/models";
 
 export type ImportStatus =
@@ -338,34 +339,35 @@ function countDelimiter(line: string, delimiter: string) {
   return count;
 }
 
-export async function getImportErrorMessage(error: unknown) {
-  if (hasJsonResponse(error)) {
-    try {
-      const body = await error.response.json();
-      const errors = Array.isArray(body?.errors) ? body.errors : [];
+type ImportRowError = { index?: number; message?: string };
 
-      if (errors.length) {
-        return errors
-          .slice(0, 3)
-          .map(
-            (item: { index?: number; message?: string }) =>
-              `Rand ${(item.index ?? 0) + 1}: ${item.message ?? "eroare import"}`,
-          )
-          .join(" | ");
-      }
-    } catch {
-      return "Importul a esuat. Verifica formatul fisierului.";
-    }
+/**
+ * Mesajul afisat cand importul cade. `apiFetch` normalizeaza orice eroare la
+ * `ApiError`, deci avem si textul serverului (`message`), si corpul raspunsului
+ * (`body`) — de acolo scoatem erorile pe rand, daca exista.
+ */
+export function getImportErrorMessage(error: unknown) {
+  const rowErrors = readRowErrors(error);
+
+  if (!rowErrors.length) {
+    return getErrorMessage(error);
   }
 
-  return "Importul a esuat. Verifica formatul fisierului.";
+  return rowErrors
+    .slice(0, 3)
+    .map(
+      (rowError) =>
+        `Rand ${(rowError.index ?? 0) + 1}: ${rowError.message ?? "eroare import"}`,
+    )
+    .join(" | ");
 }
 
-function hasJsonResponse(error: unknown): error is { response: Response } {
-  return (
-    typeof error === "object" &&
-    error !== null &&
-    "response" in error &&
-    error.response instanceof Response
-  );
+function readRowErrors(error: unknown): ImportRowError[] {
+  if (!(error instanceof ApiError) || typeof error.body !== "object" || !error.body) {
+    return [];
+  }
+
+  const { errors } = error.body as { errors?: unknown };
+
+  return Array.isArray(errors) ? errors : [];
 }

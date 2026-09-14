@@ -17,7 +17,7 @@ export function DealDetailPage({ dealId }: { dealId: string }) {
     updateDeal,
     updateTask,
   } = useDealDetail(dealId);
-  const deal = dealQuery.data?.data;
+  const deal = dealQuery.data;
 
   if (dealQuery.isLoading) {
     return (

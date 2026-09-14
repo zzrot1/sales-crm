@@ -32,18 +32,6 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type getMyPermissionsResponse200 = {
-  data: RolePermissionsDto
-  status: 200
-}
-    
-export type getMyPermissionsResponseSuccess = (getMyPermissionsResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getMyPermissionsResponse = (getMyPermissionsResponseSuccess)
-
 export const getGetMyPermissionsUrl = () => {
 
 
@@ -52,9 +40,9 @@ export const getGetMyPermissionsUrl = () => {
   return `/permissions/me`
 }
 
-export const getMyPermissions = async ( options?: RequestInit): Promise<getMyPermissionsResponse> => {
+export const getMyPermissions = async ( options?: RequestInit): Promise<RolePermissionsDto> => {
   
-  return apiFetch<getMyPermissionsResponse>(getGetMyPermissionsUrl(),
+  return apiFetch<RolePermissionsDto>(getGetMyPermissionsUrl(),
   {      
     ...options,
     method: 'GET'
@@ -69,7 +57,7 @@ export const getMyPermissions = async ( options?: RequestInit): Promise<getMyPer
 
 export const getGetMyPermissionsQueryKey = () => {
     return [
-    `/permissions/me`
+    'permissions','me'
     ] as const;
     }
 
@@ -137,18 +125,6 @@ export function useGetMyPermissions<TData = Awaited<ReturnType<typeof getMyPermi
 
 
 
-export type getPermissionsResponse200 = {
-  data: PermissionMatrixDto
-  status: 200
-}
-    
-export type getPermissionsResponseSuccess = (getPermissionsResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getPermissionsResponse = (getPermissionsResponseSuccess)
-
 export const getGetPermissionsUrl = () => {
 
 
@@ -157,9 +133,9 @@ export const getGetPermissionsUrl = () => {
   return `/permissions`
 }
 
-export const getPermissions = async ( options?: RequestInit): Promise<getPermissionsResponse> => {
+export const getPermissions = async ( options?: RequestInit): Promise<PermissionMatrixDto> => {
   
-  return apiFetch<getPermissionsResponse>(getGetPermissionsUrl(),
+  return apiFetch<PermissionMatrixDto>(getGetPermissionsUrl(),
   {      
     ...options,
     method: 'GET'
@@ -174,7 +150,7 @@ export const getPermissions = async ( options?: RequestInit): Promise<getPermiss
 
 export const getGetPermissionsQueryKey = () => {
     return [
-    `/permissions`
+    'permissions'
     ] as const;
     }
 
