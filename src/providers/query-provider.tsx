@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
-import { applyResourceQueryDefaults } from "@/core/cache/query-defaults";
+import { apiDataHandler } from "@/core/cache/api-data-handler";
 
 type QueryProviderProps = {
   children: React.ReactNode;
@@ -23,7 +23,7 @@ function makeQueryClient() {
     },
   });
 
-  applyResourceQueryDefaults(queryClient);
+  apiDataHandler.applyQueryDefaults(queryClient);
 
   return queryClient;
 }

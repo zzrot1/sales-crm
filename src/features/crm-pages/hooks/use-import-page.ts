@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { DataHandler } from "orval-data-handler";
 
-import { refreshResource } from "@/core/cache/resource-cache";
 import { importLeads } from "@/service-api/generated/endpoints/companies/companies";
 import type { ImportLeadRow } from "@/service-api/generated/models";
 
@@ -105,7 +105,7 @@ export function useImportPage() {
 
       // Importul ruleaza in batch-uri, deci nu trece prin politica de mutatii.
       // Companiile se re-cer o singura data, la final.
-      refreshResource(queryClient, "companies");
+      DataHandler.invalidateResource(queryClient, "companies");
 
       if (errors.length) {
         setStatus({

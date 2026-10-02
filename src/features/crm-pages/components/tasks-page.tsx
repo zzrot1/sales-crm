@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { CalendarClock, PhoneCall } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { DataHandler } from "orval-data-handler";
 
 import { useUpdateCompany } from "@/service-api/generated/endpoints/companies/companies";
 import {
@@ -16,6 +17,7 @@ import type {
   CallOutcomeDto,
   PartialCreateCompanyRequestStatus,
   TaskListItemDto,
+  UpdateTaskNotesRequest,
 } from "@/service-api/generated/models";
 
 import styles from "./index.module.css";
@@ -78,8 +80,8 @@ export function TasksPage() {
   }, [tasks, todayTasks]);
 
   // Reimprospatarea task-urilor, a companiilor si a deal-urilor vine din
-  // politica globala (core/cache/api-resources.ts). Aici raman doar reactiile
-  // proprii paginii: inchiderea dialogului si navigarea.
+  // politica globala (core/cache). Aici raman doar reactiile proprii paginii:
+  // inchiderea dialogului si navigarea.
   const generateTasksMutation = useGenerateDailyCallTasks({
     mutation: { meta: { successMessage: "Am generat task-urile de azi." } },
   });
@@ -103,7 +105,18 @@ export function TasksPage() {
 
   const updateTaskNotesMutation = useUpdateTaskNotes({
     mutation: {
-      meta: { successMessage: "Notitele au fost salvate." },
+      meta: {
+        successMessage: "Notitele au fost salvate.",
+        // Notita e exact ce trimitem, deci o scriem in cache pe loc: randul se
+        // schimba cand apesi Salveaza, nu cand raspunde serverul. Daca cererea
+        // esueaza, cache-ul e pus la loc si ramane doar toast-ul de eroare.
+        cache: DataHandler.writeOptimistically(
+          (variables: { taskId: string; data: UpdateTaskNotesRequest }) => ({
+            id: variables.taskId,
+            notes: variables.data.notes,
+          }),
+        ),
+      },
       onSuccess: () => resetNotesDialog(),
     },
   });

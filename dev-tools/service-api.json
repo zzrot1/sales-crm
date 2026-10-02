@@ -1077,6 +1077,193 @@
         },
         "required": ["notes", "type", "dealId"],
         "type": "object"
+      },
+      "ReportsPeriodDto": {
+        "properties": {
+          "to": { "type": "string", "description": "`YYYY-MM-DD`, inclusive" },
+          "from": { "type": "string", "description": "`YYYY-MM-DD`, inclusive" }
+        },
+        "required": ["to", "from"],
+        "type": "object",
+        "description": "Local days in Europe/Bucharest."
+      },
+      "ReportsTotalsDto": {
+        "properties": {
+          "openValue": { "type": "number", "format": "double" },
+          "openCount": {
+            "type": "number",
+            "format": "double",
+            "description": "Open pipeline right now (NEW, QUALIFIED, PROPOSAL), not limited to the period."
+          },
+          "averageWonValue": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "winRate": {
+            "type": "number",
+            "format": "double",
+            "nullable": true,
+            "description": "WON / (WON + LOST) in the period, between 0 and 1."
+          },
+          "lostValue": { "type": "number", "format": "double" },
+          "lostCount": { "type": "number", "format": "double" },
+          "wonValue": { "type": "number", "format": "double" },
+          "wonCount": { "type": "number", "format": "double" }
+        },
+        "required": [
+          "openValue",
+          "openCount",
+          "averageWonValue",
+          "winRate",
+          "lostValue",
+          "lostCount",
+          "wonValue",
+          "wonCount"
+        ],
+        "type": "object"
+      },
+      "ReportsWonByMonthDto": {
+        "properties": {
+          "value": { "type": "number", "format": "double" },
+          "count": { "type": "number", "format": "double" },
+          "month": { "type": "string", "description": "`YYYY-MM`" }
+        },
+        "required": ["value", "count", "month"],
+        "type": "object"
+      },
+      "ReportsDealStageDto": {
+        "type": "string",
+        "enum": ["NEW", "QUALIFIED", "PROPOSAL", "WON", "LOST"]
+      },
+      "ReportsPipelineStageDto": {
+        "properties": {
+          "value": { "type": "number", "format": "double" },
+          "count": { "type": "number", "format": "double" },
+          "stage": { "$ref": "#/components/schemas/ReportsDealStageDto" }
+        },
+        "required": ["value", "count", "stage"],
+        "type": "object"
+      },
+      "ReportsLostReasonDto": {
+        "properties": {
+          "value": { "type": "number", "format": "double" },
+          "count": { "type": "number", "format": "double" },
+          "reason": {
+            "type": "string",
+            "nullable": true,
+            "description": "Null when the deal was lost without a reason."
+          }
+        },
+        "required": ["value", "count", "reason"],
+        "type": "object"
+      },
+      "ReportsCallOutcomeDto": {
+        "type": "string",
+        "enum": [
+          "NO_ANSWER",
+          "NOT_INTERESTED",
+          "INTERESTED",
+          "MEETING_REQUIRED",
+          "DEAL_WON",
+          "FOLLOW_UP_LATER"
+        ]
+      },
+      "ReportsCallOutcomeCountDto": {
+        "properties": {
+          "count": { "type": "number", "format": "double" },
+          "outcome": { "$ref": "#/components/schemas/ReportsCallOutcomeDto" }
+        },
+        "required": ["count", "outcome"],
+        "type": "object"
+      },
+      "ReportsWonDealDto": {
+        "properties": {
+          "closedOn": {
+            "type": "string",
+            "description": "Local day the deal moved to WON, `YYYY-MM-DD`"
+          },
+          "value": { "type": "number", "format": "double" },
+          "companyName": { "type": "string" },
+          "title": { "type": "string" },
+          "id": { "type": "string" }
+        },
+        "required": ["closedOn", "value", "companyName", "title", "id"],
+        "type": "object"
+      },
+      "SalesReportDto": {
+        "properties": {
+          "wonDeals": {
+            "items": { "$ref": "#/components/schemas/ReportsWonDealDto" },
+            "type": "array",
+            "description": "Newest first, at most 500; compare with `totals.wonCount` to detect a cut."
+          },
+          "callOutcomes": {
+            "items": {
+              "$ref": "#/components/schemas/ReportsCallOutcomeCountDto"
+            },
+            "type": "array"
+          },
+          "lostReasons": {
+            "items": { "$ref": "#/components/schemas/ReportsLostReasonDto" },
+            "type": "array",
+            "description": "Most frequent reasons first, at most 20."
+          },
+          "pipelineByStage": {
+            "items": { "$ref": "#/components/schemas/ReportsPipelineStageDto" },
+            "type": "array"
+          },
+          "wonByMonth": {
+            "items": { "$ref": "#/components/schemas/ReportsWonByMonthDto" },
+            "type": "array"
+          },
+          "totals": { "$ref": "#/components/schemas/ReportsTotalsDto" },
+          "period": { "$ref": "#/components/schemas/ReportsPeriodDto" }
+        },
+        "required": [
+          "wonDeals",
+          "callOutcomes",
+          "lostReasons",
+          "pipelineByStage",
+          "wonByMonth",
+          "totals",
+          "period"
+        ],
+        "type": "object"
+      },
+      "ReportsActivityGranularityDto": {
+        "type": "string",
+        "enum": ["day", "week"]
+      },
+      "ReportsActivityBucketDto": {
+        "properties": {
+          "callCount": { "type": "number", "format": "double" },
+          "wonValue": { "type": "number", "format": "double" },
+          "wonCount": { "type": "number", "format": "double" },
+          "start": {
+            "type": "string",
+            "description": "First local day of the bucket, `YYYY-MM-DD`; weeks start on Monday."
+          }
+        },
+        "required": ["callCount", "wonValue", "wonCount", "start"],
+        "type": "object"
+      },
+      "ActivityReportDto": {
+        "properties": {
+          "buckets": {
+            "items": {
+              "$ref": "#/components/schemas/ReportsActivityBucketDto"
+            },
+            "type": "array",
+            "description": "One entry per day or week of the period, including empty ones."
+          },
+          "granularity": {
+            "$ref": "#/components/schemas/ReportsActivityGranularityDto"
+          },
+          "period": { "$ref": "#/components/schemas/ReportsPeriodDto" }
+        },
+        "required": ["buckets", "granularity", "period"],
+        "type": "object"
       }
     },
     "securitySchemes": {
@@ -2157,6 +2344,78 @@
             }
           }
         }
+      }
+    },
+    "/reports/sales": {
+      "get": {
+        "operationId": "GetSalesReport",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SalesReportDto" }
+              }
+            }
+          }
+        },
+        "description": "Sales report for the current user. Without a period it covers the current\r\nmonth and the 5 before it. Days are read in Europe/Bucharest; the period can\r\nspan at most 3 years and start no earlier than 2000-01-01.",
+        "tags": ["Reports"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": { "type": "string" }
+          }
+        ]
+      }
+    },
+    "/reports/activity": {
+      "get": {
+        "operationId": "GetActivity",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ActivityReportDto" }
+              }
+            }
+          }
+        },
+        "description": "Won value and completed calls per day or week, for the dashboard chart.\r\nDefaults to the last 30 days by day. At most 92 days by day, 3 years by week.",
+        "tags": ["Reports"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "in": "query",
+            "name": "granularity",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/ReportsActivityGranularityDto"
+            }
+          }
+        ]
       }
     }
   },

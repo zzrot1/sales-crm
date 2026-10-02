@@ -1862,3 +1862,254 @@
   font-size: 0.9rem;
   line-height: 1.55;
 }
+
+/* --- Rapoarte ------------------------------------------------------------ */
+
+.reportFilters {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(10rem, 12rem) minmax(10rem, 12rem);
+  gap: 0.75rem;
+  align-items: end;
+  border: 1px solid #e5e5e2;
+  border-radius: 0.75rem;
+  background: #ffffff;
+  padding: 0.85rem;
+}
+
+.reportPresets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.reportPresets button {
+  min-height: 2.4rem;
+  border: 1px solid #e5e5e2;
+  border-radius: 0.5rem;
+  background: #ffffff;
+  color: var(--foreground);
+  padding: 0 0.8rem;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 750;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease;
+}
+
+.reportPresets button:hover {
+  background: #f6f6f4;
+}
+
+.reportPresets .reportPresetActive,
+.reportPresets .reportPresetActive:hover {
+  border-color: var(--primary-color);
+  background: var(--primary-color);
+  color: #ffffff;
+}
+
+.reportsBody {
+  display: grid;
+  gap: 1.25rem;
+  transition: opacity 160ms ease;
+}
+
+.reportsRefreshing {
+  opacity: 0.6;
+}
+
+.reportStats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.reportStats .statValue {
+  font-variant-numeric: tabular-nums;
+}
+
+.reportGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.reportSection {
+  display: grid;
+  align-content: start;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.reportSectionHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.reportSectionHead .muted {
+  margin-top: 0.25rem;
+}
+
+.reportExportButton {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.1rem;
+  border: 1px solid #e5e5e2;
+  border-radius: 0.5rem;
+  background: #ffffff;
+  color: var(--foreground);
+  padding: 0 0.7rem;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.reportExportButton:hover:not(:disabled) {
+  background: #f6f6f4;
+}
+
+.reportExportButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.reportBars {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.reportBarRow {
+  display: grid;
+  grid-template-columns: minmax(6.5rem, 0.8fr) minmax(0, 2fr) minmax(6.5rem, auto);
+  gap: 0.75rem;
+  align-items: center;
+  border-radius: 0.4rem;
+  padding: 0.3rem 0.35rem;
+  font-size: 0.86rem;
+}
+
+.reportBarRow:hover {
+  background: #f6f6f4;
+}
+
+.reportBarLabel {
+  overflow: hidden;
+  color: #374151;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reportBarTrack {
+  display: block;
+  height: 0.6rem;
+}
+
+.reportBarFill {
+  display: block;
+  height: 100%;
+  border-radius: 0 4px 4px 0;
+  background: var(--primary-color);
+}
+
+.reportBarValue {
+  display: grid;
+  color: var(--foreground);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.reportBarValue small {
+  color: #666666;
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+
+.reportTable {
+  overflow-x: auto;
+  border: 1px solid #e5e5e2;
+  border-radius: 0.5rem;
+}
+
+.reportDataTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.reportDataTable th,
+.reportDataTable td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+
+.reportDataTable th {
+  background: #f6f6f4;
+  color: var(--foreground);
+  font-size: 0.8rem;
+  font-weight: 850;
+}
+
+.reportDataTable td {
+  border-top: 1px solid #e5e5e2;
+  color: #374151;
+}
+
+.reportDataTable th:not(:first-child),
+.reportDataTable td:not(:first-child) {
+  white-space: nowrap;
+}
+
+.reportDataTable th:last-child,
+.reportDataTable td:last-child {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.reportPeriodError {
+  grid-column: 1 / -1;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (max-width: 72rem) {
+  .reportFilters,
+  .reportGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .reportStats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 40rem) {
+  .reportStats {
+    grid-template-columns: 1fr;
+  }
+
+  .reportBarRow {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .reportBarTrack {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}

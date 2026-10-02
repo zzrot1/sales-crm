@@ -34,5 +34,12 @@ export default defineConfig({
         },
       },
     },
+    hooks: {
+      // Deriva lista de resurse din spec, ca sa nu fie scrisa de mana nicaieri.
+      afterAllFilesWrite: {
+        command: "node ./dev-tools/write-api-resource-names.mjs",
+        injectGeneratedDirsAndFiles: false,
+      },
+    },
   },
 });

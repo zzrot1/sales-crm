@@ -1,0 +1,21 @@
+{
+  "name": "orval-data-handler",
+  "version": "0.1.0",
+  "description": "Politica de date pentru clientii react-query generati de orval: despacheteaza GET-ul paginii si decide, per scriere, daca inregistrarea se scrie in cache, se re-cere de la server sau se aplica optimist.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "peerDependencies": {
+    "@tanstack/react-query": "^5.0.0",
+    "react": ">=18"
+  }
+}

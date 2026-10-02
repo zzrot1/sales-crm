@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useDataPage } from "orval-data-handler";
 
 import { useListState } from "@/core/list-state";
 import { usePermissions } from "@/core/permissions";
@@ -13,6 +14,7 @@ import {
 } from "@/service-api/generated/models";
 
 import type { ContactForm } from "../components/companies/edit-contact-dialog";
+import { CompaniesDataPage } from "../data-pages/companies-data-page";
 
 export function useCompaniesPage() {
   const list = useListState({ limit: 100, searchParam: "search" });
@@ -27,17 +29,19 @@ export function useCompaniesPage() {
     phone: "",
   });
 
-  const companiesQuery = useGetCompanies({
-    limit: list.limit,
-    page: list.page,
-    search: list.searchParamValue,
-    sortBy: GetCompaniesSortBy.createdAt,
-    sortOrder: GetCompaniesSortOrder.desc,
-  });
-
-  const companies = companiesQuery.data?.data ?? [];
-  const total = companiesQuery.data?.total ?? 0;
-  const totalPages = Math.max(companiesQuery.data?.totalPages ?? 1, 1);
+  // GET-ul care alimenteaza pagina, cu filtrele generate din spec
+  // (`GetCompaniesParams`). `CompaniesDataPage` scoate din raspuns randurile si
+  // paginarea, tipizate, fara `?? []` prin pagina.
+  const companiesDataPage = useDataPage(
+    CompaniesDataPage,
+    useGetCompanies({
+      limit: list.limit,
+      page: list.page,
+      search: list.searchParamValue,
+      sortBy: GetCompaniesSortBy.createdAt,
+      sortOrder: GetCompaniesSortOrder.desc,
+    }),
+  );
 
   // Cache-ul si toast-ul de eroare vin din politica globala (core/cache).
   // Aici raman doar lucrurile specifice paginii.
@@ -50,11 +54,7 @@ export function useCompaniesPage() {
 
   const openContactEditor = (company: CompanyListItemDto) => {
     setEditingCompany(company);
-    setContactForm({
-      email: company.primaryContactEmail ?? "",
-      jobTitle: company.primaryContactJobTitle ?? "",
-      phone: company.primaryContactPhone ?? "",
-    });
+    setContactForm(companiesDataPage.getContactForm(company));
   };
 
   const saveContact = () => {
@@ -78,12 +78,11 @@ export function useCompaniesPage() {
         setEditingCompany(null);
       }
     },
-    companies,
-    companiesQuery,
+    companies: companiesDataPage.records,
+    companiesDataPage,
     contactForm,
     editingCompany,
-    goToPage: (page: number) =>
-      list.setPage(Math.min(Math.max(page, 1), totalPages)),
+    goToPage: (page: number) => list.setPage(companiesDataPage.clampPage(page)),
     handleLimitChange: list.setLimit,
     handleSearchChange: list.setSearch,
     limit: list.limit,
@@ -94,8 +93,8 @@ export function useCompaniesPage() {
     selectedCompany,
     setContactForm,
     setSelectedCompany,
-    total,
-    totalPages,
+    total: companiesDataPage.total,
+    totalPages: companiesDataPage.totalPages,
     updateContactMutation,
   };
 }

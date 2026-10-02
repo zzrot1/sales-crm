@@ -13,7 +13,7 @@ export function CompaniesPage() {
   const {
     closeContactEditor,
     companies,
-    companiesQuery,
+    companiesDataPage,
     contactForm,
     editingCompany,
     goToPage,
@@ -37,14 +37,14 @@ export function CompaniesPage() {
       <section className={styles.tableCard}>
         <CompaniesDataTable
           companies={companies}
-          isError={companiesQuery.isError}
-          isFetching={companiesQuery.isFetching}
-          isLoading={companiesQuery.isLoading}
+          isError={companiesDataPage.isError}
+          isFetching={companiesDataPage.isFetching}
+          isLoading={companiesDataPage.isLoading}
           onEditCompany={openContactEditor}
           onSelectCompany={setSelectedCompany}
           selectedCompanyId={selectedCompany?.id ?? null}
           pagination={{
-            isDisabled: companiesQuery.isFetching,
+            isDisabled: companiesDataPage.isFetching,
             onPageChange: goToPage,
             onPageSizeChange: handleLimitChange,
             page,

@@ -2,11 +2,14 @@
   "name": "sales-crm",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "dev": "next dev --port 3001",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "eslint src packages",
     "generate-webapi": "powershell -NoProfile -Command \"if (Test-Path './src/service-api/generated') { Remove-Item './src/service-api/generated' -Recurse -Force }; orval.cmd\"",
     "generate-webapi:watch": "orval --watch"
   },
@@ -20,6 +23,7 @@
     "ky": "^2.0.2",
     "lucide-react": "^1.30.0",
     "next": "16.3.0",
+    "orval-data-handler": "*",
     "postcss": "^8.5.26",
     "react": "19.2.8",
     "react-dom": "19.2.8",

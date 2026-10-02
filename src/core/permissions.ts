@@ -1,6 +1,6 @@
 "use client";
 
-import type { ApiResourceName } from "@/core/cache/api-resources";
+import type { ApiResourceName } from "@/core/cache/api-data-handler";
 import { useGetMyPermissions } from "@/service-api/generated/endpoints/permissions/permissions";
 
 export type PermissionAction = "create" | "read" | "update" | "delete";

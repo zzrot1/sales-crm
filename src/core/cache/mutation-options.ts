@@ -2,14 +2,11 @@
 
 import { useQueryClient, type UseMutationOptions } from "@tanstack/react-query";
 
-import { getErrorMessage } from "@/core/api-error";
-import { readResourceNameFromUrl } from "@/core/cache/api-resources";
-import { syncCacheAfterWrite } from "@/core/cache/sync-cache-after-write";
+import { apiDataHandler, type ApiMutationMeta } from "@/core/cache/api-data-handler";
 import { useNotifications } from "@/core/notifications";
 
 /**
- * Ce poate cere in plus o pagina fata de comportamentul implicit. Se trimite
- * prin `mutation.meta`, deci se vede si in React Query Devtools:
+ * Face `mutation.meta` tipat peste tot in aplicatie:
  *
  * ```ts
  * const updateContact = useUpdateContact({
@@ -17,13 +14,6 @@ import { useNotifications } from "@/core/notifications";
  * });
  * ```
  */
-export type ApiMutationMeta = {
-  /** Textul afisat la succes. Fara el nu apare niciun toast de succes. */
-  successMessage?: string;
-  /** Inlocuieste mesajul de eroare venit de la server. */
-  errorMessage?: string;
-};
-
 declare module "@tanstack/react-query" {
   interface Register {
     mutationMeta: ApiMutationMeta;
@@ -31,58 +21,25 @@ declare module "@tanstack/react-query" {
 }
 
 /**
- * Politica aplicata AUTOMAT fiecarei mutatii generate de orval. E legata in
- * `orval.config.ts` prin `override.query.mutationOptions`, deci nu se importa
- * nicaieri manual: orval o cheama din fiecare `useXMutationOptions` generat.
+ * Puntea catre orval: fisierul asta e tinta lui
+ * `output.override.query.mutationOptions` din `orval.config.ts`, deci hook-ul de
+ * mai jos ajunge in fiecare mutatie generata. Aici se leaga React de `apiDataHandler`.
  *
- * Asa, orice `useCreate*` / `useUpdate*` / `useDelete*` primeste, fara nicio
- * linie la locul apelului:
- *
- *   - toast de eroare cu mesajul venit de la server (`ApiError`)
- *   - sincronizarea cache-ului (vezi `sync-cache-after-write.ts`)
- *   - toast de succes, daca pagina a cerut unul prin `meta.successMessage`
- *
- * Ce trimite pagina in `mutation: { ... }` ramane valabil: callback-urile ei
- * sunt chemate dupa ale noastre, nu inlocuite.
- *
- * Numele incepe cu `use` fiindca foloseste hook-uri; e apelata mereu din
- * interiorul unui hook generat, deci regulile hook-urilor sunt respectate.
+ * Trebuie sa ramana o declaratie literala cu trei parametri: orval parseaza
+ * fisierul si numara parametrii ca sa stie cate argumente sa trimita. Cu un
+ * re-export ar pierde al treilea argument, si odata cu el numele operatiei —
+ * deci si recunoasterea stergerilor.
  */
 export function useApiMutationOptions<TData, TError, TVariables, TContext>(
   options: UseMutationOptions<TData, TError, TVariables, TContext>,
   endpoint: { url: string },
   operation: { operationId: string; operationName: string },
-): UseMutationOptions<TData, TError, TVariables, TContext> {
+) {
   const queryClient = useQueryClient();
   const { notify } = useNotifications();
-  const resourceName = readResourceNameFromUrl(endpoint.url);
 
-  return {
-    ...options,
-    onError: (...callbackArgs) => {
-      const [error] = callbackArgs;
-
-      notify("error", options.meta?.errorMessage ?? getErrorMessage(error));
-
-      return options.onError?.(...callbackArgs);
-    },
-    onSuccess: (...callbackArgs) => {
-      const [mutationResponse] = callbackArgs;
-
-      if (resourceName) {
-        syncCacheAfterWrite({
-          mutationResponse,
-          operationName: operation.operationName,
-          queryClient,
-          resourceName,
-        });
-      }
-
-      if (options.meta?.successMessage) {
-        notify("success", options.meta.successMessage);
-      }
-
-      return options.onSuccess?.(...callbackArgs);
-    },
-  };
+  return apiDataHandler.buildMutationOptions(options, endpoint, operation, {
+    notify,
+    queryClient,
+  });
 }
