@@ -9,6 +9,7 @@ import {
   formatItTeam,
   normalizeWebsiteUrl,
 } from "../../utils/company-helpers";
+import { CompanyIntelligenceSection } from "./company-intelligence-section";
 import { DetailRow } from "./detail-row";
 
 export function CompanySidePanel({
@@ -30,6 +31,14 @@ export function CompanySidePanel({
           <div className={styles.sidePanelIcon}>
             <Building2 size={20} />
           </div>
+
+          {/* `key`: CUI-ul in curs de tastare nu trece de la o companie la alta. */}
+          <CompanyIntelligenceSection
+            companyId={company.id}
+            hasItTeam={company.hasItTeam}
+            key={company.id}
+            website={company.website}
+          />
 
           <section className={styles.sidePanelSection}>
             <h3>Contact principal</h3>

@@ -1,58 +1,32 @@
-import {
-  Building2,
-  CheckCircle2,
-  Mail,
-  MoreHorizontal,
-  Phone,
-  StickyNote,
-} from "lucide-react";
-import Link from "next/link";
+import { Mail, Phone } from "lucide-react";
 
-import { routes } from "@/common/routes";
-import type {
-  CallOutcomeDto,
-  PartialCreateCompanyRequestStatus,
-  TaskListItemDto,
-} from "@/service-api/generated/models";
+import type { CallOutcomeDto, TaskListItemDto } from "@/service-api/generated/models";
 
 import styles from "../index.module.css";
-import {
-  companyStatusByValue,
-  getContactLine,
-  outcomeByValue,
-  outcomeOptions,
-  typeLabels,
-} from "./task-helpers";
+import { TaskActionsMenu, type TaskActionsMenuProps } from "./task-actions-menu";
+import { companyStatusByValue, getContactLine, outcomeByValue, typeLabels } from "./task-helpers";
 
-type TaskRowProps = {
+type TaskRowProps = Omit<TaskActionsMenuProps, "task"> & {
   task: TaskListItemDto;
-  onChangeCompanyStatus?: (
-    task: TaskListItemDto,
-    status: PartialCreateCompanyRequestStatus,
-    outcome: CallOutcomeDto,
-  ) => void;
-  onComplete?: (task: TaskListItemDto) => void;
-  onOpenNotes?: (task: TaskListItemDto) => void;
-};
-
-const companyStatusByOutcome: Record<
-  CallOutcomeDto,
-  PartialCreateCompanyRequestStatus
-> = {
-  DEAL_WON: "WON",
-  FOLLOW_UP_LATER: "FOLLOW_UP_LATER",
-  INTERESTED: "INTERESTED",
-  MEETING_REQUIRED: "MEETING_REQUIRED",
-  NOT_INTERESTED: "NOT_INTERESTED",
-  NO_ANSWER: "CALLED_NO_ANSWER",
 };
 
 export function TaskRow({
   task,
   onChangeCompanyStatus,
   onComplete,
+  onDelete,
   onOpenNotes,
 }: TaskRowProps) {
+  const menu = (
+    <TaskActionsMenu
+      task={task}
+      onChangeCompanyStatus={onChangeCompanyStatus}
+      onComplete={onComplete}
+      onDelete={onDelete}
+      onOpenNotes={onOpenNotes}
+    />
+  );
+
   return (
     <tr>
       <td>
@@ -74,145 +48,22 @@ export function TaskRow({
         <TaskTypeBadge type={task.type} />
       </td>
       {onComplete ? (
-        <td>
-          <TaskActionsMenu
-            task={task}
-            onChangeCompanyStatus={onChangeCompanyStatus}
-            onComplete={onComplete}
-            onOpenNotes={onOpenNotes}
-          />
-        </td>
+        <td>{menu}</td>
       ) : (
         <>
           <td>
-            <OutcomeBadge
-              companyStatus={task.companyStatus}
-              outcome={task.outcome}
-            />
+            <OutcomeBadge companyStatus={task.companyStatus} outcome={task.outcome} />
           </td>
-          <td>
-            <TaskActionsMenu
-              task={task}
-              onChangeCompanyStatus={onChangeCompanyStatus}
-              onOpenNotes={onOpenNotes}
-            />
-          </td>
+          <td>{menu}</td>
         </>
       )}
     </tr>
   );
 }
 
-function TaskActionsMenu({
-  task,
-  onChangeCompanyStatus,
-  onComplete,
-  onOpenNotes,
-}: {
-  task: TaskListItemDto;
-  onChangeCompanyStatus?: (
-    task: TaskListItemDto,
-    status: PartialCreateCompanyRequestStatus,
-    outcome: CallOutcomeDto,
-  ) => void;
-  onComplete?: (task: TaskListItemDto) => void;
-  onOpenNotes?: (task: TaskListItemDto) => void;
-}) {
-  const hasNotes = Boolean(task.notes?.trim());
-  const companyHref = `${routes.companies.path}?search=${encodeURIComponent(
-    task.companyName ?? task.title,
-  )}`;
-
-  return (
-    <details className={styles.taskActionMenu}>
-      <summary
-        aria-label={`Actiuni pentru ${task.companyName ?? task.title}`}
-        className={styles.taskActionMenuButton}
-        title="Actiuni"
-      >
-        <MoreHorizontal />
-      </summary>
-      <div className={styles.taskActionMenuPanel}>
-        {onComplete ? (
-          <Link className={styles.taskActionMenuItem} href={companyHref}>
-            <Building2 />
-            Vezi compania
-          </Link>
-        ) : null}
-
-        {!onComplete && task.dealId ? (
-          <Link
-            className={`${styles.taskActionMenuItem} ${styles.taskActionMenuItemPrimary}`}
-            href={`${routes.deals.path}/${task.dealId}`}
-          >
-            <Building2 />
-            Vezi deal-ul
-          </Link>
-        ) : null}
-
-        {onOpenNotes ? (
-          <button
-            className={`${styles.taskActionMenuItem} ${
-              hasNotes ? styles.taskActionMenuItemActive : ""
-            }`}
-            type="button"
-            onClick={() => onOpenNotes(task)}
-          >
-            <StickyNote />
-            {hasNotes ? "Vezi notes" : "Adauga notes"}
-          </button>
-        ) : null}
-
-        {onChangeCompanyStatus && task.companyId && !onComplete ? (
-          <>
-            <span className={styles.taskActionMenuLabel}>Schimba status</span>
-            {outcomeOptions.map((option) => (
-              <button
-                className={`${styles.taskActionMenuItem} ${
-                  task.companyStatus === companyStatusByOutcome[option.value]
-                    ? styles.taskActionMenuItemActive
-                    : ""
-                }`}
-                key={option.value}
-                type="button"
-                onClick={() =>
-                  onChangeCompanyStatus(
-                    task,
-                    companyStatusByOutcome[option.value],
-                    option.value,
-                  )
-                }
-              >
-                {option.label}
-              </button>
-            ))}
-          </>
-        ) : null}
-
-        {onComplete ? (
-          <button
-            className={styles.taskActionMenuItem}
-            type="button"
-            onClick={() => onComplete(task)}
-          >
-            <CheckCircle2 />
-            Completeaza
-          </button>
-        ) : null}
-      </div>
-    </details>
-  );
-}
-
 function TaskTypeBadge({ type }: { type: string }) {
-  const isInvestigation = type === "TO_INVESTIGATE";
-
   return (
-    <span
-      className={`${styles.taskTypeBadge} ${
-        isInvestigation ? styles.taskTypeBadgeInvestigation : ""
-      }`}
-    >
+    <span className={`${styles.taskTypeBadge} ${styles[`taskType${type}`] ?? ""}`}>
       {typeLabels[type] ?? type}
     </span>
   );
@@ -231,7 +82,7 @@ function OutcomeBadge({
 
   if (!option) {
     return (
-      <span className={`${styles.outcomeBadge} ${styles.outcomeNeutral}`}>
+      <span className={`${styles.outcomeBadge} ${styles.outcomeneutral}`}>
         Fara outcome
       </span>
     );
@@ -263,9 +114,5 @@ function ContactMethod({ task }: { task: TaskListItemDto }) {
     );
   }
 
-  return (
-    <span className={`${styles.contactMethod} ${styles.contactMethodMuted}`}>
-      -
-    </span>
-  );
+  return <span className={`${styles.contactMethod} ${styles.contactMethodMuted}`}>-</span>;
 }

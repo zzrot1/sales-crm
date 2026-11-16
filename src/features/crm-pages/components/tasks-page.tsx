@@ -5,9 +5,11 @@ import { CalendarClock, PhoneCall } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { DataHandler } from "orval-data-handler";
 
+import { usePermissions } from "@/core/permissions";
 import { useUpdateCompany } from "@/service-api/generated/endpoints/companies/companies";
 import {
   useCompleteCallTask,
+  useDeleteTask,
   useGenerateDailyCallTasks,
   useGetTasks,
   useGetTodaysTasks,
@@ -33,6 +35,7 @@ import { TasksProgressHeader } from "./tasks/tasks-progress-header";
 
 export function TasksPage() {
   const router = useRouter();
+  const { can } = usePermissions();
   const [selectedTask, setSelectedTask] = useState<TaskListItemDto | null>(null);
   const [selectedNotesTask, setSelectedNotesTask] =
     useState<TaskListItemDto | null>(null);
@@ -120,6 +123,15 @@ export function TasksPage() {
       onSuccess: () => resetNotesDialog(),
     },
   });
+
+  // Stergere logica pe server. Task-ul iese din liste din raspuns; deal-urile
+  // create din el si rapoartele se re-cer prin regula "tasks" din core/cache.
+  const deleteTaskMutation = useDeleteTask({
+    mutation: { meta: { successMessage: "Task-ul a fost sters." } },
+  });
+  const deleteTask = can("delete", "tasks")
+    ? (task: TaskListItemDto) => deleteTaskMutation.mutate({ taskId: task.id })
+    : undefined;
 
   const updateCompanyMutation = useUpdateCompany({
     mutation: { meta: { successMessage: "Statusul companiei a fost actualizat." } },
@@ -219,7 +231,7 @@ export function TasksPage() {
   };
 
   return (
-    <div className={styles.page}>
+    <div className={`${styles.page} ${styles.tasksPage}`}>
       <TasksProgressHeader
         completedCount={taskStats.completedCount}
         hasPendingTasks={taskStats.pendingTasks.length > 0}
@@ -241,6 +253,7 @@ export function TasksPage() {
           title="De facut"
           onComplete={openCompleteDialog}
           onChangeCompanyStatus={changeCompanyStatus}
+          onDelete={deleteTask}
           onOpenNotes={openNotesDialog}
         />
 
@@ -254,6 +267,7 @@ export function TasksPage() {
           tasks={taskStats.closedTasks}
           title="Inchise"
           onChangeCompanyStatus={changeCompanyStatus}
+          onDelete={deleteTask}
           onOpenNotes={openNotesDialog}
         />
       </section>

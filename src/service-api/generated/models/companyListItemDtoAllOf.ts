@@ -6,6 +6,25 @@
  */
 
 export type CompanyListItemDtoAllOf = {
+  /**
+   * In lei.
+   * @nullable
+   */
+  turnover: number | null;
+  /** @nullable */
+  employees: number | null;
+  /**
+   * Anul ultimului bilant salvat; `employees` si `turnover` sunt ale lui.
+   * @nullable
+   */
+  financialYear: number | null;
+  /** @nullable */
+  caenCode: string | null;
+  /**
+   * Din datele ANAF; `null` cat timp compania nu are CUI.
+   * @nullable
+   */
+  cui: string | null;
   /** @nullable */
   primaryContactJobTitle: string | null;
   /** @nullable */

@@ -2,6 +2,7 @@
 
 import styles from "./index.module.css";
 import { CompaniesDataTable } from "./companies/companies-data-table";
+import { CompanySegmentFilters } from "./companies/company-segment-filters";
 import { CompanySidePanel } from "./companies/company-side-panel";
 import { EditContactDialog } from "./companies/edit-contact-dialog";
 import { useCompaniesPage } from "../hooks/use-companies-page";
@@ -24,6 +25,7 @@ export function CompaniesPage() {
     page,
     saveContact,
     search,
+    segments,
     selectedCompany,
     setContactForm,
     setSelectedCompany,
@@ -35,8 +37,10 @@ export function CompaniesPage() {
   return (
     <div className={styles.page}>
       <section className={styles.tableCard}>
+        <CompanySegmentFilters segments={segments} />
         <CompaniesDataTable
           companies={companies}
+          emptyMessage={segments.emptyMessage}
           isError={companiesDataPage.isError}
           isFetching={companiesDataPage.isFetching}
           isLoading={companiesDataPage.isLoading}

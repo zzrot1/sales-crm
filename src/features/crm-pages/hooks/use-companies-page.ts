@@ -15,10 +15,12 @@ import {
 
 import type { ContactForm } from "../components/companies/edit-contact-dialog";
 import { CompaniesDataPage } from "../data-pages/companies-data-page";
+import { useCompanySegments } from "./use-company-segments";
 
 export function useCompaniesPage() {
   const list = useListState({ limit: 100, searchParam: "search" });
   const { can } = usePermissions();
+  const segments = useCompanySegments(() => list.setPage(1));
   const [selectedCompany, setSelectedCompany] =
     useState<CompanyListItemDto | null>(null);
   const [editingCompany, setEditingCompany] =
@@ -38,6 +40,7 @@ export function useCompaniesPage() {
       limit: list.limit,
       page: list.page,
       search: list.searchParamValue,
+      ...segments.params,
       sortBy: GetCompaniesSortBy.createdAt,
       sortOrder: GetCompaniesSortOrder.desc,
     }),
@@ -90,6 +93,7 @@ export function useCompaniesPage() {
     page: list.page,
     saveContact,
     search: list.search,
+    segments,
     selectedCompany,
     setContactForm,
     setSelectedCompany,

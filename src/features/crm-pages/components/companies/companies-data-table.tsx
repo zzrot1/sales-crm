@@ -9,11 +9,16 @@ import {
   companyStatusLabels,
   fallback,
   formatItTeam,
+  getIndustryGroup,
+  getItTeamTone,
+  industryGroups,
 } from "../../utils/company-helpers";
+import { formatCount, formatLei, suggestOffer } from "../../utils/intelligence-helpers";
 import { CompanyStatusBadge } from "./company-status-badge";
 
 type CompaniesDataTableProps = {
   companies: CompanyListItemDto[];
+  emptyMessage?: string;
   isError: boolean;
   isFetching: boolean;
   isLoading: boolean;
@@ -26,6 +31,7 @@ type CompaniesDataTableProps = {
 
 export function CompaniesDataTable({
   companies,
+  emptyMessage = "Nu exista companii importate inca.",
   isError,
   isFetching,
   isLoading,
@@ -49,14 +55,58 @@ export function CompaniesDataTable({
       },
       {
         canCollapse: true,
+        id: "employees",
+        header: "Angajati",
+        minWidth: 96,
+        width: 110,
+        cell: (company) => formatCount(company.employees),
+      },
+      {
+        canCollapse: true,
+        id: "turnover",
+        header: "Cifra de afaceri",
+        width: 150,
+        cell: (company) => (
+          <div className={styles.companyCell}>
+            <span>{formatLei(company.turnover)}</span>
+            {company.financialYear ? <small>in {company.financialYear}</small> : null}
+          </div>
+        ),
+      },
+      {
+        canCollapse: true,
+        id: "offer",
+        header: "Ce le propun",
+        width: 260,
+        cell: (company) => {
+          const suggestion = suggestOffer(company);
+
+          return suggestion ? (
+            <span title={suggestion.reason}>{suggestion.offer}</span>
+          ) : (
+            "-"
+          );
+        },
+      },
+      {
+        canCollapse: true,
         id: "industry",
         header: "Industrie",
+        // Se filtreaza dupa grupa, nu dupa textul liber din import.
         filter: {
-          getValue: (company) => company.industry,
+          getValue: (company) => getIndustryGroup(company.industry),
+          options: industryGroups.map((group) => ({ label: group, value: group })),
           placeholder: "Toate industriile",
           type: "select",
         },
-        cell: (company) => fallback(company.industry),
+        cell: (company) => (
+          <div className={styles.companyCell}>
+            <span>{fallback(getIndustryGroup(company.industry))}</span>
+            {company.industry ? (
+              <small title={company.industry}>{company.industry}</small>
+            ) : null}
+          </div>
+        ),
       },
       {
         canCollapse: true,
@@ -128,7 +178,11 @@ export function CompaniesDataTable({
           type: "select",
         },
         cell: (company) => (
-          <span className={styles.status}>{formatItTeam(company.hasItTeam)}</span>
+          <span
+            className={`${styles.status} ${styles.itTeamBadge} ${styles[getItTeamTone(company.hasItTeam)]}`}
+          >
+            {formatItTeam(company.hasItTeam)}
+          </span>
         ),
       },
       {
@@ -164,7 +218,7 @@ export function CompaniesDataTable({
     <DataTable
       columns={columns}
       data={companies}
-      emptyMessage="Nu exista companii importate inca."
+      emptyMessage={emptyMessage}
       getRowId={(company) => company.id}
       hasCollapsedColumns
       hasFixedColumns
@@ -172,7 +226,7 @@ export function CompaniesDataTable({
       isError={isError}
       isLoading={isLoading}
       loadingMessage="Se incarca companiile..."
-      minWidth="64rem"
+      minWidth="88rem"
       onRowClick={onSelectCompany}
       pagination={pagination}
       rowState={(company) =>

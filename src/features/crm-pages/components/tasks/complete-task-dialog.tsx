@@ -1,6 +1,5 @@
 import { LoaderCircle } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import type { CallOutcomeDto, TaskListItemDto } from "@/service-api/generated/models";
 
 import styles from "../index.module.css";
@@ -86,10 +85,15 @@ export function CompleteTaskDialog({
         ) : null}
 
         <div className={styles.dialogActions}>
-          <Button disabled={isSaving} type="button" onClick={onSave}>
-            {isSaving ? <LoaderCircle className={styles.spinner} /> : null}
+          <button
+            className={styles.button}
+            disabled={isSaving}
+            type="button"
+            onClick={onSave}
+          >
+            {isSaving ? <LoaderCircle className={styles.spinner} size={16} /> : null}
             Salveaza
-          </Button>
+          </button>
         </div>
       </section>
     </div>

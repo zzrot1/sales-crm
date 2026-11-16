@@ -4,6 +4,7 @@
  * sales-crm
  * OpenAPI spec version: 1.0.0
  */
+import type { CompanySizeDto } from './companySizeDto';
 import type { GetCompaniesSortBy } from './getCompaniesSortBy';
 import type { GetCompaniesSortOrder } from './getCompaniesSortOrder';
 
@@ -14,6 +15,11 @@ search?: string;
 searchCriterion?: string;
 industry?: string;
 ownerId?: number;
+size?: CompanySizeDto;
+/**
+ * `false` = inca nesunate (status NEW sau TO_CALL), `true` = restul.
+ */
+called?: boolean;
 sortBy?: GetCompaniesSortBy;
 sortOrder?: GetCompaniesSortOrder;
 };

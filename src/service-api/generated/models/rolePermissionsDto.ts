@@ -4,9 +4,10 @@
  * sales-crm
  * OpenAPI spec version: 1.0.0
  */
+import type { PermissionsByResourceDto } from './permissionsByResourceDto';
 import type { RolePermissionsDtoRole } from './rolePermissionsDtoRole';
 
 export interface RolePermissionsDto {
-  permissions: string[];
+  permissions: PermissionsByResourceDto;
   role: RolePermissionsDtoRole;
 }

@@ -8,7 +8,7 @@ import {
 
 export function CompanyStatusBadge({ status }: { status: CompanyDtoStatus }) {
   return (
-    <span className={`${styles.status} ${styles[companyStatusTones[status]]}`}>
+    <span className={`${styles.status} ${styles.companyStatusBadge} ${styles[companyStatusTones[status]]}`}>
       {companyStatusLabels[status]}
     </span>
   );

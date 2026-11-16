@@ -333,24 +333,104 @@
         },
         "type": "object"
       },
+      "ResourcePermissionsDto": {
+        "properties": {
+          "delete": {
+            "type": "boolean"
+          },
+          "update": {
+            "type": "boolean"
+          },
+          "create": {
+            "type": "boolean"
+          },
+          "read": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "delete",
+          "update",
+          "create",
+          "read"
+        ],
+        "type": "object"
+      },
+      "PermissionsByResourceDto": {
+        "properties": {
+          "tasks": {
+            "$ref": "#/components/schemas/ResourcePermissionsDto"
+          },
+          "deals": {
+            "$ref": "#/components/schemas/ResourcePermissionsDto"
+          },
+          "companies": {
+            "$ref": "#/components/schemas/ResourcePermissionsDto"
+          }
+        },
+        "required": [
+          "tasks",
+          "deals",
+          "companies"
+        ],
+        "type": "object"
+      },
       "RolePermissionsDto": {
         "properties": {
-          "permissions": { "items": { "type": "string" }, "type": "array" },
-          "role": { "type": "string", "enum": ["USER", "ADMIN"] }
+          "permissions": {
+            "$ref": "#/components/schemas/PermissionsByResourceDto"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "USER",
+              "ADMIN"
+            ]
+          }
         },
-        "required": ["permissions", "role"],
+        "required": [
+          "permissions",
+          "role"
+        ],
         "type": "object"
       },
       "PermissionMatrixDto": {
         "properties": {
           "roles": {
-            "items": { "$ref": "#/components/schemas/RolePermissionsDto" },
+            "items": {
+              "$ref": "#/components/schemas/RolePermissionsDto"
+            },
             "type": "array"
           },
-          "actions": { "items": { "type": "string" }, "type": "array" },
-          "resources": { "items": { "type": "string" }, "type": "array" }
+          "actions": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "read",
+                "create",
+                "update",
+                "delete"
+              ]
+            },
+            "type": "array"
+          },
+          "resources": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "companies",
+                "deals",
+                "tasks"
+              ]
+            },
+            "type": "array"
+          }
         },
-        "required": ["roles", "actions", "resources"],
+        "required": [
+          "roles",
+          "actions",
+          "resources"
+        ],
         "type": "object"
       },
       "DealsDealStageDto": {
@@ -808,16 +888,64 @@
       },
       "CompanyListItemDto": {
         "allOf": [
-          { "$ref": "#/components/schemas/CompanyDto" },
+          {
+            "$ref": "#/components/schemas/CompanyDto"
+          },
           {
             "properties": {
-              "primaryContactJobTitle": { "type": "string", "nullable": true },
-              "primaryContactPhone": { "type": "string", "nullable": true },
-              "primaryContactEmail": { "type": "string", "nullable": true },
-              "primaryContactName": { "type": "string", "nullable": true },
-              "primaryContactId": { "type": "string", "nullable": true }
+              "turnover": {
+                "type": "number",
+                "format": "double",
+                "nullable": true,
+                "description": "In lei."
+              },
+              "employees": {
+                "type": "number",
+                "format": "double",
+                "nullable": true
+              },
+              "financialYear": {
+                "type": "number",
+                "format": "double",
+                "nullable": true,
+                "description": "Anul ultimului bilant salvat; `employees` si `turnover` sunt ale lui."
+              },
+              "caenCode": {
+                "type": "string",
+                "nullable": true
+              },
+              "cui": {
+                "type": "string",
+                "nullable": true,
+                "description": "Din datele ANAF; `null` cat timp compania nu are CUI."
+              },
+              "primaryContactJobTitle": {
+                "type": "string",
+                "nullable": true
+              },
+              "primaryContactPhone": {
+                "type": "string",
+                "nullable": true
+              },
+              "primaryContactEmail": {
+                "type": "string",
+                "nullable": true
+              },
+              "primaryContactName": {
+                "type": "string",
+                "nullable": true
+              },
+              "primaryContactId": {
+                "type": "string",
+                "nullable": true
+              }
             },
             "required": [
+              "turnover",
+              "employees",
+              "financialYear",
+              "caenCode",
+              "cui",
               "primaryContactJobTitle",
               "primaryContactPhone",
               "primaryContactEmail",
@@ -827,6 +955,304 @@
             "type": "object"
           }
         ]
+      },
+      "CompanyRegistryDto": {
+        "properties": {
+          "syncedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isInactive": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "isVatPayer": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "county": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "legalForm": {
+            "type": "string",
+            "nullable": true
+          },
+          "tradeRegisterNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "registeredAt": {
+            "type": "string",
+            "nullable": true,
+            "description": "YYYY-MM-DD"
+          },
+          "registrationStatus": {
+            "type": "string",
+            "nullable": true,
+            "description": "Textul ANAF, ex: \"INREGISTRAT din data 29.08.2006\"."
+          },
+          "caenName": {
+            "type": "string",
+            "nullable": true
+          },
+          "caenCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "legalName": {
+            "type": "string",
+            "nullable": true
+          },
+          "cui": {
+            "type": "string",
+            "description": "Doar cifrele, fara prefixul \"RO\"."
+          }
+        },
+        "required": [
+          "syncedAt",
+          "isInactive",
+          "isVatPayer",
+          "county",
+          "address",
+          "legalForm",
+          "tradeRegisterNumber",
+          "registeredAt",
+          "registrationStatus",
+          "caenName",
+          "caenCode",
+          "legalName",
+          "cui"
+        ],
+        "type": "object"
+      },
+      "CompanyFinancialDto": {
+        "properties": {
+          "equity": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "totalDebts": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "employees": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "netProfit": {
+            "type": "number",
+            "format": "double",
+            "nullable": true,
+            "description": "Negativ = pierdere."
+          },
+          "turnover": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "year": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "required": [
+          "equity",
+          "totalDebts",
+          "employees",
+          "netProfit",
+          "turnover",
+          "year"
+        ],
+        "type": "object",
+        "description": "Indicatori din bilantul anual, in lei. `null` = lipseste din bilant."
+      },
+      "CompanyIntelligenceDto": {
+        "properties": {
+          "financials": {
+            "items": {
+              "$ref": "#/components/schemas/CompanyFinancialDto"
+            },
+            "type": "array",
+            "description": "Crescator dupa an."
+          },
+          "registry": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CompanyRegistryDto"
+              }
+            ],
+            "nullable": true,
+            "description": "`null` cat timp compania nu are CUI."
+          },
+          "companyId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "financials",
+          "registry",
+          "companyId"
+        ],
+        "type": "object"
+      },
+      "RefreshCompanyIntelligenceRequest": {
+        "properties": {
+          "cui": {
+            "type": "string",
+            "description": "Seteaza sau schimba CUI-ul. Fara el se foloseste cel deja salvat."
+          }
+        },
+        "type": "object"
+      },
+      "CompanySizeDto": {
+        "type": "string",
+        "enum": [
+          "small",
+          "medium",
+          "large",
+          "unknown"
+        ],
+        "description": "Dupa numarul mediu de salariati din ultimul bilant:\n`small` 5-10, `medium` 11-49, `large` 50+, `unknown` fara date ANAF."
+      },
+      "CuiCandidateDto": {
+        "properties": {
+          "matchesName": {
+            "type": "boolean",
+            "description": "Denumirea legala seamana cu numele companiei sau cu domeniul site-ului."
+          },
+          "county": {
+            "type": "string",
+            "nullable": true
+          },
+          "legalName": {
+            "type": "string",
+            "nullable": true
+          },
+          "cui": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "matchesName",
+          "county",
+          "legalName",
+          "cui"
+        ],
+        "type": "object"
+      },
+      "CuiDiscoveryReviewItemDto": {
+        "properties": {
+          "candidates": {
+            "items": {
+              "$ref": "#/components/schemas/CuiCandidateDto"
+            },
+            "type": "array"
+          },
+          "companyName": {
+            "type": "string"
+          },
+          "companyId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "candidates",
+          "companyName",
+          "companyId"
+        ],
+        "type": "object"
+      },
+      "CuiDiscoveryStatusDto": {
+        "properties": {
+          "error": {
+            "type": "string",
+            "nullable": true
+          },
+          "finishedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "notFound": {
+            "type": "number",
+            "format": "double",
+            "description": "Fara site sau fara niciun CUI valid pe el."
+          },
+          "needsReview": {
+            "items": {
+              "$ref": "#/components/schemas/CuiDiscoveryReviewItemDto"
+            },
+            "type": "array",
+            "description": "CUI gasit pe site, dar denumirea nu seamana: decide omul."
+          },
+          "saved": {
+            "type": "number",
+            "format": "double",
+            "description": "Din cele potrivite, cate au deja cifrele salvate."
+          },
+          "matched": {
+            "type": "number",
+            "format": "double",
+            "description": "CUI-uri potrivite sigur cu firma."
+          },
+          "websitesRead": {
+            "type": "number",
+            "format": "double",
+            "description": "Site-uri citite pana acum."
+          },
+          "total": {
+            "type": "number",
+            "format": "double",
+            "description": "Companii fara CUI la pornire."
+          },
+          "phase": {
+            "type": "string",
+            "enum": [
+              "websites",
+              "registry",
+              "latestYear",
+              "history",
+              null
+            ],
+            "nullable": true
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "idle",
+              "running",
+              "done",
+              "failed"
+            ]
+          }
+        },
+        "required": [
+          "error",
+          "finishedAt",
+          "startedAt",
+          "notFound",
+          "needsReview",
+          "saved",
+          "matched",
+          "websitesRead",
+          "total",
+          "phase",
+          "state"
+        ],
+        "type": "object"
       },
       "PagedCompaniesResponse": {
         "properties": {
@@ -1013,9 +1439,17 @@
       },
       "MeResponse": {
         "properties": {
-          "user": { "$ref": "#/components/schemas/AuthUserDto" }
+          "permissions": {
+            "$ref": "#/components/schemas/PermissionsByResourceDto"
+          },
+          "user": {
+            "$ref": "#/components/schemas/AuthUserDto"
+          }
         },
-        "required": ["user"],
+        "required": [
+          "permissions",
+          "user"
+        ],
         "type": "object"
       },
       "AuthToken": {
@@ -1654,6 +2088,40 @@
       }
     },
     "/tasks/{taskId}": {
+      "delete": {
+        "operationId": "DeleteTask",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskDto"
+                }
+              }
+            }
+          }
+        },
+        "description": "Stergere logica: task-ul ramane in baza de date, dar dispare din aplicatie,\nimpreuna cu deal-urile create din el.",
+        "tags": [
+          "Tasks"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "taskId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
       "patch": {
         "operationId": "UpdateTask",
         "responses": {
@@ -1661,50 +2129,44 @@
             "description": "Ok",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/TaskDto" }
+                "schema": {
+                  "$ref": "#/components/schemas/TaskDto"
+                }
               }
             }
           }
         },
-        "tags": ["Tasks"],
-        "security": [{ "bearerAuth": [] }],
+        "tags": [
+          "Tasks"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
             "name": "taskId",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/UpdateTaskRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTaskRequest"
+              }
             }
           }
         }
       }
     },
-    "/permissions/me": {
-      "get": {
-        "operationId": "GetMyPermissions",
-        "responses": {
-          "200": {
-            "description": "Ok",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/RolePermissionsDto" }
-              }
-            }
-          }
-        },
-        "tags": ["Permissions"],
-        "security": [{ "bearerAuth": [] }],
-        "parameters": []
-      }
-    },
-    "/permissions": {
+"/permissions": {
       "get": {
         "operationId": "GetPermissions",
         "responses": {
@@ -2028,19 +2490,29 @@
             "description": "Ok",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/CompanyDto" }
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyDto"
+                }
               }
             }
           }
         },
-        "tags": ["Companies"],
-        "security": [{ "bearerAuth": [] }],
+        "tags": [
+          "Companies"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/CreateCompanyRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/CreateCompanyRequest"
+              }
             }
           }
         }
@@ -2059,44 +2531,82 @@
             }
           }
         },
-        "tags": ["Companies"],
-        "security": [{ "bearerAuth": [] }],
+        "tags": [
+          "Companies"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "in": "query",
             "name": "page",
             "required": false,
-            "schema": { "format": "double", "type": "number" }
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
           },
           {
             "in": "query",
             "name": "limit",
             "required": false,
-            "schema": { "format": "double", "type": "number" }
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
           },
           {
             "in": "query",
             "name": "search",
             "required": false,
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           },
           {
             "in": "query",
             "name": "searchCriterion",
             "required": false,
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           },
           {
             "in": "query",
             "name": "industry",
             "required": false,
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           },
           {
             "in": "query",
             "name": "ownerId",
             "required": false,
-            "schema": { "format": "double", "type": "number" }
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/CompanySizeDto"
+            }
+          },
+          {
+            "description": "`false` = inca nesunate (status NEW sau TO_CALL), `true` = restul.",
+            "in": "query",
+            "name": "called",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
           },
           {
             "in": "query",
@@ -2104,14 +2614,24 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["createdAt", "name", "industry"]
+              "enum": [
+                "createdAt",
+                "name",
+                "industry"
+              ]
             }
           },
           {
             "in": "query",
             "name": "sortOrder",
             "required": false,
-            "schema": { "type": "string", "enum": ["asc", "desc"] }
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
           }
         ]
       }
@@ -2140,6 +2660,175 @@
             }
           }
         }
+      }
+    },
+    "/companies/{companyId}/intelligence": {
+      "get": {
+        "operationId": "GetCompanyIntelligence",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyIntelligenceDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Companies"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "companyId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "post": {
+        "operationId": "RefreshCompanyIntelligence",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyIntelligenceDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Companies"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "companyId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshCompanyIntelligenceRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/companies/cui-discovery": {
+      "get": {
+        "operationId": "GetCuiDiscovery",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CuiDiscoveryStatusDto"
+                }
+              }
+            }
+          }
+        },
+        "description": "Starea cautarii automate de CUI-uri.",
+        "tags": [
+          "Companies"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": []
+      },
+      "post": {
+        "operationId": "StartCuiDiscovery",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CuiDiscoveryStatusDto"
+                }
+              }
+            }
+          }
+        },
+        "description": "Porneste cautarea de CUI-uri pe site-urile firmelor fara CUI.",
+        "tags": [
+          "Companies"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": []
+      }
+    },
+    "/companies/{companyId}/cui-candidates": {
+      "get": {
+        "operationId": "GetCuiCandidates",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CuiCandidateDto"
+                  },
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        "description": "CUI-urile gasite pe site-ul companiei, verificate la ANAF.",
+        "tags": [
+          "Companies"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "companyId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
       }
     },
     "/companies/{companyId}": {

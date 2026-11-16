@@ -25,12 +25,16 @@ import type {
 
 import type {
   CompanyDto,
+  CompanyIntelligenceDto,
   CreateCompanyRequest,
+  CuiCandidateDto,
+  CuiDiscoveryStatusDto,
   GetCompaniesParams,
   ImportLeadsRequest,
   ImportLeadsResponse,
   PagedCompaniesResponse,
-  PartialCreateCompanyRequest
+  PartialCreateCompanyRequest,
+  RefreshCompanyIntelligenceRequest
 } from '../../models';
 
 import { apiFetch } from '../../../mutator/api-fetch';
@@ -272,7 +276,425 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
       return useMutation(mutationOptions, queryClient);
     }
-    export const getGetCompanyUrl = (companyId: string,) => {
+    export const getGetCompanyIntelligenceUrl = (companyId: string,) => {
+
+
+  
+
+  return `/companies/${companyId}/intelligence`
+}
+
+export const getCompanyIntelligence = async (companyId: string, options?: RequestInit): Promise<CompanyIntelligenceDto> => {
+  
+  return apiFetch<CompanyIntelligenceDto>(getGetCompanyIntelligenceUrl(companyId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetCompanyIntelligenceQueryKey = (companyId?: string,) => {
+    return [
+    'companies',companyId,'intelligence'
+    ] as const;
+    }
+
+    
+export const getGetCompanyIntelligenceQueryOptions = <TData = Awaited<ReturnType<typeof getCompanyIntelligence>>, TError = ErrorType<unknown>>(companyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompanyIntelligence>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCompanyIntelligenceQueryKey(companyId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCompanyIntelligence>>> = ({ signal }) => getCompanyIntelligence(companyId, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(companyId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCompanyIntelligence>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetCompanyIntelligenceQueryResult = NonNullable<Awaited<ReturnType<typeof getCompanyIntelligence>>>
+export type GetCompanyIntelligenceQueryError = ErrorType<unknown>
+
+
+export function useGetCompanyIntelligence<TData = Awaited<ReturnType<typeof getCompanyIntelligence>>, TError = ErrorType<unknown>>(
+ companyId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompanyIntelligence>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCompanyIntelligence>>,
+          TError,
+          Awaited<ReturnType<typeof getCompanyIntelligence>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCompanyIntelligence<TData = Awaited<ReturnType<typeof getCompanyIntelligence>>, TError = ErrorType<unknown>>(
+ companyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompanyIntelligence>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCompanyIntelligence>>,
+          TError,
+          Awaited<ReturnType<typeof getCompanyIntelligence>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCompanyIntelligence<TData = Awaited<ReturnType<typeof getCompanyIntelligence>>, TError = ErrorType<unknown>>(
+ companyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompanyIntelligence>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetCompanyIntelligence<TData = Awaited<ReturnType<typeof getCompanyIntelligence>>, TError = ErrorType<unknown>>(
+ companyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompanyIntelligence>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetCompanyIntelligenceQueryOptions(companyId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+export const getRefreshCompanyIntelligenceUrl = (companyId: string,) => {
+
+
+  
+
+  return `/companies/${companyId}/intelligence`
+}
+
+export const refreshCompanyIntelligence = async (companyId: string,
+    refreshCompanyIntelligenceRequest: RefreshCompanyIntelligenceRequest, options?: RequestInit): Promise<CompanyIntelligenceDto> => {
+  
+  return apiFetch<CompanyIntelligenceDto>(getRefreshCompanyIntelligenceUrl(companyId),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      refreshCompanyIntelligenceRequest,)
+  }
+);}
+
+
+
+
+export const useRefreshCompanyIntelligenceMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof refreshCompanyIntelligence>>, TError,{companyId: string;data: BodyType<RefreshCompanyIntelligenceRequest>}, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof refreshCompanyIntelligence>>, TError,{companyId: string;data: BodyType<RefreshCompanyIntelligenceRequest>}, TContext> => {
+
+const mutationKey = ['refreshCompanyIntelligence'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof refreshCompanyIntelligence>>, {companyId: string;data: BodyType<RefreshCompanyIntelligenceRequest>}> = (props) => {
+          const {companyId,data} = props ?? {};
+
+          return  refreshCompanyIntelligence(companyId,data,requestOptions)
+        }
+
+        const customOptions = useApiMutationOptions({...mutationOptions, mutationFn}, { url: `/companies/{companyId}/intelligence` }, { operationId: 'RefreshCompanyIntelligence', operationName: 'refreshCompanyIntelligence' });
+
+
+  return  customOptions}
+
+    export type RefreshCompanyIntelligenceMutationResult = NonNullable<Awaited<ReturnType<typeof refreshCompanyIntelligence>>>
+    export type RefreshCompanyIntelligenceMutationBody = BodyType<RefreshCompanyIntelligenceRequest>
+    export type RefreshCompanyIntelligenceMutationError = ErrorType<unknown>
+
+    export const useRefreshCompanyIntelligence = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof refreshCompanyIntelligence>>, TError,{companyId: string;data: BodyType<RefreshCompanyIntelligenceRequest>}, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof refreshCompanyIntelligence>>,
+        TError,
+        {companyId: string;data: BodyType<RefreshCompanyIntelligenceRequest>},
+        TContext
+      > => {
+
+      const mutationOptions = useRefreshCompanyIntelligenceMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
+ * Starea cautarii automate de CUI-uri.
+ */
+export const getGetCuiDiscoveryUrl = () => {
+
+
+  
+
+  return `/companies/cui-discovery`
+}
+
+export const getCuiDiscovery = async ( options?: RequestInit): Promise<CuiDiscoveryStatusDto> => {
+  
+  return apiFetch<CuiDiscoveryStatusDto>(getGetCuiDiscoveryUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetCuiDiscoveryQueryKey = () => {
+    return [
+    'companies','cui-discovery'
+    ] as const;
+    }
+
+    
+export const getGetCuiDiscoveryQueryOptions = <TData = Awaited<ReturnType<typeof getCuiDiscovery>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCuiDiscovery>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCuiDiscoveryQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCuiDiscovery>>> = ({ signal }) => getCuiDiscovery({ signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCuiDiscovery>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetCuiDiscoveryQueryResult = NonNullable<Awaited<ReturnType<typeof getCuiDiscovery>>>
+export type GetCuiDiscoveryQueryError = ErrorType<unknown>
+
+
+export function useGetCuiDiscovery<TData = Awaited<ReturnType<typeof getCuiDiscovery>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCuiDiscovery>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCuiDiscovery>>,
+          TError,
+          Awaited<ReturnType<typeof getCuiDiscovery>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCuiDiscovery<TData = Awaited<ReturnType<typeof getCuiDiscovery>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCuiDiscovery>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCuiDiscovery>>,
+          TError,
+          Awaited<ReturnType<typeof getCuiDiscovery>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCuiDiscovery<TData = Awaited<ReturnType<typeof getCuiDiscovery>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCuiDiscovery>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetCuiDiscovery<TData = Awaited<ReturnType<typeof getCuiDiscovery>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCuiDiscovery>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetCuiDiscoveryQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+/**
+ * Porneste cautarea de CUI-uri pe site-urile firmelor fara CUI.
+ */
+export const getStartCuiDiscoveryUrl = () => {
+
+
+  
+
+  return `/companies/cui-discovery`
+}
+
+export const startCuiDiscovery = async ( options?: RequestInit): Promise<CuiDiscoveryStatusDto> => {
+  
+  return apiFetch<CuiDiscoveryStatusDto>(getStartCuiDiscoveryUrl(),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
+
+
+export const useStartCuiDiscoveryMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startCuiDiscovery>>, TError,void, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof startCuiDiscovery>>, TError,void, TContext> => {
+
+const mutationKey = ['startCuiDiscovery'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof startCuiDiscovery>>, void> = () => {
+          
+
+          return  startCuiDiscovery(requestOptions)
+        }
+
+        const customOptions = useApiMutationOptions({...mutationOptions, mutationFn}, { url: `/companies/cui-discovery` }, { operationId: 'StartCuiDiscovery', operationName: 'startCuiDiscovery' });
+
+
+  return  customOptions}
+
+    export type StartCuiDiscoveryMutationResult = NonNullable<Awaited<ReturnType<typeof startCuiDiscovery>>>
+    
+    export type StartCuiDiscoveryMutationError = ErrorType<unknown>
+
+    export const useStartCuiDiscovery = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startCuiDiscovery>>, TError,void, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof startCuiDiscovery>>,
+        TError,
+        void,
+        TContext
+      > => {
+
+      const mutationOptions = useStartCuiDiscoveryMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
+ * CUI-urile gasite pe site-ul companiei, verificate la ANAF.
+ */
+export const getGetCuiCandidatesUrl = (companyId: string,) => {
+
+
+  
+
+  return `/companies/${companyId}/cui-candidates`
+}
+
+export const getCuiCandidates = async (companyId: string, options?: RequestInit): Promise<CuiCandidateDto[]> => {
+  
+  return apiFetch<CuiCandidateDto[]>(getGetCuiCandidatesUrl(companyId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetCuiCandidatesQueryKey = (companyId?: string,) => {
+    return [
+    'companies',companyId,'cui-candidates'
+    ] as const;
+    }
+
+    
+export const getGetCuiCandidatesQueryOptions = <TData = Awaited<ReturnType<typeof getCuiCandidates>>, TError = ErrorType<unknown>>(companyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCuiCandidates>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCuiCandidatesQueryKey(companyId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCuiCandidates>>> = ({ signal }) => getCuiCandidates(companyId, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(companyId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCuiCandidates>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetCuiCandidatesQueryResult = NonNullable<Awaited<ReturnType<typeof getCuiCandidates>>>
+export type GetCuiCandidatesQueryError = ErrorType<unknown>
+
+
+export function useGetCuiCandidates<TData = Awaited<ReturnType<typeof getCuiCandidates>>, TError = ErrorType<unknown>>(
+ companyId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCuiCandidates>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCuiCandidates>>,
+          TError,
+          Awaited<ReturnType<typeof getCuiCandidates>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCuiCandidates<TData = Awaited<ReturnType<typeof getCuiCandidates>>, TError = ErrorType<unknown>>(
+ companyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCuiCandidates>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCuiCandidates>>,
+          TError,
+          Awaited<ReturnType<typeof getCuiCandidates>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCuiCandidates<TData = Awaited<ReturnType<typeof getCuiCandidates>>, TError = ErrorType<unknown>>(
+ companyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCuiCandidates>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetCuiCandidates<TData = Awaited<ReturnType<typeof getCuiCandidates>>, TError = ErrorType<unknown>>(
+ companyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCuiCandidates>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetCuiCandidatesQueryOptions(companyId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+export const getGetCompanyUrl = (companyId: string,) => {
 
 
   

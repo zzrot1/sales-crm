@@ -11,7 +11,14 @@ import {
   LoaderCircle,
   Search,
 } from "lucide-react";
-import { type PointerEvent as ReactPointerEvent, type ReactNode, useMemo, useState } from "react";
+import {
+  type PointerEvent as ReactPointerEvent,
+  type ReactNode,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import {
   Table,
@@ -147,8 +154,32 @@ export function DataTable<TData>({
   rowState,
   search,
 }: DataTableProps<TData>) {
-  const [isColumnPanelOpen, setIsColumnPanelOpen] = useState(false);
-  const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
+  // Un singur panou deschis odata; click in afara barei sau Escape il inchide.
+  const [openPanel, setOpenPanel] = useState<"filters" | "columns" | null>(null);
+  const toolbarActionsRef = useRef<HTMLDivElement>(null);
+  const togglePanel = (panel: "filters" | "columns") =>
+    setOpenPanel((current) => (current === panel ? null : panel));
+
+  useEffect(() => {
+    if (!openPanel) return;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!toolbarActionsRef.current?.contains(event.target as Node)) {
+        setOpenPanel(null);
+      }
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpenPanel(null);
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [openPanel]);
   const [internalPage, setInternalPage] = useState(1);
   const [internalPageSize, setInternalPageSize] = useState(
     defaultPageSizeOptions[0],
@@ -299,13 +330,13 @@ export function DataTable<TData>({
             <span />
           )}
 
-          <div className={styles.toolbarActions}>
+          <div className={styles.toolbarActions} ref={toolbarActionsRef}>
             {filterableColumns.length ? (
               <div className={styles.columnMenu}>
                 <button
-                  aria-expanded={isFilterPanelOpen}
+                  aria-expanded={openPanel === "filters"}
                   className={styles.columnsButton}
-                  onClick={() => setIsFilterPanelOpen((open) => !open)}
+                  onClick={() => togglePanel("filters")}
                   type="button"
                 >
                   <Filter size={15} />
@@ -315,7 +346,7 @@ export function DataTable<TData>({
                   ) : null}
                   <ChevronDown size={14} />
                 </button>
-                {isFilterPanelOpen ? (
+                {openPanel === "filters" ? (
                   <div className={styles.filtersPanel}>
                     <div className={styles.filtersPanelHeader}>
                       <span>Filtre coloane</span>
@@ -364,16 +395,16 @@ export function DataTable<TData>({
             {hasCollapsedColumns && collapsibleColumns.length ? (
             <div className={styles.columnMenu}>
               <button
-                aria-expanded={isColumnPanelOpen}
+                aria-expanded={openPanel === "columns"}
                 className={styles.columnsButton}
-                onClick={() => setIsColumnPanelOpen((open) => !open)}
+                onClick={() => togglePanel("columns")}
                 type="button"
               >
                 <Columns3 size={15} />
                 Coloane
                 <ChevronDown size={14} />
               </button>
-              {isColumnPanelOpen ? (
+              {openPanel === "columns" ? (
                 <div className={styles.columnsPanel}>
                   {collapsibleColumns.map((column) => (
                     <label className={styles.columnToggle} key={column.id}>

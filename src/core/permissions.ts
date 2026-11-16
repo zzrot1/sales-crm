@@ -1,18 +1,22 @@
 "use client";
 
 import type { ApiResourceName } from "@/core/cache/api-data-handler";
-import { useGetMyPermissions } from "@/service-api/generated/endpoints/permissions/permissions";
+import { useMe } from "@/service-api/generated/endpoints/auth/auth";
+import type { PermissionsByResourceDto } from "@/service-api/generated/models";
 
 export type PermissionAction = "create" | "read" | "update" | "delete";
 
 /**
- * Formatul string-urilor din `RolePermissionsDto.permissions`.
- * Spec-ul le declara doar ca `string[]`, deci conventia sta aici — daca
- * backend-ul foloseste alt separator sau alta ordine, se schimba doar linia asta.
+ * Resursele fara drepturi proprii pe server. Contactele apartin companiilor,
+ * deci se modifica cu dreptul pe companii.
  */
-function toPermissionKey(action: PermissionAction, resource: ApiResourceName) {
-  return `${resource}:${action}`;
-}
+const permissionResourceFor: Partial<Record<ApiResourceName, keyof PermissionsByResourceDto>> =
+  {
+    companies: "companies",
+    contacts: "companies",
+    deals: "deals",
+    tasks: "tasks",
+  };
 
 /**
  * ```tsx
@@ -21,18 +25,22 @@ function toPermissionKey(action: PermissionAction, resource: ApiResourceName) {
  * <button disabled={!can("update", "companies")}>Editeaza</button>
  * ```
  *
- * Nu are nevoie de provider — react-query deduplica cererea, deci hook-ul poate
- * fi apelat in oricate componente cu un singur `GET /permissions/me` pe sesiune.
- * Cat timp se incarca, `can` intoarce `false`.
+ * Drepturile vin in `GET /auth/me`, ca `{ companies: { read, create, update,
+ * delete }, deals, tasks }`. React-query deduplica cererea, deci hook-ul poate
+ * fi apelat in oricate componente. Cat timp se incarca, `can` intoarce `false`.
  */
 export function usePermissions() {
-  const query = useGetMyPermissions();
-  const granted = query.data?.permissions ?? [];
+  const query = useMe();
+  const permissions = query.data?.permissions;
 
   return {
-    can: (action: PermissionAction, resource: ApiResourceName) =>
-      granted.includes(toPermissionKey(action, resource)),
+    can: (action: PermissionAction, resource: ApiResourceName) => {
+      const permissionResource = permissionResourceFor[resource];
+      return Boolean(
+        permissions && permissionResource && permissions[permissionResource][action],
+      );
+    },
     isLoading: query.isPending,
-    role: query.data?.role,
+    role: query.data?.user.role,
   };
 }

@@ -40,7 +40,7 @@ export function DealsPage() {
   };
 
   return (
-    <div className={styles.page}>
+    <div className={`${styles.page} ${styles.dealsPage}`}>
       {dealsQuery.isError ? (
         <p className={styles.formError}>Nu am putut incarca deal-urile.</p>
       ) : null}

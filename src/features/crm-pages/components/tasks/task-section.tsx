@@ -22,6 +22,7 @@ type TaskSectionProps = {
     outcome: CallOutcomeDto,
   ) => void;
   onComplete?: (task: TaskListItemDto) => void;
+  onDelete?: (task: TaskListItemDto) => void;
   onOpenNotes?: (task: TaskListItemDto) => void;
   subtitle: string;
   tasks: TaskListItemDto[];
@@ -36,6 +37,7 @@ export function TaskSection({
   isLoading,
   onChangeCompanyStatus,
   onComplete,
+  onDelete,
   onOpenNotes,
   subtitle,
   tasks,
@@ -79,6 +81,7 @@ export function TaskSection({
                   task={task}
                   onChangeCompanyStatus={onChangeCompanyStatus}
                   onComplete={onComplete}
+                  onDelete={onDelete}
                   onOpenNotes={onOpenNotes}
                 />
               ))

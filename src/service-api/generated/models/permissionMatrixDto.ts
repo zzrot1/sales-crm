@@ -5,9 +5,11 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { RolePermissionsDto } from './rolePermissionsDto';
+import type { PermissionMatrixDtoActionsItem } from './permissionMatrixDtoActionsItem';
+import type { PermissionMatrixDtoResourcesItem } from './permissionMatrixDtoResourcesItem';
 
 export interface PermissionMatrixDto {
   roles: RolePermissionsDto[];
-  actions: string[];
-  resources: string[];
+  actions: PermissionMatrixDtoActionsItem[];
+  resources: PermissionMatrixDtoResourcesItem[];
 }

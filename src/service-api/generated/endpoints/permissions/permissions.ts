@@ -20,8 +20,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  PermissionMatrixDto,
-  RolePermissionsDto
+  PermissionMatrixDto
 } from '../../models';
 
 import { apiFetch } from '../../../mutator/api-fetch';
@@ -29,99 +28,6 @@ import type { ErrorType } from '../../../mutator/api-fetch';
 
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
-
-
-
-export const getGetMyPermissionsUrl = () => {
-
-
-  
-
-  return `/permissions/me`
-}
-
-export const getMyPermissions = async ( options?: RequestInit): Promise<RolePermissionsDto> => {
-  
-  return apiFetch<RolePermissionsDto>(getGetMyPermissionsUrl(),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
-
-
-
-export const getGetMyPermissionsQueryKey = () => {
-    return [
-    'permissions','me'
-    ] as const;
-    }
-
-    
-export const getGetMyPermissionsQueryOptions = <TData = Awaited<ReturnType<typeof getMyPermissions>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMyPermissions>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getGetMyPermissionsQueryKey();
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMyPermissions>>> = ({ signal }) => getMyPermissions({ signal, ...requestOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMyPermissions>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetMyPermissionsQueryResult = NonNullable<Awaited<ReturnType<typeof getMyPermissions>>>
-export type GetMyPermissionsQueryError = ErrorType<unknown>
-
-
-export function useGetMyPermissions<TData = Awaited<ReturnType<typeof getMyPermissions>>, TError = ErrorType<unknown>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMyPermissions>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getMyPermissions>>,
-          TError,
-          Awaited<ReturnType<typeof getMyPermissions>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof apiFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetMyPermissions<TData = Awaited<ReturnType<typeof getMyPermissions>>, TError = ErrorType<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMyPermissions>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getMyPermissions>>,
-          TError,
-          Awaited<ReturnType<typeof getMyPermissions>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof apiFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetMyPermissions<TData = Awaited<ReturnType<typeof getMyPermissions>>, TError = ErrorType<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMyPermissions>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
-export function useGetMyPermissions<TData = Awaited<ReturnType<typeof getMyPermissions>>, TError = ErrorType<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMyPermissions>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetMyPermissionsQueryOptions(options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
-
-  return query;
-}
 
 
 

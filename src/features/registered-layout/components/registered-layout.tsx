@@ -85,6 +85,9 @@ export function RegisteredLayout({ children }: RegisteredLayoutProps) {
   const authUser = meQuery.data?.user;
   const userDisplayName = authUser?.name?.trim() || authUser?.email || "User";
   const userInitials = getUserInitials(userDisplayName);
+  // Pe pagina de task-uri modalul doar ar repeta ce e deja pe ecran.
+  const isOnTasksPage =
+    pathname === routes.tasks.path || pathname.startsWith(`${routes.tasks.path}/`);
   const activeItem = navGroups
     .flatMap((group) => group.items)
     .find((item) => pathname === item.href || pathname.startsWith(`${item.href}/`));
@@ -223,7 +226,7 @@ export function RegisteredLayout({ children }: RegisteredLayoutProps) {
         <main className={styles.main}>{children}</main>
       </div>
 
-      {ensureModalMessage ? (
+      {ensureModalMessage && !isOnTasksPage ? (
         <div className={styles.modalOverlay} role="presentation">
           <section
             aria-labelledby="daily-calls-modal-title"
@@ -237,7 +240,9 @@ export function RegisteredLayout({ children }: RegisteredLayoutProps) {
             <div className={styles.modalCopy}>
               <p className={styles.modalEyebrow}>Task-uri pending</p>
               <h2 id="daily-calls-modal-title">Ai call-uri de terminat</h2>
-              <p>{ensureModalMessage}</p>
+              <p>
+                Termina task-urile ramase ca sa primesti call-urile de azi.
+              </p>
             </div>
             <div className={styles.modalActions}>
               <button

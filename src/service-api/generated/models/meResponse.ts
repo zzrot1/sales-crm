@@ -4,8 +4,10 @@
  * sales-crm
  * OpenAPI spec version: 1.0.0
  */
+import type { PermissionsByResourceDto } from './permissionsByResourceDto';
 import type { AuthUserDto } from './authUserDto';
 
 export interface MeResponse {
+  permissions: PermissionsByResourceDto;
   user: AuthUserDto;
 }

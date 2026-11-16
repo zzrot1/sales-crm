@@ -47,6 +47,7 @@ export const companyStatusByValue: Record<
 export const typeLabels: Record<string, string> = {
   CALL: "Call",
   EMAIL: "Email",
+  MEETING: "Intalnire",
   TO_INVESTIGATE: "De verificat",
 };
 

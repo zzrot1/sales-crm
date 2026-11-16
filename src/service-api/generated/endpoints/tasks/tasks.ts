@@ -566,6 +566,74 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
       return useMutation(mutationOptions, queryClient);
     }
+    /**
+ * Stergere logica: task-ul ramane in baza de date, dar dispare din aplicatie,
+impreuna cu deal-urile create din el.
+ */
+export const getDeleteTaskUrl = (taskId: string,) => {
+
+
+  
+
+  return `/tasks/${taskId}`
+}
+
+export const deleteTask = async (taskId: string, options?: RequestInit): Promise<TaskDto> => {
+  
+  return apiFetch<TaskDto>(getDeleteTaskUrl(taskId),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
+
+
+export const useDeleteTaskMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteTask>>, TError,{taskId: string}, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteTask>>, TError,{taskId: string}, TContext> => {
+
+const mutationKey = ['deleteTask'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteTask>>, {taskId: string}> = (props) => {
+          const {taskId} = props ?? {};
+
+          return  deleteTask(taskId,requestOptions)
+        }
+
+        const customOptions = useApiMutationOptions({...mutationOptions, mutationFn}, { url: `/tasks/{taskId}` }, { operationId: 'DeleteTask', operationName: 'deleteTask' });
+
+
+  return  customOptions}
+
+    export type DeleteTaskMutationResult = NonNullable<Awaited<ReturnType<typeof deleteTask>>>
+    
+    export type DeleteTaskMutationError = ErrorType<unknown>
+
+    export const useDeleteTask = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteTask>>, TError,{taskId: string}, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteTask>>,
+        TError,
+        {taskId: string},
+        TContext
+      > => {
+
+      const mutationOptions = useDeleteTaskMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
     export const getUpdateTaskUrl = (taskId: string,) => {
 
 
